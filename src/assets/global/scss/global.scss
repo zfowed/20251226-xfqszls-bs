@@ -1,0 +1,39 @@
+// global.scss
+
+@import './fonts';
+
+html, body {
+  font-family: OPPOSans-B, OPPOSans-H, OPPOSans-L, OPPOSans-M, OPPOSans-R, "PingFang SC","Microsoft YaHei",Arial,sans-serif;
+}
+
+
+// Transition 默认淡入
+.v {
+  &-enter-from {
+    opacity: 0;
+  }
+
+  &-enter-active,
+  &-enter-to {
+    transition: opacity 1s;
+  }
+
+  &-leave-from,
+  &-leave-active,
+  &-leave-to {
+    display: none;
+  }
+}
+
+// Transition 淡入淡出
+.v-fade-enter-from, .v-fade-leave-to {
+  opacity: 0;
+}
+
+.v-fade-enter-active, .v-fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.v-fade-enter-to, .v-fade-leave-from {
+  opacity: 1;
+}

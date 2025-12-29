@@ -1,0 +1,29 @@
+html,
+body,
+.layout {
+  background: none !important;
+
+  &::before  {
+    background: none !important;
+  }
+}
+
+.container-load {
+  display: none !important;
+}
+
+.layout-header {
+  background: none !important;
+
+  .layout-header__title {
+    visibility: hidden;
+  }
+}
+
+.page-side__left {
+  background: none !important;
+}
+
+.page-side__right {
+  background: none !important;
+}

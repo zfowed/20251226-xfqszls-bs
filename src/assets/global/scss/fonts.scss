@@ -1,0 +1,50 @@
+
+// YouSheBiaoTiHei
+@import url('@zf-web-font/youshebiaotihei/style-cdn.scss');
+
+// Digital
+@import url('@zf-web-font/digital/style-cdn.scss');
+
+// Montserrat Ace
+@import url('@zf-web-font/montserrat-ace/style-cdn.scss');
+
+// 思源黑体 SourceHanSansCN
+@import url('@zf-web-font/sourcehansanscn/style-cdn.scss');
+
+// DIN Alternate Bold
+@font-face {
+	font-family: 'DIN Alternate Bold';
+	src: url('../font/DINAlternateBold.ttf') format('truetype');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+// DIN Condensed Bold
+@font-face {
+	font-family: 'DIN Condensed Bold';
+	src: url('../font/DINCondensedBold.ttf') format('truetype');
+	font-weight: 700;
+	font-style: normal;
+	font-display: swap;
+}
+
+// DIN Medium
+@font-face {
+	font-family: 'DIN Medium';
+	src: url('../font/DINMedium.ttf') format('truetype');
+	font-weight: 500;
+	font-style: normal;
+	font-display: swap;
+}
+
+// 胖棉正道标题体 PangMenZhengDao
+@font-face {
+	font-family: 'PangMenZhengDao';
+	src: url('../font/PangMenZhengDaoBiaoTiTi-1.ttf') format('truetype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+

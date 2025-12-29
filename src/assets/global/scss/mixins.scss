@@ -1,0 +1,22 @@
+// mixins.scss
+
+// 文本渐变
+@mixin text-gradient ($direction: to bottom, $before: #FFFEB2, $after: #FFCE2B) {
+  color: $after;
+  @supports (-webkit-background-clip: text) {
+    color: transparent;
+    font-weight: normal;
+    background: linear-gradient($direction, $before, $after);
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+// 文本n行溢出隐藏
+@mixin ellipsis ($clamp: 1) {
+  display: box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: $clamp;
+}
