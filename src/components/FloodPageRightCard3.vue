@@ -18,7 +18,7 @@
           :loop="true"
           :slides-per-view="1.9"
           :space-between="30"
-          :autoplay="{ delay: 300000 }"
+          :autoplay="{ delay: 3000 }"
           :centered-slides="true"
           class="swiper-section"
         >

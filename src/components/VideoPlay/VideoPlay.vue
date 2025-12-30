@@ -1,7 +1,7 @@
 <template>
   <div class="video" :class="`video--${props.ratio}`">
     <VideoPlayHls v-if="isUseHls" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" />
-    <video v-else-if="props.src" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" />
+    <video v-else-if="props.src" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" autoplay />
     <div v-else class="video__error">
       <span>{{ props.emptyText }}</span>
     </div>

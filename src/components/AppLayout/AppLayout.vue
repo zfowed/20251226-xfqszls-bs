@@ -289,7 +289,7 @@ provide('isPageScreenInit', isPageScreenInit)
   text-align: center;
   letter-spacing: 5px;
   z-index: 5;
-  margin-top: -20px;
+  margin-top: -60px;
 
   &.navbar-menu__active,
   &:hover {
