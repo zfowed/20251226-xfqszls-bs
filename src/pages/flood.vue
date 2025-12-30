@@ -1,12 +1,16 @@
 <template>
   <PageScreen>
     <template #left>
-      <div>123</div>
+      <FloodPageLeftCard1 class="mb-[50px]" />
+      <FloodPageLeftCard2 class="mb-[50px]" />
+      <FloodPageLeftCard3 />
     </template>
 
     <template #middle />
     <template #right>
-      <div>123</div>
+      <FloodPageRightCard1 class="mb-[50px]" />
+      <FloodPageRightCard2 class="mb-[50px]" />
+      <FloodPageRightCard3 />
     </template>
   </PageScreen>
 </template>

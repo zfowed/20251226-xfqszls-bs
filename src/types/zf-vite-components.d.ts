@@ -8,7 +8,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     '(2)': typeof import('./../components/SituationPageRightCard1 - 副本 (2).vue')['default']
-    '副本': typeof import('./../components/SituationPageRightCard1 - 副本.vue')['default']
+    '副本': typeof import('./../components/FloodPageRightCard2 - 副本.vue')['default']
     AppLayout: typeof import('./../components/AppLayout/AppLayout.vue')['default']
     CollectDetailInfo: typeof import('./../components/CollectDetailInfo/index.vue')['default']
     DeviceDetailsInfo: typeof import('./../components/DeviceDetailsInfo/index.vue')['default']
@@ -30,6 +30,12 @@ declare module 'vue' {
     EmergencyPageRight2: typeof import('./../components/EmergencyPageRight2.vue')['default']
     EmergencyPageRight3: typeof import('./../components/EmergencyPageRight3.vue')['default']
     EmergencyPageRight4: typeof import('./../components/EmergencyPageRight4.vue')['default']
+    FloodPageLeftCard1: typeof import('./../components/FloodPageLeftCard1.vue')['default']
+    FloodPageLeftCard2: typeof import('./../components/FloodPageLeftCard2.vue')['default']
+    FloodPageLeftCard3: typeof import('./../components/FloodPageLeftCard3.vue')['default']
+    FloodPageRightCard1: typeof import('./../components/FloodPageRightCard1.vue')['default']
+    FloodPageRightCard2: typeof import('./../components/FloodPageRightCard2.vue')['default']
+    FloodPageRightCard3: typeof import('./../components/FloodPageRightCard3.vue')['default']
     GaugeChart: typeof import('./../components/GaugeChart/GaugeChart.vue')['default']
     MessageDialog: typeof import('./../components/MessageDialog/index.vue')['default']
     MonitorList: typeof import('./../components/MonitorList/index.vue')['default']
@@ -63,6 +69,11 @@ declare module 'vue' {
     VideoPlay: typeof import('./../components/VideoPlay/VideoPlay.vue')['default']
     VideoPlayHls: typeof import('./../components/VideoPlay/VideoPlayHls.vue')['default']
     VueEcharts: typeof import('./../components/VueEcharts/VueEcharts.vue')['default']
+    WaterPageLeftCard1: typeof import('./../components/WaterPageLeftCard1.vue')['default']
+    WaterPageLeftCard2: typeof import('./../components/WaterPageLeftCard2.vue')['default']
+    WaterPageLeftCard3: typeof import('./../components/WaterPageLeftCard3.vue')['default']
+    WaterPageRightCard1: typeof import('./../components/WaterPageRightCard1.vue')['default']
+    WaterPageRightCard2: typeof import('./../components/WaterPageRightCard2.vue')['default']
     ZfApp: typeof import('zf-dbs')['ZfApp']
     ZfTweenNumber: typeof import('zf-dbs')['ZfTweenNumber']
   }

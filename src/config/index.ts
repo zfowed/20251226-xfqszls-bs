@@ -7,6 +7,7 @@ const config = defineAppConfig({
   appTitle: '可视化大屏',
   // 项目宽度，用于计算缩放比例，如果需要适配多个宽度
   appWidth: 9472,
+  appWidths: [9472, 4544],
   // 项目高度，用于计算缩放比例（非必要不要修改，通过修改宽度来适配）
   appHeight: 2556,
   // 是否使用缩放

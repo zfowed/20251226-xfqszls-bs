@@ -1,12 +1,15 @@
 <template>
   <PageScreen>
     <template #left>
-      <div>123</div>
+      <WaterPageLeftCard1 class="mb-[76px]" />
+      <WaterPageLeftCard2 class="mb-[76px]" />
+      <WaterPageLeftCard3 />
     </template>
 
     <template #middle />
     <template #right>
-      <div>123</div>
+      <WaterPageRightCard1 class="mb-[61px]" />
+      <WaterPageRightCard2 />
     </template>
   </PageScreen>
 </template>

@@ -48,14 +48,14 @@
       </div>
 
       <!-- 水源工程 -->
-      <div class="header-title mb-[25px]">
+      <div class="header-title mb-[15px]">
         <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
         <span>水源工程</span>
       </div>
 
       <img src="@/assets/global/images/preview/card-right1.png" class="mb-[25px]">
 
-      <div class="app-table mb-[25px]">
+      <div class="app-table mb-[35px]">
         <div class="table-header">
           <div class="sluice-btns" :class="{'active': item.active}" v-for="item in sluiceBtns" :key="item.id" @click="clickSluiceHandle(item)">
             <img :src="item.icon" class="mr-[20px]">
@@ -76,7 +76,7 @@
           </div>
         </div>
       </div>
-      <div class="app-table mb-[25px]">
+      <div class="app-table mb-[35px]">
         <div class="table-header">
           <div class="sluice-btns" :class="{'active': item.active}" v-for="item in sluiceBtns2" :key="item.id">
             <img :src="item.icon" class="mr-[20px]">
@@ -97,7 +97,7 @@
           </div>
         </div>
       </div>
-      <div class="app-table mb-[25px]">
+      <div class="app-table mb-[35px]">
         <div class="table-header">
           <div class="sluice-btns" :class="{'active': item.active}" v-for="item in sluiceBtns3" :key="item.id">
             <img :src="item.icon" class="mr-[20px]">

@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="水库信息" bg-class="left">
+  <PageCard title="未来24h水库水情" bg-class="left">
     <div class="page-container">
       <div class="grid grid-cols-3 gap-col-[29px]">
         <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
@@ -8,7 +8,11 @@
             <div class="reservoir-item__label">
               {{ item.name }}
             </div>
-            <div>
+            <div v-if="typeof item.value == 'string'">
+              <span class="text-[30px] mr-[8px]">{{ item.value }}</span>
+              <span class="text-[16px]">{{ item.unit }}</span>
+            </div>
+            <div v-else>
               <ZfTweenNumber :value="item.value" class="reservoir-item__value" />
               <span class="reservoir-item__unit">{{ item.unit }}</span>
             </div>
@@ -16,7 +20,7 @@
         </div>
       </div>
 
-      <div class="h-[448px] mt-[60px]">
+      <div class="h-[448px] mt-[50px]">
         <VueEcharts :option="echartOption" />
       </div>
     </div>
@@ -27,10 +31,14 @@
 import dayjs from 'dayjs'
 import { SeededRandom } from 'zf-utilz'
 
+const getPhotoUrl = (icon: string) => {
+  return new URL(`../assets/global/images/flood/${icon}.png`, import.meta.url).href
+}
+
 const reservoirInfo = ref<Record<string, any>>([
-  { name: '水位', value: 0, unit: 'm' },
-  { name: '入库流量', value: 0, unit: 'm3/s' },
-  { name: '出库流量', value: 0, unit: 'm3/s' }
+  { icon: getPhotoUrl('day-water-icon'), name: '当日供水', value: 0, unit: 'm' },
+  { icon: getPhotoUrl('watch-time-icon'), name: '监测时间', value: '', unit: '' },
+  { icon: getPhotoUrl('alarm-status-icon'), name: '警戒状态', value: 0, unit: 'm3/s' }
 ])
 
 const echartOption = ref({
@@ -233,7 +241,8 @@ usePolling(async () => {
   echartOption.value.series[2].data = arrList3
 
   reservoirInfo.value[0].value = SeededRandom.randomNumber(50, 150)
-  reservoirInfo.value[1].value = SeededRandom.randomNumber(0, 100)
+  reservoirInfo.value[1].value = dayjs().format('MM.DD')
+  reservoirInfo.value[1].unit = dayjs().format('HH:mm')
   reservoirInfo.value[2].value = SeededRandom.randomNumber(0, 100)
 })
 
@@ -241,7 +250,7 @@ usePolling(async () => {
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 45px 40px;
+  padding: 35px 40px;
 }
 
 .reservoir-item {

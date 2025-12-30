@@ -12,7 +12,7 @@
           <span>灌区概述</span>
           <span class="header-title__tag">西干果</span>
         </div>
-        <div class="h-[620px]">
+        <div class="h-[640px]">
           <PageTable :thead-col="theadCol" :data-list="dataList" :index="true" :limit-scroll="5">
             <template #index="scope">
               <div class="table-index">

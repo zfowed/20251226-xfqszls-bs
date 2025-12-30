@@ -130,8 +130,7 @@ usePolling(async () => {
   .today-weather__temp {
     font-size: 64px;
     color: #FFF;
-    font-weight: bold;
-    font-family: DINAlternate, sans-serif;
+    font-family: DINAlternateBold, sans-serif;
     text-shadow: 0 0 5px #56EBFF;
   }
 }

@@ -184,8 +184,7 @@ usePolling(async () => {
 
   .average-water__title {
     font-size: 28px;
-    font-weight: bold;
-    font-family: DINAlternate, sans-serif;
+    font-family: DINAlternateBold, sans-serif;
   }
 
   .average-water__label {

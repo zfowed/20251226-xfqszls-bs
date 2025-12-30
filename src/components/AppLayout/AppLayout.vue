@@ -30,7 +30,7 @@
     </div>
 
     <div class="layout-footer">
-      <div class="navbar-preview mr-[160px]" :class="{'navbar-preview__active': route.path === navbar.path}" v-for="navbar in menuList" :key="navbar.path" @click="navbarBtnHandle(navbar)">
+      <div class="navbar-menu" :class="{'navbar-menu__active': route.path === navbar.path}" v-for="navbar in menuList" :key="navbar.path" @click="navbarBtnHandle(navbar)">
         {{ navbar.name }}
       </div>
     </div>
@@ -248,13 +248,16 @@ provide('isPageScreenInit', isPageScreenInit)
 }
 
 .layout-footer {
-  position: relative;
-  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 65px;
+  display: grid;
+  grid-template-columns: repeat(4, auto);
   justify-content: center;
-  align-items: center;
+  column-gap: 160px;
   z-index: 2;
   flex: 0 0 134px;
-  width: 100%;
+  width: calc(100% - 130px);
   height: 134px;
 
   &::after {
@@ -270,7 +273,7 @@ provide('isPageScreenInit', isPageScreenInit)
   }
 }
 
-.navbar-preview {
+.navbar-menu {
   position: relative;
   width: 382.17px;
   height: 106.78px;
@@ -285,8 +288,9 @@ provide('isPageScreenInit', isPageScreenInit)
   text-align: center;
   letter-spacing: 5px;
   z-index: 5;
+  margin-top: -20px;
 
-  &.navbar-preview__active,
+  &.navbar-menu__active,
   &:hover {
     background: url('./assets/navbar/nav-active.png') no-repeat center center;
     color: #DBEEFF;
