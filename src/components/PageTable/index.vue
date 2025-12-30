@@ -1,11 +1,5 @@
 <template>
   <div class="table-container">
-    <div v-if="props.searchVisible" class="table-search">
-      <input v-model="searchValue" class="table-search__input" type="text" placeholder="请输入物资类型">
-      <span class="table-search__icon" @click="searchList">
-        <img src="./assets/search-icon.png">
-      </span>
-    </div>
     <div v-if="showHead" class="table-header">
       <div class="table-header__tr">
         <div v-if="props.index" class="w-[110px] text-center">
@@ -52,7 +46,6 @@
 type Props = {
   theadCol: {[key: string]:any}[],
   dataList: {[key: string]:any}[],
-  searchVisible?: boolean,
   showHead?: boolean,
   limitScroll?: number,
   index?: boolean
@@ -61,15 +54,9 @@ const props = withDefaults(defineProps<Props>(), {
   theadCol: () => [],
   dataList: () => [],
   showHead: true,
-  searchVisible: false,
   limitScroll: undefined,
   index: false
 })
-
-type Emits = {
-  (name: 'searchList', value:string):void
-}
-const emit = defineEmits<Emits>()
 
 let intervalValue = reactive({} as any)
 // 鼠标经过
@@ -123,15 +110,6 @@ watch(() => props.dataList?.length, () => {
 onUnmounted(() => {
   clearInterval(intervalValue)
 })
-
-// 列表查询事件
-const searchValue = ref('')
-const searchList = () => {
-  emit('searchList', searchValue.value)
-  if (tableBodyScroll.value) {
-    tableBodyScroll.value.scrollTop = 0
-  }
-}
 
 </script>
 
