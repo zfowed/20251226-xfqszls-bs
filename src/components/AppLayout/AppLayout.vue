@@ -248,16 +248,17 @@ provide('isPageScreenInit', isPageScreenInit)
 }
 
 .layout-footer {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 65px;
+  right: 65px;
   display: grid;
   grid-template-columns: repeat(4, auto);
   justify-content: center;
   column-gap: 160px;
   z-index: 2;
   flex: 0 0 134px;
-  width: calc(100% - 130px);
+  width: auto;
   height: 134px;
 
   &::after {
