@@ -1,7 +1,7 @@
 <template>
   <PageCard title="预警信息" bg-class="right">
     <div class="page-container">
-      <div class="mb-[40px] grid grid-cols-3 gap-col-[12px]">
+      <div class="air-temperature">
         <div class="weather-item warning">
           <div class="item-header">
             高温预警
@@ -9,7 +9,8 @@
           <div class="item-content">
             <div class="mb-[21px]">
               <span class="mr-[19px]">最高气温</span>
-              <ZfTweenNumber :value="weatherInfo.temperature.value" />
+              <span v-if="typeof weatherInfo.temperature.value === 'string'">{{ weatherInfo.temperature.value }}</span>
+              <ZfTweenNumber v-else :value="weatherInfo.temperature.value" />
               <span>{{ weatherInfo.temperature.unit }}</span>
             </div>
             <div>
@@ -23,7 +24,7 @@
           </div>
           <div class="item-content">
             <div class="mb-[21px]">
-              <span class="mr-[19px]">当前水位</span>
+              <span class="mr-[19px]">水位</span>
               <ZfTweenNumber :value="weatherInfo.supply.value" />
               <span>{{ weatherInfo.supply.unit }}</span>
             </div>
@@ -39,7 +40,8 @@
           <div class="item-content">
             <div class="mb-[21px]">
               <span class="mr-[19px]">上一次降雨</span>
-              <ZfTweenNumber :value="weatherInfo.rain.value" />
+              <span v-if="typeof weatherInfo.rain.value === 'string'">{{ weatherInfo.rain.value }}</span>
+              <ZfTweenNumber v-else :value="weatherInfo.rain.value" />
               <span>{{ weatherInfo.rain.unit }}</span>
             </div>
             <div>
@@ -52,31 +54,33 @@
       <div class="h-[510px] overflow-y-auto">
         <div class="dispatch-item" v-for="item in dataList" :key="item.id">
           <div class="dispatch-item__header">
-            <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
-            <span>{{ item.name }}</span>
+            <img
+              src="@/assets/global/images/card-title-icon.png"
+              class="w-[30px] h-[32px] mr-[9px]"
+            >
+            <span>{{ item.stnm }}</span>
           </div>
           <div class="dispatch-item__content">
             <div>
               <div class="mb-[10px]">
                 监测时间：
               </div>
-              <div>{{ item.datatime }}</div>
+              <div class="min-h-[44px]">
+                {{ item.tm }}
+              </div>
             </div>
             <div>
               <div class="mb-[10px]">
                 平均含水量：
               </div>
-              <div><ZfTweenNumber :value="item.average" />%</div>
+              <div><ZfTweenNumber :value="item.avgValue" />%</div>
             </div>
             <div>
               <div class="mb-[10px]">
                 预警状态：
               </div>
-              <div class="text-[#FF0A0A]" v-if="item.status === 'danger'">
-                红色预警
-              </div>
-              <div class="text-[#65EB2B]" v-else-if="item.status === 'success'">
-                正常
+              <div :class="item.msg === 'warning' ? 'text-[#FF4D4F]' : 'text-[#65EB2B]'">
+                {{ item.msg }}
               </div>
             </div>
           </div>
@@ -88,11 +92,9 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { SeededRandom } from 'zf-utilz'
-
 const dataList = ref<Record<string, any>>([])
 
-const weatherInfo = reactive({
+const weatherInfo = reactive<any>({
   temperature: {
     value: 0,
     unit: '℃',
@@ -111,20 +113,35 @@ const weatherInfo = reactive({
 })
 
 usePolling(async () => {
-  weatherInfo.temperature.value = SeededRandom.randomNumber(25, 40)
-  weatherInfo.temperature.datetime = dayjs().format('YYYY.MM.DD HH:mm')
-  weatherInfo.supply.value = SeededRandom.randomNumber(50, 150)
-  weatherInfo.supply.datetime = dayjs().format('YYYY.MM.DD HH:mm')
-  weatherInfo.rain.value = SeededRandom.randomNumber(0, 100)
-  weatherInfo.rain.datetime = dayjs().format('YYYY.MM.DD HH:mm')
-
-  const resultList = []
-  for (let i = 0; i < 6; i++) {
-    resultList.push({ id: i, name: `阿尔达${i + 1}`, datatime: dayjs().format('YYYY.MM.DD HH:mm'), average: SeededRandom.randomNumber(1, 150), status: i % 2 === 0 ? 'success' : 'danger' })
+  const result: any = await service.xfqs.getTemperatureAndPptnWarnInfoForBus({})
+  if (result.airTemperature.msg === '无') {
+    weatherInfo.temperature.value = '无'
+    weatherInfo.temperature.datetime = '--'
+    weatherInfo.temperature.unit = ''
+  } else {
+    // result.airTemperature.msg 有无高温预警，没有就显示无，有就显示红色的高温预警文字
+    // 最高气温
+    weatherInfo.temperature.value = Number(result.airTemperature.maxTemperature)
+    // 最高气温时间
+    weatherInfo.temperature.datetime = result.airTemperature.maxTime
+    weatherInfo.temperature.unit = '℃'
   }
-  dataList.value = resultList
-})
 
+  // 连续无雨日
+  // result.pptnData.PPTNSum1
+  // 上一次降雨量
+  weatherInfo.rain.value = result.pptnData.beforePptn.accp ? Number(result.pptnData.beforePptn.accp) : '--'
+  weatherInfo.rain.unit = result.pptnData.beforePptn.accp ? 'mm' : ''
+  // 上一次降雨时间
+  weatherInfo.rain.datetime = result.pptnData.beforePptn.tm
+
+  const resultRsvr: any = await service.xfqs.getRsvrWarnInfo({})
+  weatherInfo.supply.value = Number(resultRsvr.currntZ)
+  weatherInfo.supply.datetime = dayjs(resultRsvr.tm).format('YYYY-MM-DD HH:mm')
+
+  const resultSoilWarn: any = await service.xfqs.getSoilWarnInfo({})
+  dataList.value = resultSoilWarn.list
+})
 </script>
 
 <style lang="scss" scoped>
@@ -133,34 +150,47 @@ usePolling(async () => {
   overflow: hidden;
 }
 
-.weather-item {
-  display: flex;
-  flex-direction: column;
-  height: 183px;
-  background: url('@/assets/global/images/flood/weather-default.png') no-repeat center;
-  background-size: 100% 100%;
+.air-temperature {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 12px;
+  margin-bottom: 40px;
 
-  &.warning {
-    background: url('@/assets/global/images/flood/weather-warning.png') no-repeat center;
-    background-size: 100% 100%;
-  }
-
-  .item-header {
-    flex: 0 0 40px;
-    padding-left: 45px;
-    box-sizing: border-box;
-    font-size: 30px;
-  }
-
-  .item-content {
-    flex: 1;
+  .weather-item {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    font-family: PingFangSC, sans-serif;
-    font-size: 28px;
-    color: #FFF;
+    height: 183px;
+    flex: 0 0 268px;
+    margin-right: 12px;
+    background: url("@/assets/global/images/flood/weather-default.png") no-repeat center;
+    background-size: 100% 100%;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &.warning {
+      background: url("@/assets/global/images/flood/weather-warning.png") no-repeat center;
+      background-size: 100% 100%;
+    }
+
+    .item-header {
+      flex: 0 0 40px;
+      padding-left: 45px;
+      box-sizing: border-box;
+      font-size: 30px;
+    }
+
+    .item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: PingFangSC, sans-serif;
+      font-size: 28px;
+      color: #fff;
+    }
   }
 }
 
@@ -186,13 +216,13 @@ usePolling(async () => {
     padding: 0 30px;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(180deg, #1E5384 0%, #0084FF 100%);
+      background: linear-gradient(180deg, #1e5384 0%, #0084ff 100%);
       opacity: 0.52;
       z-index: -1;
     }
@@ -204,7 +234,7 @@ usePolling(async () => {
     padding: 29px 36px;
 
     &::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
@@ -215,5 +245,4 @@ usePolling(async () => {
     }
   }
 }
-
 </style>

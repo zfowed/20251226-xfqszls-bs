@@ -3,19 +3,22 @@
     <div class="page-container">
       <div v-for="item in dataList" :key="item.id" class="user-mb-30">
         <div class="header-title">
-          <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
-          <span>{{ item.title }}</span>
+          <img
+            src="@/assets/global/images/card-title-icon.png"
+            class="w-[30px] h-[32px] mr-[9px]"
+          >
+          <span>{{ item.workName }}</span>
         </div>
         <div class="flex items-center">
           <img src="@/assets/global/images/flood/safe-user-icon.png">
           <div class="user-aside">
             <div class="user-aside__title">
-              {{ item.name }}
+              {{ item.userName }}
             </div>
             <div class="mb-[4px]">
-              {{ item.position }}
+              {{ item.positionName }}
             </div>
-            <div>单位：{{ item.unit }}</div>
+            <div>单位：{{ item.deptName }}</div>
           </div>
         </div>
       </div>
@@ -27,28 +30,20 @@
 const dataList = ref<Record<string, any>[]>([])
 
 usePolling(async () => {
-  dataList.value = [
-    {
-      id: 1,
-      title: '技术负责人',
-      name: '杨启林',
-      position: '党委委员、副局长',
-      unit: '湖北省吴岭水库管理局'
-    }, {
-      id: 2,
-      title: '管理单位责任人',
-      name: '向华军',
-      position: '党委副书记、纪委书记',
-      unit: '湖北省吴岭水库管理局'
-    }
-  ]
-})
+  const result: any = await service.xfqs.queryMaterialManagerList({
+    pageNum: 1,
+    pageSize: 1000
+  })
 
+  dataList.value = result
+})
 </script>
 
 <style lang="scss" scoped>
 .page-container {
   padding: 30px 40px;
+  overflow: auto;
+  height: 564px;
 }
 
 .header-title {
@@ -56,7 +51,7 @@ usePolling(async () => {
   display: flex;
   align-items: center;
   font-size: 34px;
-  color: #FFF;
+  color: #fff;
   margin-bottom: 36px;
   font-family: DINMedium, sans-serif;
 }
@@ -64,13 +59,13 @@ usePolling(async () => {
 .user-aside {
   flex: 1;
   padding: 27px;
-  background: #215F9D;
+  background: #215f9d;
   font-size: 28px;
-  color: #81E6FF;
+  color: #81e6ff;
 
   &__title {
     font-size: 28px;
-    color: #C6F3FF;
+    color: #c6f3ff;
     margin-bottom: 8px;
     font-family: DINAlternateBold, sans-serif;
   }

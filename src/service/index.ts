@@ -8,9 +8,7 @@ for (const key of Object.keys(files)) {
 }
 
 export const service = <{
-  jnks: typeof import('./jnks')
-  hml: typeof import('./hml')
-  taurusfront: typeof import('./taurusfront')
+  xfqs: typeof import('./xfqs')
 }>modules
 
 export default service

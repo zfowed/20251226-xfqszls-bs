@@ -27,21 +27,21 @@
               <div class="mb-[9px]">
                 当日供水
               </div>
-              <div><ZfTweenNumber :value="item.day" />m3/s</div>
+              <div><ZfTweenNumber :value="item.daySupplyW === '' ? 0 : Number(item.daySupplyW)" />m3/s</div>
             </div>
             <div class="flex flex-col items-center">
               <img src="@/assets/global/images/water/month-water-icon.png" class="mb-[9px]">
               <div class="mb-[9px]">
                 当月供水
               </div>
-              <div><ZfTweenNumber :value="item.month" />m3/s</div>
+              <div><ZfTweenNumber :value="item.mthSupplyW === '' ? 0 : Number(item.mthSupplyW)" />m3/s</div>
             </div>
             <div class="flex flex-col items-center">
               <img src="@/assets/global/images/water/year-water-icon.png" class="mb-[9px]">
               <div class="mb-[9px]">
                 当年供水
               </div>
-              <div><ZfTweenNumber :value="item.year" />m3/s</div>
+              <div><ZfTweenNumber :value="item.yrSupplyW === '' ? 0 : Number(item.yrSupplyW)" />m3/s</div>
             </div>
           </div>
         </div>
@@ -51,7 +51,6 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
 
 const dataList = ref<Record<string, any>>([])
 
@@ -62,15 +61,12 @@ const reservoirInfo = ref<Record<string, any>>([
 ])
 
 usePolling(async () => {
-  const resultList = []
-  for (let i = 0; i < 6; i++) {
-    resultList.push({ id: i, name: '杨XX', day: SeededRandom.randomNumber(1, 150), month: SeededRandom.randomNumber(1, 150), year: SeededRandom.randomNumber(1, 150) })
-  }
-  dataList.value = resultList
+  const result: any = await service.xfqs.getGongshuiInfo({})
+  reservoirInfo.value[0].value = Number(result.data.dayTotalW)
+  reservoirInfo.value[1].value = Number(result.data.mthTotalW)
+  reservoirInfo.value[2].value = Number(result.data.yrTotalW)
 
-  reservoirInfo.value[0].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[1].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[2].value = SeededRandom.randomNumber(1, 150)
+  dataList.value = result.data.list
 })
 
 </script>

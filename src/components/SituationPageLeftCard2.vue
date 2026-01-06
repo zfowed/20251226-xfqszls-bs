@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="h-[448px] mt-[60px]">
+      <div class="h-[498px] mt-[60px]">
         <VueEcharts :option="echartOption" />
       </div>
     </div>
@@ -25,7 +25,6 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { SeededRandom } from 'zf-utilz'
 
 const reservoirInfo = ref<Record<string, any>>([
   { name: '水位', value: 0, unit: 'm' },
@@ -216,25 +215,35 @@ const echartOption = ref({
 })
 
 usePolling(async () => {
+  const stcdResult: any = await service.xfqs.findSinlgeRsvrData({ stcd: 'RV_001' })
+  reservoirInfo.value[0].value = stcdResult[0].z ? stcdResult[0].z : 0
+  reservoirInfo.value[1].value = stcdResult[0].q ? stcdResult[0].q : 0
+  reservoirInfo.value[2].value = stcdResult[0].otq ? stcdResult[0].otq : 0
+
+  const stepResult: any = await service.xfqs.getAllstep({
+    startTime: dayjs().format('YYYY-MM-DD 00:00:00'),
+    endTime: dayjs().format('YYYY-MM-DD 16:00:00'),
+    type: '1',
+    start: 1,
+    limit: 20,
+    stcd: 'RV_001'
+  })
+
   const nameKeys = []
   const arrList1 = []
   const arrList2 = []
   const arrList3 = []
-  for (let i = 0; i < 15; i++) {
-    const currentDay = dayjs().add(i + 1, 'day')
-    nameKeys.push(currentDay.format('MM.DD'))
-    arrList1.push(SeededRandom.randomNumber(50, 150))
-    arrList2.push(SeededRandom.randomNumber(50, 150))
-    arrList3.push(SeededRandom.randomNumber(50, 150))
+
+  for (const stepItem of stepResult.list) {
+    nameKeys.push(dayjs(stepItem.tm).format('HH:mm'))
+    arrList1.push(stepItem.z ? Number(stepItem.z) : 0)
+    arrList2.push(stepItem.q ? Number(stepItem.q) : 0)
+    arrList3.push(stepItem.otq ? Number(stepItem.otq) : 0)
   }
   echartOption.value.xAxis.data = nameKeys
   echartOption.value.series[0].data = arrList1
   echartOption.value.series[1].data = arrList2
   echartOption.value.series[2].data = arrList3
-
-  reservoirInfo.value[0].value = SeededRandom.randomNumber(50, 150)
-  reservoirInfo.value[1].value = SeededRandom.randomNumber(0, 100)
-  reservoirInfo.value[2].value = SeededRandom.randomNumber(0, 100)
 })
 
 </script>

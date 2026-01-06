@@ -3,7 +3,10 @@
     <div class="page-container">
       <div class="grid grid-cols-3 gap-col-[29px]">
         <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
-          <img src="@/assets/global/images/situation/reservoir-icon.png" class="reservoir-item__icon mr-[14px]">
+          <img
+            src="@/assets/global/images/situation/reservoir-icon.png"
+            class="reservoir-item__icon mr-[14px]"
+          >
           <div>
             <div class="reservoir-item__label">
               {{ item.name }}
@@ -20,7 +23,7 @@
         </div>
       </div>
 
-      <div class="h-[448px] mt-[50px]">
+      <div class="h-[428px] mt-[50px]">
         <VueEcharts :option="echartOption" />
       </div>
     </div>
@@ -29,7 +32,6 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { SeededRandom } from 'zf-utilz'
 
 const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/flood/${icon}.png`, import.meta.url).href
@@ -38,7 +40,7 @@ const getPhotoUrl = (icon: string) => {
 const reservoirInfo = ref<Record<string, any>>([
   { icon: getPhotoUrl('day-water-icon'), name: '当日供水', value: 0, unit: 'm' },
   { icon: getPhotoUrl('watch-time-icon'), name: '监测时间', value: '', unit: '' },
-  { icon: getPhotoUrl('alarm-status-icon'), name: '警戒状态', value: 0, unit: 'm3/s' }
+  { icon: getPhotoUrl('alarm-status-icon'), name: '警戒状态', value: '', unit: '' }
 ])
 
 const echartOption = ref({
@@ -56,11 +58,7 @@ const echartOption = ref({
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 8]
     },
-    data: [
-      { name: '水位', icon: 'rect' },
-      { name: '入库流量' },
-      { name: '出库流量' }
-    ]
+    data: [{ name: '水位', icon: 'rect' }, { name: '入库流量' }, { name: '出库流量' }]
   },
   grid: {
     top: '12%',
@@ -90,60 +88,60 @@ const echartOption = ref({
     },
     data: [] as string[]
   },
-  yAxis: [{
-    name: '水位（m)',
-    nameGap: 25,
-    type: 'value',
-    position: 'left',
-    offset: 10,
-    nameTextStyle: {
-      color: '#fff',
-      fontSize: 20
-    },
-    splitLine: {
-      show: true,
-      lineStyle: {
-        type: 'dashed',
-        color: 'rgba(217,231,255, 0.2)'
+  yAxis: [
+    {
+      name: '水位（m)',
+      nameGap: 25,
+      type: 'value',
+      position: 'left',
+      offset: 10,
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 20
+      },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          type: 'dashed',
+          color: 'rgba(217,231,255, 0.2)'
+        }
+      },
+      axisLabel: {
+        color: '#fff',
+        fontSize: 20,
+        fontFamily: 'PingFangSC, sans-serif'
+      },
+      axisTick: {
+        show: false
       }
     },
-    axisLabel: {
-      color: '#fff',
-      fontSize: 20,
-      fontFamily: 'PingFangSC, sans-serif'
-    },
-    axisTick: {
-      show: false
-    }
-  },
-  {
-    name: '流量（m³/s）',
-    nameGap: 25,
-    type: 'value',
-    position: 'right',
-    offset: 10,
-    // 保证柱子从 x 轴开始向上画，不会穿过 x 轴
-    min: 0,
-    nameTextStyle: {
-      color: '#fff',
-      fontSize: 20
-    },
-    splitLine: {
-      show: true,
-      lineStyle: {
-        type: 'dashed',
-        color: 'rgba(217,231,255, 0.2)'
+    {
+      name: '流量（m³/s）',
+      nameGap: 25,
+      type: 'value',
+      position: 'right',
+      // 保证柱子从 x 轴开始向上画，不会穿过 x 轴
+      min: 0,
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 20
+      },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          type: 'dashed',
+          color: 'rgba(217,231,255, 0.2)'
+        }
+      },
+      axisLabel: {
+        color: '#fff',
+        fontSize: 20,
+        fontFamily: 'PingFangSC, sans-serif'
+      },
+      axisTick: {
+        show: false
       }
-    },
-    axisLabel: {
-      color: '#fff',
-      fontSize: 20,
-      fontFamily: 'PingFangSC, sans-serif'
-    },
-    axisTick: {
-      show: false
     }
-  }
   ],
   series: [
     {
@@ -224,28 +222,39 @@ const echartOption = ref({
 })
 
 usePolling(async () => {
-  const nameKeys = []
-  const arrList1 = []
-  const arrList2 = []
-  const arrList3 = []
-  for (let i = 0; i < 15; i++) {
-    const currentDay = dayjs().add(i + 1, 'day')
-    nameKeys.push(currentDay.format('MM.DD'))
-    arrList1.push(SeededRandom.randomNumber(50, 150))
-    arrList2.push(SeededRandom.randomNumber(50, 150))
-    arrList3.push(SeededRandom.randomNumber(50, 150))
+  const warnInfoResult: any = await service.xfqs.getRsvrWarnInfo({})
+  reservoirInfo.value[0].value = Number(warnInfoResult.currntZ)
+  reservoirInfo.value[1].value = dayjs(warnInfoResult.tm).format('MM.DD')
+  reservoirInfo.value[1].unit = dayjs(warnInfoResult.tm).format('HH:mm')
+  reservoirInfo.value[2].value = warnInfoResult.msg
+
+  const pageResult: any = await service.xfqs.hsybForecastccFindPage({
+    start: 1,
+    limit: 1,
+    lx: 1
+  })
+  if (pageResult.list.length > 0) {
+    // 获取hsybForecastccFindPage 接口的第一个id，调用 hsybForecastccFindById 接口获取水库水情预测数据
+    const echartsResult: any = await service.xfqs.hsybForecastccFindById({
+      id: pageResult.list[0].id
+    })
+    const hsybForecastList = echartsResult.hsybForecastccDdfafExtList[0].hsybForecastcExtList[0].hsybForecastList
+    const nameKeys = []
+    const arrList1 = []
+    const arrList2 = []
+    const arrList3 = []
+    for (const hsybItem of hsybForecastList) {
+      nameKeys.push(dayjs(hsybItem.tm).format('MM.DD'))
+      arrList1.push(hsybItem.q)
+      arrList2.push(hsybItem.otq)
+      arrList3.push(hsybItem.z)
+    }
+    echartOption.value.xAxis.data = nameKeys
+    echartOption.value.series[0].data = arrList1
+    echartOption.value.series[1].data = arrList2
+    echartOption.value.series[2].data = arrList3
   }
-  echartOption.value.xAxis.data = nameKeys
-  echartOption.value.series[0].data = arrList1
-  echartOption.value.series[1].data = arrList2
-  echartOption.value.series[2].data = arrList3
-
-  reservoirInfo.value[0].value = SeededRandom.randomNumber(50, 150)
-  reservoirInfo.value[1].value = dayjs().format('MM.DD')
-  reservoirInfo.value[1].unit = dayjs().format('HH:mm')
-  reservoirInfo.value[2].value = SeededRandom.randomNumber(0, 100)
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -266,13 +275,12 @@ usePolling(async () => {
     font-family: Quantico, sans-serif;
     font-size: 32px;
     font-weight: bold;
-    color: #50FFFC;
+    color: #50fffc;
   }
 
   .reservoir-item__unit {
     font-size: 24px;
-    color: #BEEEFF;
+    color: #beeeff;
   }
 }
-
 </style>

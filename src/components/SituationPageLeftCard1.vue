@@ -44,7 +44,6 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { SeededRandom } from 'zf-utilz'
 
 const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/weather/${icon}.png`, import.meta.url).href
@@ -61,49 +60,35 @@ const todayWeather = ref<Record<string, any>>({
   humidity: 0
 })
 const weatherList = ref<Record<string, any>>([])
-const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-const iconArrList = [
-  {
-    name: '多云',
-    type: 'cloudy'
-  }, {
-    name: '晴',
-    type: 'sun'
-  },
-  {
-    name: '雷阵雨',
-    type: 'thunder'
-  }
-]
 usePolling(async () => {
-  // 今日天气
-  const randomWeather = iconArrList[SeededRandom.randomNumber(0, iconArrList.length - 1)]
-  todayWeather.value = {
-    date: '今日',
-    direction: '东南风',
-    weather: getPhotoUrl(randomWeather.type),
-    weatherText: randomWeather.name,
-    tempMin: SeededRandom.randomNumber(10, 24),
-    tempMax: SeededRandom.randomNumber(25, 30),
-    currentTemp: SeededRandom.randomNumber(15, 30),
-    humidity: SeededRandom.randomNumber(10, 100)
-  }
-
-  const resultList = []
-  for (let i = 0; i < 6; i++) {
-    const currentDay = dayjs().add(i + 1, 'day')
-    const randomWeather = iconArrList[SeededRandom.randomNumber(0, iconArrList.length - 1)]
-    resultList.push({
-      date: currentDay.format('MM-DD'),
-      week: weekMap[currentDay.day()],
-      weather: getPhotoUrl(randomWeather.type),
-      weatherText: randomWeather.name,
-      tempMin: SeededRandom.randomNumber(10, 24),
-      tempMax: SeededRandom.randomNumber(25, 30),
-      humidity: SeededRandom.randomNumber(10, 100)
+  const result: any = await service.xfqs.queryStationWeather({})
+  // 18:00时间戳： 1767693600000
+  // 未来一周天气
+  const dayWeatherList = []
+  for (const dayItem of result.predict.detail) {
+    dayWeatherList.push({
+      date: dayjs(dayItem.date).format('MM-DD'),
+      week: dayItem.week,
+      weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(dayItem.night.weather.info) : getPhotoUrl(dayItem.day.weather.info),
+      weatherText: dayItem.textDay,
+      tempMin: dayItem.night.weather.temperature,
+      tempMax: dayItem.day.weather.temperature,
+      humidity: dayItem.humidity
     })
   }
-  weatherList.value = resultList
+  weatherList.value = dayWeatherList.slice(1, 7)
+
+  // 今日天气
+  todayWeather.value = {
+    date: '今日',
+    direction: result.real.wind.direct,
+    weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(result.real.weather.info) : getPhotoUrl(result.real.weather.info),
+    weatherText: result.real.weather.info,
+    tempMin: result.predict.detail[0].night.weather.temperature,
+    tempMax: result.predict.detail[0].day.weather.temperature,
+    currentTemp: Math.round(result.real.weather.temperature),
+    humidity: result.real.weather.humidity
+  }
 })
 
 </script>

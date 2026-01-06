@@ -42,14 +42,12 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
 import dayjs from 'dayjs'
-
 const router = useRouter()
 const route = useRoute()
 
 const getPhotoUrl = (icon: string) => {
-  return new URL(`./assets/weather-icon/${icon}.png`, import.meta.url).href
+  return new URL(`../../assets/global/images/weather/${icon}.png`, import.meta.url).href
 }
 
 const menuList = reactive([
@@ -63,22 +61,14 @@ const navbarBtnHandle = (item: any) => {
   for (const menuItem of menuList) {
     if (menuItem.path === route.path) {
       menuItem.active = false
-
-      // ue.emit(menuItem.ueEvent, false)
+      ue.emit('menu', false, menuItem.name)
       break
     }
   }
   item.active = true
-  ue.emit(item.ueEvent, true)
+  ue.emit('menu', true, item.name)
   router.push(item.path)
 }
-
-const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
-const serverDateTime = ref<any>({
-  date: dayjs().format('YYYY-MM-DD'),
-  week: weekMap[dayjs().day()],
-  time: dayjs().format('HH:mm:ss')
-})
 
 const weatherInfo = reactive({
   min: 0,
@@ -86,13 +76,20 @@ const weatherInfo = reactive({
   text: '',
   icon: ''
 })
-onMounted(() => {
-  weatherInfo.min = SeededRandom.randomNumber(15, 35)
-  weatherInfo.max = SeededRandom.randomNumber(15, 35)
-  weatherInfo.text = '多云转晴'
-  weatherInfo.icon = getPhotoUrl('sun')
+usePolling(async () => {
+  const result: any = await service.xfqs.queryStationWeather({})
+  weatherInfo.min = result.predict.detail[0].night.weather.temperature
+  weatherInfo.max = result.predict.detail[0].day.weather.temperature
+  weatherInfo.text = result.real.weather.info
+  weatherInfo.icon = getPhotoUrl('晴')
 })
 
+const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
+const serverDateTime = ref<any>({
+  date: dayjs().format('YYYY-MM-DD'),
+  week: weekMap[dayjs().day()],
+  time: dayjs().format('HH:mm:ss')
+})
 useInterval(() => {
   serverDateTime.value.date = dayjs().format('YYYY.MM.DD')
   serverDateTime.value.time = dayjs().format('HH:mm:ss')
@@ -111,23 +108,23 @@ provide('isPageScreenInit', isPageScreenInit)
   height: 100%;
   overflow: hidden;
   font-size: 26px;
-  background: #010815 url("./assets/background.png") no-repeat center center;
+  background: #010815 url("./assets/background.jpeg") no-repeat center center;
   background-size: 100% 100%;
   box-sizing: border-box;
   padding: 0 65px;
 
-  &::before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: url("./assets/background-mask.png") no-repeat center center;
-    background-size: 100% 100%;
-    content: "";
-  }
+  // &::before {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   z-index: 1;
+  //   display: block;
+  //   width: 100%;
+  //   height: 100%;
+  //   background: url("./assets/background-mask.jpeg") no-repeat center center;
+  //   background-size: 100% 100%;
+  //   content: "";
+  // }
 
   .layout-left__border {
     position: absolute;

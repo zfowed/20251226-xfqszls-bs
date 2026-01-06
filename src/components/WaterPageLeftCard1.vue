@@ -3,7 +3,10 @@
     <div class="page-container">
       <div class="grid grid-cols-[auto_auto] justify-between gap-row-[63px]">
         <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
-          <img src="@/assets/global/images/situation/reservoir-icon.png" class="reservoir-item__icon mr-[14px]">
+          <img
+            src="@/assets/global/images/situation/reservoir-icon.png"
+            class="reservoir-item__icon mr-[14px]"
+          >
           <div>
             <div class="reservoir-item__label">
               {{ item.name }}
@@ -20,22 +23,23 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
 
 const reservoirInfo = ref<Record<string, any>>([
-  { name: '总降雨', value: 0, unit: 'mm' },
-  { name: '总来水量', value: 0, unit: 'mm' },
-  { name: '当前水库水位', value: 0, unit: 'mm' },
-  { name: '当前需水量', value: 0, unit: 'mm' }
+  { name: '当前水位', value: 0, unit: 'm' },
+  { name: '当前水量', value: 0, unit: '万m³' },
+  { name: '入库流量', value: 0, unit: 'm³/s' },
+  { name: '出库流量', value: 0, unit: 'm³/s' }
 ])
 
 usePolling(async () => {
-  reservoirInfo.value[0].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[1].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[2].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[3].value = SeededRandom.randomNumber(1, 150)
+  const result: any = await service.xfqs.findSinlgeRsvrData({
+    stcd: 'RV_001'
+  })
+  reservoirInfo.value[0].value = result[0].z ? result[0].z : 0
+  reservoirInfo.value[1].value = result[0].v ? result[0].v : 0
+  reservoirInfo.value[2].value = result[0].q ? result[0].q : 0
+  reservoirInfo.value[3].value = result[0].otq ? result[0].otq : 0
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -56,13 +60,12 @@ usePolling(async () => {
     font-family: Quantico, sans-serif;
     font-size: 32px;
     font-weight: bold;
-    color: #50FFFC;
+    color: #50fffc;
   }
 
   .reservoir-item__unit {
     font-size: 24px;
-    color: #BEEEFF;
+    color: #beeeff;
   }
 }
-
 </style>

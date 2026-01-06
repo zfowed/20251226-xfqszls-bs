@@ -3,11 +3,14 @@
     <div class="page-container">
       <!-- 渠系信息 -->
       <div class="header-title mb-[20px]">
-        <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+        <img
+          src="@/assets/global/images/card-title-icon.png"
+          class="w-[30px] h-[32px] mr-[9px]"
+        >
         <span>渠系信息</span>
       </div>
       <div class="ditch-main">
-        <div class="grid grid-cols-2 gap-[186px] mb-[40px] w-[697px]">
+        <div class="grid grid-cols-[auto_auto] justify-between mb-[40px] w-[697px]">
           <div class="ditch-total">
             <div class="ditch-total__label">
               数量
@@ -31,25 +34,41 @@
             <div class="ditch-total__bg" />
           </div>
         </div>
-        <div class="grid grid-cols-3 gap-col-[71px] gap-row-[48px]">
-          <div class="ditch-item" v-for="item in ditchList" :key="item.id">
-            <img :src="item.icon" class="w-[35px] h-[45px] mt-[20px] mb-[10px]">
-            <div class="ditch-item__title">
-              {{ item.name }}
-            </div>
-            <div class="flex items-baseline mb-[9px]">
-              <div class="ditch-item__value">
-                <ZfTweenNumber :value="item.value" />
+
+        <Swiper
+          :slides-per-view="1"
+          :grid="{ rows: 1, fill: 'row' }"
+          :modules="[Autoplay]"
+          :autoplay="{ delay: 3000 }"
+          :space-between="30"
+          class="mySwiper"
+        >
+          <SwiperSlide v-for="(group, groupIdx) in ditchList" :key="groupIdx">
+            <div class="grid grid-cols-3 gap-col-[71px] gap-row-[48px]">
+              <div class="ditch-item" v-for="item in group" :key="item.id">
+                <img :src="item.icon" class="w-[35px] h-[45px] mt-[20px] mb-[10px]">
+                <div class="ditch-item__title">
+                  {{ item.name }}
+                </div>
+                <div class="flex items-baseline mb-[9px]">
+                  <div class="ditch-item__value">
+                    <ZfTweenNumber :value="Number(item.len)" />
+                  </div>
+                  <span class="ditch-item__unit">km</span>
+                </div>
               </div>
-              <span class="ditch-item__unit">km</span>
             </div>
-          </div>
-        </div>
+          </SwiperSlide>
+        </Swiper>
+        <div class="my-swiper-pagination" />
       </div>
 
       <!-- 水源工程 -->
       <div class="header-title mb-[15px]">
-        <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+        <img
+          src="@/assets/global/images/card-title-icon.png"
+          class="w-[30px] h-[32px] mr-[9px]"
+        >
         <span>水源工程</span>
       </div>
 
@@ -57,9 +76,17 @@
 
       <div class="app-table mb-[35px]">
         <div class="table-header">
-          <div class="sluice-btns" :class="{'active': item.active}" v-for="item in sluiceBtns" :key="item.id" @click="clickSluiceHandle(item)">
+          <div
+            class="sluice-btns"
+            :class="{ active: item.active }"
+            v-for="item in sluiceBtns"
+            :key="item.id"
+            @click="clickSluiceHandle(item)"
+          >
             <img :src="item.icon" class="mr-[20px]">
-            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{ item.name }}</span>
+            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{
+              item.name
+            }}</span>
           </div>
         </div>
         <div class="table-tbody">
@@ -78,9 +105,16 @@
       </div>
       <div class="app-table mb-[35px]">
         <div class="table-header">
-          <div class="sluice-btns" :class="{'active': item.active}" v-for="item in sluiceBtns2" :key="item.id">
+          <div
+            class="sluice-btns"
+            :class="{ active: item.active }"
+            v-for="item in sluiceBtns2"
+            :key="item.id"
+          >
             <img :src="item.icon" class="mr-[20px]">
-            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{ item.name }}</span>
+            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{
+              item.name
+            }}</span>
           </div>
         </div>
         <div class="table-tbody">
@@ -99,9 +133,16 @@
       </div>
       <div class="app-table mb-[35px]">
         <div class="table-header">
-          <div class="sluice-btns" :class="{'active': item.active}" v-for="item in sluiceBtns3" :key="item.id">
+          <div
+            class="sluice-btns"
+            :class="{ active: item.active }"
+            v-for="item in sluiceBtns3"
+            :key="item.id"
+          >
             <img :src="item.icon" class="mr-[20px]">
-            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{ item.name }}</span>
+            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{
+              item.name
+            }}</span>
           </div>
         </div>
         <div class="table-tbody">
@@ -128,12 +169,18 @@
 
       <!-- 渠系建筑物 -->
       <div class="header-title mb-[25px]">
-        <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+        <img
+          src="@/assets/global/images/card-title-icon.png"
+          class="w-[30px] h-[32px] mr-[9px]"
+        >
         <span>渠系建筑物</span>
       </div>
       <div class="architecture-main">
         <div class="architecture-item" v-for="item in architectureList" :key="item.id">
-          <img src="@/assets/global/images/preview/architecture-icon.png" class="mr-[15px]">
+          <img
+            src="@/assets/global/images/preview/architecture-icon.png"
+            class="mr-[15px]"
+          >
           <div>
             <div class="architecture-item__title">
               {{ item.name }}
@@ -152,6 +199,13 @@
 </template>
 
 <script setup lang="ts">
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Autoplay } from 'swiper'
+// @ts-ignore: Swiper CSS has no type declarations
+import 'swiper/css'
+// @ts-ignore: Swiper CSS has no type declarations
+import 'swiper/css/grid'
+
 import { SeededRandom } from 'zf-utilz'
 
 const getPhotoUrl = (icon: string) => {
@@ -169,7 +223,8 @@ const ditchList = ref<Record<string, any>[]>([
   { id: 'ditch3', name: '姚店干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
   { id: 'ditch4', name: '百帅分水闸', value: 0, icon: getPhotoUrl('ditch-icon-2') },
   { id: 'ditch5', name: '张冲干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
-  { id: 'ditch6', name: '口口干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') }
+  { id: 'ditch6', name: '口口干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
+  { id: 'ditch7', name: '123干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') }
 ])
 
 // 水源工程
@@ -182,14 +237,14 @@ const sluiceList2 = ref<Record<string, any>[]>([
   { id: 'sluiceList2', name: '校核泄洪流量', value: 0, unit: 'm³/s' }
 ])
 const sluiceList3 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '设计流量 （东）', value: 0, unit: 'm³/s' },
-  { id: 'sluiceList2', name: '设计流量 （东）', value: 0, unit: 'm³/s' },
+  { id: 'sluiceList1', name: '设计流量（东）', value: 0, unit: 'm³/s' },
+  { id: 'sluiceList2', name: '设计流量（东）', value: 0, unit: 'm³/s' },
   { id: 'sluiceList1', name: '取水形式：', value: '', unit: '' },
   { id: 'sluiceList2', name: '闸板形式：', value: '', unit: '' }
 ])
 
 const triggerPolling = usePolling(async () => {
-  sluiceList1.value.forEach(item => {
+  sluiceList1.value.forEach((item) => {
     item.value = SeededRandom.randomNumber(0, 100)
   })
 })
@@ -203,10 +258,15 @@ const sluiceBtns2 = ref<Record<string, any>[]>([
   { id: 'sluice21', icon: getPhotoUrl('sluice-icon-1'), name: '泄洪闸', active: true }
 ])
 const sluiceBtns3 = ref<Record<string, any>[]>([
-  { id: 'sluice31', icon: getPhotoUrl('sluice-icon-1'), name: '东西干果渠首闸', active: true }
+  {
+    id: 'sluice31',
+    icon: getPhotoUrl('sluice-icon-1'),
+    name: '东西干果渠首闸',
+    active: true
+  }
 ])
 const clickSluiceHandle = (item: Record<string, any>) => {
-  sluiceBtns.value.forEach(btn => {
+  sluiceBtns.value.forEach((btn) => {
     btn.active = false
   })
   item.active = true
@@ -227,10 +287,28 @@ const architectureList = ref<Record<string, any>[]>([
 ])
 
 usePolling(async () => {
-  totalInfo.totalDitchCount = SeededRandom.randomNumber(0, 100)
-  totalInfo.totalDitchLength = SeededRandom.randomNumber(0, 100)
+  const ditchResult: any = await service.xfqs.getChannelCount({})
 
-  ditchList.value.forEach(item => {
+  totalInfo.totalDitchCount = ditchResult.size
+  totalInfo.totalDitchLength = ditchResult.allLen
+  if (ditchResult.channelList.length > 0) {
+    const processed = ditchResult.channelList.map((it: any, index: number) => {
+      return {
+        ...it,
+        icon: index === 3 ? getPhotoUrl('ditch-icon-2') : getPhotoUrl('ditch-icon-1')
+      }
+    })
+
+    // 分列处理
+    const groups = []
+    const perPage = 6 // 2行3列
+    for (let i = 0; i < processed.length; i += perPage) {
+      groups.push(processed.slice(i, i + perPage))
+    }
+    ditchList.value = groups
+  }
+
+  sluiceList2.value.forEach((item) => {
     item.value = SeededRandom.randomNumber(0, 100)
   })
 
@@ -239,11 +317,10 @@ usePolling(async () => {
   sluiceList3.value[2].value = '自流'
   sluiceList3.value[3].value = '手动启闭机'
 
-  architectureList.value.forEach(item => {
+  architectureList.value.forEach((item) => {
     item.value = SeededRandom.randomNumber(0, 100)
   })
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -256,7 +333,7 @@ usePolling(async () => {
   display: flex;
   align-items: center;
   font-size: 34px;
-  color: #FFF;
+  color: #fff;
   font-family: DINMedium, sans-serif;
 }
 
@@ -276,9 +353,9 @@ usePolling(async () => {
       line-height: 40px;
       padding: 0 12px;
       text-align: center;
-      color: #D1E4FF;
+      color: #d1e4ff;
       margin-right: 14px;
-      background: url('@/assets/global/images/preview/total-label-bg.png') no-repeat;
+      background: url("@/assets/global/images/preview/total-label-bg.png") no-repeat;
       background-size: 100% 100%;
       font-family: PangMenZhengDao, sans-serif;
       font-size: 20px;
@@ -289,9 +366,9 @@ usePolling(async () => {
       position: absolute;
       left: 4px;
       bottom: -10px;
-      width: calc(100% - 4px);
+      width: 104%;
       height: 100%;
-      background: url('@/assets/global/images/preview/total-line-bg.png') no-repeat;
+      background: url("@/assets/global/images/preview/total-line-bg.png") no-repeat;
       background-size: 100% 100%;
     }
   }
@@ -301,9 +378,9 @@ usePolling(async () => {
     flex-direction: column;
     align-items: center;
     height: 157px;
-    background: url('@/assets/global/images/preview/ditch-item-bg.png') no-repeat;
+    background: url("@/assets/global/images/preview/ditch-item-bg.png") no-repeat;
     background-size: 100% 100%;
-    color: #BEEEFF;
+    color: #beeeff;
     font-family: PingFangSC, sans-serif;
 
     &__title {
@@ -312,7 +389,7 @@ usePolling(async () => {
 
     &__value {
       font-size: 36px;
-      color: #50FFFC;
+      color: #50fffc;
       font-family: Quantico, sans-serif;
       margin-right: 5px;
       font-weight: bold;
@@ -331,7 +408,7 @@ usePolling(async () => {
     height: 78px;
     width: 100%;
     background: rgb(0 42 93 / 0.52);
-    border: 1px solid #92BBFF;
+    border: 1px solid #92bbff;
     border-bottom: none;
     padding: 0 20px;
     box-sizing: border-box;
@@ -342,11 +419,11 @@ usePolling(async () => {
     grid-template-columns: repeat(2, 1fr);
     width: 100%;
     background: rgb(48 142 212 / 0.58);
-    border: 1px solid #92BBFF;
+    border: 1px solid #92bbff;
     box-sizing: border-box;
 
     &__tr {
-      border-right: 1px solid #92BBFF;
+      border-right: 1px solid #92bbff;
 
       &:nth-child(2n) {
         border-right: none;
@@ -365,7 +442,7 @@ usePolling(async () => {
     cursor: pointer;
 
     &.active {
-      text-shadow: 0 0 3.6px #2BDFFF;
+      text-shadow: 0 0 3.6px #2bdfff;
     }
   }
 
@@ -382,12 +459,12 @@ usePolling(async () => {
       top: 50%;
       left: 30px;
       transform: translateY(-50%);
-      content: '';
+      content: "";
       width: 10px;
       height: 10px;
-      background: #03E6FF;
+      background: #03e6ff;
       border-radius: 50%;
-      box-shadow: 0 0 4px #03E6FF;
+      box-shadow: 0 0 4px #03e6ff;
     }
 
     &__title {
@@ -397,14 +474,14 @@ usePolling(async () => {
 
     &__value {
       font-size: 24px;
-      color: #50FFFC;
+      color: #50fffc;
       font-family: Quantico, sans-serif;
       font-weight: bold;
       margin: 0 15px;
     }
 
     &__unit {
-      color: #BEEEFF;
+      color: #beeeff;
       font-size: 24px;
     }
   }
@@ -428,7 +505,7 @@ usePolling(async () => {
 
     &__value {
       font-size: 28px;
-      color: #50FFFC;
+      color: #50fffc;
       font-family: Quantico, sans-serif;
       margin-right: 5px;
       font-weight: bold;
@@ -436,7 +513,7 @@ usePolling(async () => {
 
     &__unit {
       font-size: 20px;
-      color: #BEEEFF;
+      color: #beeeff;
     }
   }
 }

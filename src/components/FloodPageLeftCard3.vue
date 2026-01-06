@@ -2,9 +2,12 @@
   <PageCard title="重点水位预警" bg-class="left">
     <div class="page-container">
       <div class="ditch-main">
-        <div class="grid grid-cols-[auto_auto] justify-between mb-[40px] ">
+        <div class="grid grid-cols-[auto_auto] justify-between mb-[40px]">
           <div class="ditch-total">
-            <img src="@/assets/global/images/flood/danger-alarm-icon.png" class="relative top-[8px]">
+            <img
+              src="@/assets/global/images/flood/danger-alarm-icon.png"
+              class="relative top-[8px]"
+            >
             <div class="ditch-total__label">
               <span>预警</span>
               <ZfTweenNumber :value="totalInfo.danger" class="mx-[10px]" />
@@ -13,7 +16,10 @@
             <div class="ditch-total__bg" />
           </div>
           <div class="ditch-total">
-            <img src="@/assets/global/images/flood/success-alarm-icon.png" class="relative top-[8px]">
+            <img
+              src="@/assets/global/images/flood/success-alarm-icon.png"
+              class="relative top-[8px]"
+            >
             <div class="ditch-total__label">
               <span>正常</span>
               <ZfTweenNumber :value="totalInfo.success" class="mx-[10px]" />
@@ -27,13 +33,15 @@
         <PageTable :thead-col="theadCol" :data-list="dataList" :limit-scroll="4">
           <template #header-total="{ column }">
             <div class="flex flex-col items-center">
-              <div>{{ column.name }}<span class="text-[#BEEEFF] text-[24px]">mm</span></div>
+              <div>
+                {{ column.name }}<span class="text-[#BEEEFF] text-[24px]">mm</span>
+              </div>
             </div>
           </template>
-          <template #status="{ row }">
+          <template #warnStatus="{ row }">
             <div class="flex items-center justify-center w-full h-full">
-              <div :class="row.status === '正常' ? 'success-alarm' : 'danger-alarm'">
-                {{ row.status }}
+              <div :class="row.warnStatus === 0 ? 'success-alarm' : 'danger-alarm'">
+                {{ row.warnStatus === 0 ? "正常" : "预警" }}
               </div>
             </div>
           </template>
@@ -44,34 +52,31 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
-import { SeededRandom } from 'zf-utilz'
-
 const theadCol = ref([
   {
-    key: 'name',
+    key: 'stnm',
     name: '站点名称',
     width: 160
   },
   {
-    key: 'dateTime',
+    key: 'tmMin',
     name: '时间',
     width: 190,
     align: 'center'
   },
   {
-    key: 'total',
+    key: 'z',
     name: '水位',
     align: 'center'
   },
   {
-    key: 'status',
+    key: 'warnStatus',
     name: '预警',
     width: 130,
     align: 'center'
   }
 ])
-const dataList = ref<{[key:string]: any}[]>([])
+const dataList = ref<{ [key: string]: any }[]>([])
 
 const totalInfo = reactive({
   success: 0,
@@ -79,19 +84,15 @@ const totalInfo = reactive({
 })
 
 usePolling(async () => {
-  totalInfo.success = Math.floor(SeededRandom.random() * 50 + 50)
-  totalInfo.danger = Math.floor(SeededRandom.random() * 20 + 10)
-
-  const resultList = []
-  for (let i = 0; i < 15; i++) {
-    resultList.push({
-      name: `站点${i + 11}`,
-      dateTime: dayjs().format('MM-DD HH:mm'),
-      total: (SeededRandom.random() * 50 + 50).toFixed(2),
-      status: i % 2 === 0 ? '正常' : '预警'
-    })
+  const result: any = await service.xfqs.getZZWarnInfo({})
+  for (const item of result.dataList) {
+    if (item.warnStatus === 0) {
+      totalInfo.success += 1
+    } else if (item.warnStatus === 1) {
+      totalInfo.danger += 1
+    }
   }
-  dataList.value = resultList
+  dataList.value = result.dataList
 })
 </script>
 
@@ -105,8 +106,8 @@ usePolling(async () => {
   height: 40px;
   line-height: 40px;
   background: rgb(0 145 59 / 0.33);
-  color: #DEF0DC;
-  border: 1px solid #3FF83C
+  color: #def0dc;
+  border: 1px solid #3ff83c;
 }
 
 .danger-alarm {
@@ -114,8 +115,8 @@ usePolling(async () => {
   height: 40px;
   line-height: 40px;
   background: rgb(148 0 0 / 0.51);
-  color: #F0DCDC;
-  border: 1px solid #F83C3C
+  color: #f0dcdc;
+  border: 1px solid #f83c3c;
 }
 
 .ditch-main {
@@ -131,7 +132,12 @@ usePolling(async () => {
     display: flex;
     align-items: center;
     border-bottom: 3px solid transparent;
-    border-image: linear-gradient(to right, rgb(49 135 255 / 0.96), rgb(109 183 255 / 0.96)) 1;
+    border-image: linear-gradient(
+        to right,
+        rgb(49 135 255 / 0.96),
+        rgb(109 183 255 / 0.96)
+      )
+      1;
 
     .ditch-total__label {
       height: 67px;
@@ -146,7 +152,7 @@ usePolling(async () => {
       bottom: 0;
       width: 276px;
       height: 100%;
-      background: url('@/assets/global/images/flood/alarm-shadow.png') no-repeat;
+      background: url("@/assets/global/images/flood/alarm-shadow.png") no-repeat;
       background-size: 100% 100%;
     }
   }

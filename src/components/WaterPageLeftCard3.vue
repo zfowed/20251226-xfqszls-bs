@@ -5,10 +5,10 @@
         <div class="dispatch-item" v-for="item in dataList" :key="item.id">
           <div class="dispatch-item__header">
             <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
-            <span>{{ item.name }}</span>
+            <span>{{ item.ruleName }}</span>
           </div>
           <div class="dispatch-item__content">
-            <div>灌溉面积：<ZfTweenNumber :value="item.area" />亩</div>
+            <div>灌溉面积：<ZfTweenNumber :value="item.irrigateArea ? Number(item.irrigateArea) : 0" />亩</div>
             <div>灌溉总量：<ZfTweenNumber :value="item.total" />万m3</div>
           </div>
         </div>
@@ -18,16 +18,11 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
-
 const dataList = ref<Record<string, any>>([])
 
 usePolling(async () => {
-  const resultList = []
-  for (let i = 0; i < 6; i++) {
-    resultList.push({ id: i, name: `方案${i + 1}`, area: SeededRandom.randomNumber(1, 150), total: SeededRandom.randomNumber(1, 150) })
-  }
-  dataList.value = resultList
+  const result: any = await service.xfqs.getOptionConfigList({})
+  dataList.value = result.list
 })
 
 </script>

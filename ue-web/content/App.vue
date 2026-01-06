@@ -21,21 +21,21 @@
   height: 100%;
   overflow: hidden;
   font-size: 26px;
-  background: #010815 url("./assets/background.png") no-repeat center center;
+  background: #010815 url("./assets/background.jpeg") no-repeat center center;
   background-size: 100% 100%;
 
-  &::before {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: url("./assets/background-mask.png") no-repeat center center;
-    background-size: 100% 100%;
-    content: "";
-  }
+  // &::before {
+  //   position: absolute;
+  //   top: 0;
+  //   left: 0;
+  //   z-index: 1;
+  //   display: block;
+  //   width: 100%;
+  //   height: 100%;
+  //   background: url("./assets/background-mask.jpeg") no-repeat center center;
+  //   background-size: 100% 100%;
+  //   content: "";
+  // }
 }
 
 .layout-header {

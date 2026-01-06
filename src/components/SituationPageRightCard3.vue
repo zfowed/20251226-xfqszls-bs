@@ -19,6 +19,9 @@
 
 const monitorUrl = ref<string>('')
 usePolling(async () => {
+  const videoResult: any = await service.xfqs.getVideoStationList({})
+  console.log(videoResult)
+
   monitorUrl.value = 'https://media.w3.org/2010/05/sintel/trailer.mp4'
 })
 

@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="工程巡检" bg-class="right">
+  <PageCard title="水闸状态" bg-class="right">
     <div class="page-container">
       <div class="h-[640px]">
         <PageTable :thead-col="theadCol" :data-list="dataList" :limit-scroll="6">
@@ -10,7 +10,9 @@
             <span class="text-[#fff]">{{ scope.row.type }}</span>
           </template>
           <template #status="scope">
-            <span class="text-[#fff]">{{ scope.row.status }}</span>
+            <span class="text-[#fff]" v-if="scope.row.status === 'offline'">离线</span>
+            <span class="text-[#65eb2b]" v-else-if="scope.row.status === 'on'">开</span>
+            <span class="text-[#ff0a0a]" v-else-if="scope.row.status === 'off'">关</span>
           </template>
         </PageTable>
       </div>
@@ -19,21 +21,20 @@
 </template>
 
 <script setup lang="ts">
-
 const theadCol = ref([
   {
-    key: 'name',
+    key: 'stnm',
     name: '闸门'
   },
   {
-    key: 'code',
+    key: 'pipleNo',
     name: '桩号',
-    width: '220'
+    width: '150'
   },
   {
-    key: 'type',
-    name: '类型',
-    width: '150'
+    key: 'channelName',
+    name: '所属渠道',
+    width: '220'
   },
   {
     key: 'status',
@@ -41,25 +42,28 @@ const theadCol = ref([
     width: '100'
   }
 ])
-const dataList = ref<{[key:string]: any}[]>([])
+const dataList = ref<{ [key: string]: any }[]>([])
 usePolling(async () => {
-  const resultList = []
-  for (let i = 0; i < 20; i++) {
-    resultList.push({
-      name: `龚湾节制闸127${i + 1}`,
-      code: `ZMN-${1000 + i}`,
-      type: i % 2 === 0 ? '节制闸' : '节制闸',
-      status: i % 2 === 0 ? '开' : '关'
-    })
+  const result: any = await service.xfqs.getGatePageList({
+    start: 1,
+    limit: 1000,
+    sttp: 'DD'
+  })
+  for (const element of result.list) {
+    if (!element.gtophgt) {
+      element.status = 'offline'
+    } else if (element.gtophgt >= 0.1) {
+      element.status = 'on'
+    } else if (element.gtophgt < 0.1) {
+      element.status = 'off'
+    }
   }
-  dataList.value = resultList
+  dataList.value = result.list
 })
-
 </script>
 
 <style lang="scss" scoped>
 .page-container {
   padding: 35px 32px 32px;
 }
-
 </style>

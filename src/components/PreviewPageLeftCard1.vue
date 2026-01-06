@@ -34,7 +34,11 @@
           </div>
         </div>
         <div class="average-water__content">
-          <div v-for="item in dataList" :key="item.title" class="flex flex-col justify-center">
+          <div
+            v-for="item in dataList"
+            :key="item.title"
+            class="flex flex-col justify-center"
+          >
             <div class="average-water__label">
               {{ item.title }}
             </div>
@@ -79,13 +83,12 @@ const dataList = reactive([
 
 usePolling(async () => {
   let countTotal = 0
-  dataList.forEach(item => {
+  dataList.forEach((item) => {
     item.value = SeededRandom.randomNumber(200, 900)
     countTotal += item.value
   })
   completeRate.value = countTotal
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -97,7 +100,7 @@ usePolling(async () => {
   position: relative;
   display: flex;
   font-size: 34px;
-  color: #FFF;
+  color: #fff;
   margin-bottom: 36px;
   font-family: DINMedium, sans-serif;
 
@@ -110,7 +113,7 @@ usePolling(async () => {
     display: block;
     width: 100%;
     height: 100%;
-    background: url('@/assets/global/images/card-title-icon.png') no-repeat;
+    background: url("@/assets/global/images/card-title-icon.png") no-repeat;
     background-position: left center;
   }
 }
@@ -133,8 +136,8 @@ usePolling(async () => {
       margin: 0 8px;
       width: 14px;
       height: 14px;
-      background: #84A8B4;
-      box-shadow: 0 0 4px #98EEFF;
+      background: #84a8b4;
+      box-shadow: 0 0 4px #98eeff;
     }
 
     .swiper-pagination-bullet-active {
@@ -156,7 +159,6 @@ usePolling(async () => {
   :deep(.swiper-slide-next img) {
     clip-path: polygon(0 0, 86% 21%, 86% 82%, 0 100%);
   }
-
 }
 
 .average-water {
@@ -165,7 +167,7 @@ usePolling(async () => {
   width: 100%;
   box-sizing: border-box;
   padding: 30px 35px;
-  background: url('../assets/global/images/preview/water-total-bg.png') no-repeat;
+  background: url("../assets/global/images/preview/water-total-bg.png") no-repeat;
   background-size: 100% 100%;
 
   .average-water__header {
@@ -191,14 +193,15 @@ usePolling(async () => {
     position: relative;
     font-family: PIngFangSC, sans-serif;
     font-size: 30px;
-    text-shadow: 0 0 5px #56EBFF;
+    text-shadow: 0 0 5px #56ebff;
 
     &::after {
       position: absolute;
       top: 27px;
       left: 0;
       content: "";
-      background: url('../assets/global/images/preview/water-total-title-mask.png') no-repeat;
+      background: url("../assets/global/images/preview/water-total-title-mask.png")
+        no-repeat;
       background-size: 100% 100%;
       width: 133px;
       height: 9px;
@@ -206,7 +209,7 @@ usePolling(async () => {
   }
 
   .average-water__value {
-    color: #50FFFC;
+    color: #50fffc;
     font-size: 28px;
     font-weight: bold;
     font-family: Quantico, sans-serif;
@@ -214,7 +217,7 @@ usePolling(async () => {
   }
 
   .average-water__unit {
-    color: #BEEEFF;
+    color: #beeeff;
     font-size: 20px;
     font-family: PingFangSC, sans-serif;
   }

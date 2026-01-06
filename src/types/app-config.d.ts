@@ -11,11 +11,8 @@ declare module 'zf-dbs' {
 
   // 配置
   interface AppConfig {
-    jnksRequestBaseUrl: string,
-    hmlRequestBaseUrl: string,
-    taurusfrontRequestUrl: string,
-    taurusfrontRequestToken: string,
-    Authorization: string,
+    xfqxRequestUrl: string,
+    xfqxRequestToken: string,
   }
 }
 

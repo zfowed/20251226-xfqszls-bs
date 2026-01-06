@@ -1,45 +1,45 @@
 <template>
   <PageCard title="水库监测" bg-class="left">
     <div class="page-container">
-      <div class="h-[455px]">
+      <div class="h-[507px]">
         <PageTable :thead-col="theadCol" :data-list="dataList" :limit-scroll="5">
           <template #name="{ row }">
-            <div class="flex flex-col leading-[39.5px]">
-              <span>{{ row.nameMain }}</span>
-              <span class="text-[24px] text-[#BEEEFF]">{{ row.nameSub }}</span>
+            <div class="flex flex-col leading-[45.5px]">
+              <span>{{ row.stnm }}</span>
+              <span class="text-[24px] text-[#BEEEFF]">{{ row.stcd }}</span>
             </div>
           </template>
 
           <template #date="{ row }">
-            <div class="flex flex-col items-center leading-[39.5px]">
-              <span>{{ row.date }}</span>
-              <span class="text-[24px] text-[#BEEEFF]">{{ row.time }}</span>
+            <div class="flex flex-col items-center leading-[45.5px]">
+              <span>{{ row.tm ? dayjs(row.tm).format('MM.DD') : '' }}</span>
+              <span class="text-[24px] text-[#BEEEFF]">{{ row.tm ? dayjs(row.tm).format('HH:mm') : '' }}</span>
             </div>
           </template>
 
-          <template #header-opening="{ column }">
-            <div class="flex flex-col items-center leading-[39.5px]">
+          <template #header-gtophgt="{ column }">
+            <div class="flex flex-col items-center leading-[45.5px]">
               <span>{{ column.name }}</span>
               <span class="text-[#BEEEFF] text-[20px]">(mm)</span>
             </div>
           </template>
 
-          <template #header-waterBefore="{ column }">
-            <div class="flex flex-col items-center leading-[39.5px]">
+          <template #header-inz="{ column }">
+            <div class="flex flex-col items-center leading-[45.5px]">
               <span>{{ column.name }}</span>
               <span class="text-[#BEEEFF] text-[20px]">(m)</span>
             </div>
           </template>
 
-          <template #header-waterAfter="{ column }">
-            <div class="flex flex-col items-center leading-[39.5px]">
+          <template #header-otz="{ column }">
+            <div class="flex flex-col items-center leading-[45.5px]">
               <span>{{ column.name }}</span>
               <span class="text-[#BEEEFF] text-[20px]">(m)</span>
             </div>
           </template>
 
-          <template #header-size="{ column }">
-            <div class="flex flex-col items-center leading-[39.5px]">
+          <template #header-sq="{ column }">
+            <div class="flex flex-col items-center leading-[45.5px]">
               <span>{{ column.name }}</span>
               <span class="text-[#BEEEFF] text-[20px]">(m³/s)</span>
             </div>
@@ -52,7 +52,6 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
-import { SeededRandom } from 'zf-utilz'
 
 const theadCol = ref([
   {
@@ -67,43 +66,35 @@ const theadCol = ref([
     align: 'center'
   },
   {
-    key: 'opening',
+    key: 'gtophgt',
     name: '开度',
     align: 'center'
   },
   {
-    key: 'waterBefore',
+    key: 'inz',
     name: '闸前水位',
     align: 'center'
   },
   {
-    key: 'waterAfter',
+    key: 'otz',
     name: '闸后水位',
     align: 'center'
   },
   {
-    key: 'size',
+    key: 'sq',
     name: '流量',
     align: 'center'
   }
 ])
-const dataList = ref<{[key:string]: any}[]>([])
+const dataList = ref<{ [key: string]: any }[]>([])
 
 usePolling(async () => {
-  const resultList = []
-  for (let i = 0; i < 15; i++) {
-    resultList.push({
-      nameMain: `水库${i + 1}`,
-      nameSub: `编号${1000 + i + 1}`,
-      date: dayjs().format('MM.DD'),
-      time: dayjs().format('HH:mm'),
-      opening: SeededRandom.randomNumber(10, 100),
-      waterBefore: SeededRandom.randomNumber(5, 20),
-      waterAfter: SeededRandom.randomNumber(3, 15),
-      size: SeededRandom.randomNumber(10, 100)
-    })
-  }
-  dataList.value = resultList
+  const result: any = await service.xfqs.getGatePageList({
+    start: 1,
+    limit: 1000,
+    sttp: 'DD'
+  })
+  dataList.value = result.list
 })
 </script>
 

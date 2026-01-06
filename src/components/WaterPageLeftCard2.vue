@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="可供水量" bg-class="left">
+  <PageCard title="水库信息" bg-class="left">
     <div class="page-container">
       <div class="grid grid-cols-2 gap-col-[40px] mb-[70px]">
         <div class="total-banner user-shadow">
@@ -15,7 +15,10 @@
       </div>
       <div class="grid grid-cols-[auto_auto] justify-between gap-row-[63px]">
         <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
-          <img src="@/assets/global/images/water/reservoir-icon.png" class="reservoir-item__icon mr-[14px]">
+          <img
+            src="@/assets/global/images/water/reservoir-icon.png"
+            class="reservoir-item__icon mr-[14px]"
+          >
           <div>
             <div class="reservoir-item__label">
               {{ item.name }}
@@ -52,11 +55,14 @@ usePolling(async () => {
 
   const resultList = []
   for (let i = 0; i < 6; i++) {
-    resultList.push({ name: `巡检工程：${i + 1}`, value: SeededRandom.randomNumber(1, 150), unit: 'mm' })
+    resultList.push({
+      name: `巡检工程：${i + 1}`,
+      value: SeededRandom.randomNumber(1, 150),
+      unit: 'mm'
+    })
   }
   reservoirInfo.value = resultList
 })
-
 </script>
 
 <style lang="scss" scoped>
@@ -77,32 +83,31 @@ usePolling(async () => {
     font-family: Quantico, sans-serif;
     font-size: 32px;
     font-weight: bold;
-    color: #50FFFC;
+    color: #50fffc;
   }
 
   .reservoir-item__unit {
     font-size: 24px;
-    color: #BEEEFF;
+    color: #beeeff;
   }
 }
 
 .total-banner {
   height: 83px;
   line-height: 83px;
-  font-family: 'DIN Medium', sans-serif;
+  font-family: "DIN Medium", sans-serif;
   font-size: 30px;
   padding-left: 79px;
   box-sizing: border-box;
 
   &.user-shadow {
-    background: url('@/assets/global/images/water/user-shadow-bg.png') no-repeat center;
+    background: url("@/assets/global/images/water/user-shadow-bg.png") no-repeat center;
     background-size: 100% 100%;
   }
 
   &.ditch-shadow {
-    background: url('@/assets/global/images/water/ditch-shadow-bg.png') no-repeat center;
+    background: url("@/assets/global/images/water/ditch-shadow-bg.png") no-repeat center;
     background-size: 100% 100%;
   }
 }
-
 </style>

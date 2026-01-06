@@ -10,22 +10,18 @@
         <div class="header-title">
           <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
           <span>灌区概述</span>
-          <span class="header-title__tag">西干果</span>
+          <!-- <span class="header-title__tag">西干果</span> -->
         </div>
         <div class="h-[640px]">
-          <PageTable :thead-col="theadCol" :data-list="dataList" :index="true" :limit-scroll="5">
+          <PageTable :thead-col="currentType === 'ecology' ? theadCol2 : theadCol" :data-list="dataList" :index="true" :limit-scroll="7">
             <template #index="scope">
               <div class="table-index">
                 {{ scope.index }}
               </div>
             </template>
-            <template #effective="scope">
-              <ZfTweenNumber :value="scope.row.effective" />
-              <span class="text-[24px] text-[#BEEEFF] ml-[14px]">万亩</span>
-            </template>
-            <template #actual="scope">
-              <ZfTweenNumber :value="scope.row.actual" />
-              <span class="text-[24px] text-[#BEEEFF] ml-[14px]">万亩</span>
+            <template #area="scope">
+              <ZfTweenNumber :value="Number(scope.row.area)" />
+              <span class="text-[24px] text-[#BEEEFF] ml-[14px]">亩</span>
             </template>
           </PageTable>
         </div>
@@ -35,8 +31,9 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
+// import { SeededRandom } from 'zf-utilz'
 
+const currentType = ref<string>('agriculture')
 const btnsList = reactive([
   { label: '农业灌溉供水', value: 'agriculture', active: true },
   { label: '城镇生活供水', value: 'town', active: false },
@@ -47,6 +44,7 @@ const clickOperationHandle = (item: Record<string, any>) => {
     btnsItem.active = false
   })
   item.active = true
+  currentType.value = item.value
   tablePolling.trigger()
 }
 
@@ -56,28 +54,43 @@ const theadCol = ref([
     name: '灌区名称'
   },
   {
-    key: 'effective',
-    name: '有效灌溉面积'
+    key: 'area',
+    name: '灌溉面积'
+  }
+])
+
+const theadCol2 = ref([
+  {
+    key: 'stw',
+    name: '生态水量（万m³）'
   },
   {
-    key: 'actual',
-    name: '实灌面积'
+    key: 'time',
+    name: '日期'
   }
 ])
 const dataList = ref<{[key:string]: any}[]>([])
 
 const tablePolling = usePolling(async () => {
-  const resultList = []
-  for (let i = 0; i < 20; i++) {
-    resultList.push({
-      name: `灌区${i + 1}`,
-      effective: `${SeededRandom.randomNumber(4, 20)}`,
-      actual: `${SeededRandom.randomNumber(4, 20)}`
-    })
+  // const resultList = []
+  // for (let i = 0; i < 20; i++) {
+  //   resultList.push({
+  //     name: `灌区${i + 1}`,
+  //     effective: `${SeededRandom.randomNumber(4, 20)}`,
+  //     actual: `${SeededRandom.randomNumber(4, 20)}`
+  //   })
+  // }
+  let result: any = []
+  if (currentType.value === 'agriculture') {
+    result = await service.xfqs.findWaterUserList({})
+  } else if (currentType.value === 'ecology') {
+    result = await service.xfqs.getFactoryRealData({})
+  } else if (currentType.value === 'town') {
+    result = []
   }
-  dataList.value = resultList
-})
 
+  dataList.value = result.list || []
+})
 </script>
 
 <style lang="scss" scoped>
