@@ -41,7 +41,7 @@
           :modules="[Autoplay]"
           :autoplay="{ delay: 3000 }"
           :space-between="30"
-          class="mySwiper"
+          class="h-[362px]"
         >
           <SwiperSlide v-for="(group, groupIdx) in ditchList" :key="groupIdx">
             <div class="grid grid-cols-3 gap-col-[71px] gap-row-[48px]">
@@ -217,15 +217,7 @@ const totalInfo = reactive({
   totalDitchCount: 0,
   totalDitchLength: 0
 })
-const ditchList = ref<Record<string, any>[]>([
-  { id: 'ditch1', name: '幸福渠主干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
-  { id: 'ditch2', name: '支城干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
-  { id: 'ditch3', name: '姚店干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
-  { id: 'ditch4', name: '百帅分水闸', value: 0, icon: getPhotoUrl('ditch-icon-2') },
-  { id: 'ditch5', name: '张冲干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
-  { id: 'ditch6', name: '口口干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') },
-  { id: 'ditch7', name: '123干渠', value: 0, icon: getPhotoUrl('ditch-icon-1') }
-])
+const ditchList = ref<Record<string, any>[]>([])
 
 // 水源工程
 const sluiceList1 = ref<Record<string, any>[]>([

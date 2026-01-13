@@ -96,6 +96,8 @@ usePolling(async () => {
 <style lang="scss" scoped>
 .page-container {
   padding: 45px 40px;
+  height: 465px;
+  box-sizing: border-box;
 }
 
 .today-weather {
