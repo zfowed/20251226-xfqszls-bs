@@ -327,7 +327,7 @@ async function getLongWaterHandle () {
       .el-select__icon {
         width: 30px;
         height: 30px;
-        background: url('@/assets/floor/preview/guide-triangle.svg') no-repeat;
+        background: url('@/assets/global/images/flood/guide-triangle.png') no-repeat;
         background-size: 100%;
       }
     }

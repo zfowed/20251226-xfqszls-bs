@@ -7,10 +7,7 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    '副本': typeof import('./../components/VideoPlay/VideoPlayHls - 副本.vue')['default']
     AppLayout: typeof import('./../components/AppLayout/AppLayout.vue')['default']
-    ElButton: typeof import('element-plus/es')['ElButton']
-    ElDialog: typeof import('element-plus/es')['ElDialog']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
     ElSelect: typeof import('element-plus/es')['ElSelect']
