@@ -75,7 +75,7 @@ const dataListTiggle = usePolling(async () => {
 
 function downloadFile (file: any) {
   const link = document.createElement('a')
-  link.href = file.filePath
+  link.href = import.meta.env.VITE_DOWNLOAD_FILE_URL + file.filePath
   link.download = file.fileName
   document.body.appendChild(link)
   link.click()
