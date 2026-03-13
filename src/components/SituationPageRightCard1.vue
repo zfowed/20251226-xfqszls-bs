@@ -1,26 +1,26 @@
 <template>
   <PageCard title="工程巡检" bg-class="right">
     <div class="page-container">
-      <div class="ditch-main">
-        <div class="grid grid-cols-2 gap-[106px] mb-[70px] ">
+      <div class="ditch-main mb-[40px]">
+        <div class="grid grid-cols-2 gap-[106px] mb-[50px] ">
           <div class="ditch-total">
             <div class="ditch-total__label">
               巡查
             </div>
             <div class="mt-[10px]">
-              <span>年巡查次数</span>
-              <ZfTweenNumber :value="totalInfo.totalDitchCount" class="mx-[10px]" />
+              <span>计划巡查次数</span>
+              <ZfTweenNumber :value="totalInfo.planitchCount" class="mx-[10px]" />
               <span>次</span>
             </div>
             <div class="ditch-total__bg" />
           </div>
           <div class="ditch-total">
             <div class="ditch-total__label">
-              养护
+              巡查
             </div>
             <div class="mt-[10px]">
-              <span>年养护次数</span>
-              <ZfTweenNumber :value="totalInfo.totalDitchLength" class="mx-[10px]" />
+              <span>已经巡查次数</span>
+              <ZfTweenNumber :value="totalInfo.doneDitchCount" class="mx-[10px]" />
               <span>次</span>
             </div>
             <div class="ditch-total__bg" />
@@ -30,17 +30,48 @@
           <VueEcharts :option="echartOption" />
         </div>
       </div>
+      <div class="ditch-main">
+        <div class="grid grid-cols-2 gap-[106px] mb-[50px] ">
+          <div class="ditch-total">
+            <div class="ditch-total__label">
+              巡查
+            </div>
+            <div class="mt-[10px]">
+              <span>巡查上报事件</span>
+              <ZfTweenNumber :value="totalInfo.reportEventCount" class="mx-[10px]" />
+              <span>件</span>
+            </div>
+            <div class="ditch-total__bg" />
+          </div>
+          <div class="ditch-total">
+            <div class="ditch-total__label">
+              巡查
+            </div>
+            <div class="mt-[10px]">
+              <span>巡查处理事件</span>
+              <ZfTweenNumber :value="totalInfo.disposeEventCount" class="mx-[10px]" />
+              <span>件</span>
+            </div>
+            <div class="ditch-total__bg" />
+          </div>
+        </div>
+        <div class="h-[343px]">
+          <VueEcharts :option="echartOption2" />
+        </div>
+      </div>
     </div>
   </PageCard>
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
+import dayjs from 'dayjs'
 
 // 渠系信息
 const totalInfo = reactive({
-  totalDitchCount: 0,
-  totalDitchLength: 0
+  planitchCount: 0,
+  doneDitchCount: 0,
+  reportEventCount: 0,
+  disposeEventCount: 0
 })
 
 const echartOption = ref({
@@ -60,8 +91,8 @@ const echartOption = ref({
       padding: [0, 0, 0, 8]
     },
     data: [
-      { name: '巡检', icon: 'rect' },
-      { name: '养护', icon: 'rect' }
+      { name: '未巡', icon: 'rect' },
+      { name: '已巡', icon: 'rect' }
     ]
   },
   grid: {
@@ -121,7 +152,7 @@ const echartOption = ref({
   ],
   series: [
     {
-      name: '巡检',
+      name: '未巡',
       data: [] as any,
       type: 'bar',
       smooth: true,
@@ -142,7 +173,7 @@ const echartOption = ref({
       }
     },
     {
-      name: '养护',
+      name: '已巡',
       data: [] as any,
       type: 'bar',
       smooth: true,
@@ -165,20 +196,172 @@ const echartOption = ref({
   ]
 })
 
+const echartOption2 = ref({
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    top: 0,
+    left: 'center',
+    itemWidth: 30,
+    itemHeight: 10,
+    itemGap: 62,
+    textStyle: {
+      color: '#FFFFFF',
+      fontSize: 20,
+      fontFamily: 'PingFangSC, sans-serif',
+      padding: [0, 0, 0, 8]
+    },
+    data: [
+      { name: '上报问题', icon: 'rect' },
+      { name: '处理问题', icon: 'rect' }
+    ]
+  },
+  grid: {
+    top: '12%',
+    left: '3%',
+    right: '3%',
+    bottom: '5%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    // 柱状图建议留左右间距，避免柱子超出坐标系
+    // boundaryGap: false,
+    axisTick: {
+      show: false
+    },
+    offset: 15,
+    axisLine: {
+      lineStyle: {
+        type: 'solid',
+        color: 'rgba(179,223,255, 0.5)'
+      }
+    },
+    axisLabel: {
+      color: '#fff',
+      fontSize: 18,
+      fontFamily: 'PingFangSC, sans-serif'
+    },
+    data: [] as string[]
+  },
+  yAxis: {
+    type: 'value',
+    position: 'left',
+    offset: 10,
+    nameTextStyle: {
+      color: '#fff',
+      fontSize: 20
+    },
+    splitLine: {
+      show: true,
+      lineStyle: {
+        type: 'dashed',
+        color: 'rgba(217,231,255, 0.2)'
+      }
+    },
+    axisLabel: {
+      color: '#fff',
+      fontSize: 20,
+      fontFamily: 'PingFangSC, sans-serif'
+    },
+    axisTick: {
+      show: false
+    }
+  },
+  series: [
+    {
+      name: '处理问题',
+      data: [] as any,
+      type: 'line',
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: 6,
+      areaStyle: {
+        color: {
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(136, 229, 120, 0.5)' },
+            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
+          ]
+        }
+      },
+      lineStyle: { color: '#5DFF68' },
+      itemStyle: {
+        color: '#5DFF68'
+      }
+    },
+    {
+      name: '上报问题',
+      data: [] as any,
+      type: 'line',
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: 6,
+      areaStyle: {
+        color: {
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(255, 162, 55, 0.34)' },
+            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
+          ]
+        }
+      },
+      lineStyle: { color: '#FF932F' },
+      itemStyle: {
+        color: '#FF932F'
+      }
+    }
+  ]
+})
+
 usePolling(async () => {
   const nameKeys = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-  const arrList1 = []
-  const arrList2 = []
-  for (let i = 0; i < 12; i++) {
-    arrList1.push(SeededRandom.randomNumber(50, 150))
-    arrList2.push(SeededRandom.randomNumber(50, 150))
-  }
   echartOption.value.xAxis.data = nameKeys
-  echartOption.value.series[0].data = arrList1
-  echartOption.value.series[1].data = arrList2
+  echartOption2.value.xAxis.data = nameKeys
 
-  totalInfo.totalDitchCount = SeededRandom.randomNumber(0, 100)
-  totalInfo.totalDitchLength = SeededRandom.randomNumber(0, 100)
+  const result: any = await service.xfqs.getPatrolList({
+    tabId: 0,
+    year: dayjs().format('YYYY')
+  })
+  totalInfo.planitchCount = result.plan_num
+  totalInfo.doneDitchCount = result.comp_num
+
+  // 巡查统计
+  if (result.planStatistic && result.planStatistic.length > 0) {
+    const arrList1 = []
+    const arrList2 = []
+    for (const planItem of result.planStatistic) {
+      arrList1.push(planItem.plan_num - planItem.complete_num)
+      arrList2.push(planItem.complete_num)
+    }
+    echartOption.value.series[0].data = arrList1
+    echartOption.value.series[1].data = arrList2
+  }
+
+  // 巡查事件统计
+  if (result.event && result.event.length > 0) {
+    const arrList1 = []
+    const arrList2 = []
+    for (const eventItem of result.event) {
+      arrList1.push(eventItem.num)
+    }
+    for (const disposeItem of result.dispose) {
+      arrList2.push(disposeItem.num)
+    }
+    totalInfo.reportEventCount = arrList1.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+    totalInfo.disposeEventCount = arrList2.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
+    echartOption2.value.series[0].data = arrList1
+    echartOption2.value.series[1].data = arrList2
+  }
 })
 
 </script>

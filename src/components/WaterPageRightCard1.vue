@@ -1,188 +1,336 @@
 <template>
   <PageCard title="灌区需水" bg-class="right">
     <div class="page-container">
-      <div class="grid grid-cols-[auto_auto_auto] justify-between mb-[90px]">
-        <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
-          <img :src="item.icon" class="reservoir-item__icon mr-[14px]">
-          <div>
-            <div class="reservoir-item__label">
-              {{ item.name }}
-            </div>
-            <div>
-              <ZfTweenNumber :value="item.value" class="reservoir-item__value" />
-              <span class="reservoir-item__unit">{{ item.unit }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="header-title">
-        灌溉需水：<ZfTweenNumber :value="totalIrrigationWater" />万m3
-      </div>
-      <div>
-        <div>
-          <div v-for="progressItem in progressList" :key="progressItem.id" class="mb-[50px]">
-            <div class="progress-item">
-              <div class="progress-item__label">
-                {{ progressItem.label }}
-              </div>
-              <div>
-                <ZfTweenNumber class="progress-item__value" :value="progressItem.value" />
-                <span class="progress-item__unit">t</span>
-              </div>
-            </div>
-            <div class="progress-container mr-[23px]">
-              <div class="progress" :style="{'width': progressItem.process + '%'}" />
-              <div class="progress-right-side" />
-            </div>
-          </div>
-        </div>
+      <ElSelect
+        v-model="filterWaterValue"
+        placeholder="请选择"
+        :teleported="false"
+        class="app-select mb-[40px]"
+        @change="dataListTiggle.trigger()"
+      >
+        <ElOption
+          v-for="item in optionsList"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </ElSelect>
+      <div class="h-[353px] relative">
+        <span>需水量（万m3）</span>
+        <VueEcharts v-if="filterWaterValue === 'long'" :option="echartOption" class="mt-[20px]" />
+        <VueEcharts v-else-if="filterWaterValue === 'short'" :option="echartOption2" class="mt-[20px]" />
       </div>
     </div>
   </PageCard>
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
+import dayjs from 'dayjs'
 
-const getPhotoUrl = (icon: string) => {
-  return new URL(`../assets/global/images/water/${icon}.png`, import.meta.url).href
-}
+const filterWaterValue = ref('long')
+const optionsList = [
+  { value: 'long', label: '长期' },
+  { value: 'short', label: '短期' }
+]
 
-const totalIrrigationWater = ref<number>(0)
-const reservoirInfo = ref<Record<string, any>>([
-  { icon: getPhotoUrl('reservoir-icon'), name: '农业需水', value: 0, unit: '万m3' },
-  { icon: getPhotoUrl('home-icon'), name: '生活需水', value: 0, unit: '万m3' },
-  { icon: getPhotoUrl('ecology-icon'), name: '生态需水', value: 0, unit: '万m3' }
-])
-
-const progressList = ref<Record<string, any>>([])
-
-usePolling(async () => {
-  totalIrrigationWater.value = SeededRandom.randomNumber(300, 800)
-
-  reservoirInfo.value[0].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[1].value = SeededRandom.randomNumber(1, 150)
-  reservoirInfo.value[2].value = SeededRandom.randomNumber(1, 150)
-
-  const resultList = []
-  for (let i = 0; i < 7; i++) {
-    resultList.push({
-      id: i,
-      label: `西干果直灌区${i + 1}`,
-      value: SeededRandom.randomNumber(10, 100),
-      process: SeededRandom.randomNumber(0, 100)
-    })
+const echartOption = ref({
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    top: -5,
+    left: 'center',
+    itemWidth: 30,
+    itemHeight: 10,
+    itemGap: 20,
+    textStyle: {
+      color: '#FFFFFF',
+      fontSize: 20,
+      fontFamily: 'PingFangSC, sans-serif',
+      padding: [0, 0, 0, 8]
+    },
+    data: [] as any
+  },
+  grid: {
+    top: '15%',
+    left: '3%',
+    right: '3%',
+    bottom: '5%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    // boundaryGap: false,
+    axisTick: {
+      show: false
+    },
+    offset: 15,
+    axisLine: {
+      lineStyle: {
+        type: 'solid',
+        color: 'rgba(179,223,255, 0.5)'
+      }
+    },
+    axisLabel: {
+      color: '#fff',
+      fontSize: 18,
+      fontFamily: 'PingFangSC, sans-serif'
+    },
+    data: [] as string[]
+  },
+  yAxis: [{
+    type: 'value',
+    position: 'left',
+    nameTextStyle: {
+      color: '#fff',
+      fontSize: 20,
+      padding: [0, 55, 0, 0]
+    },
+    splitLine: {
+      show: true,
+      lineStyle: {
+        type: 'dashed',
+        color: 'rgba(217,231,255, 0.2)'
+      }
+    },
+    axisLabel: {
+      color: '#fff',
+      fontSize: 20,
+      fontFamily: 'PingFangSC, sans-serif'
+    },
+    axisTick: {
+      show: false
+    }
   }
-  progressList.value = resultList
+  ],
+  series: [] as any
 })
 
+const echartOption2 = ref({
+  tooltip: {
+    trigger: 'axis'
+  },
+  legend: {
+    top: -5,
+    left: 'center',
+    itemWidth: 30,
+    itemHeight: 10,
+    itemGap: 20,
+    textStyle: {
+      color: '#FFFFFF',
+      fontSize: 20,
+      fontFamily: 'PingFangSC, sans-serif',
+      padding: [0, 0, 0, 8]
+    },
+    data: [] as any
+  },
+  grid: {
+    top: '15%',
+    left: '3%',
+    right: '3%',
+    bottom: '5%',
+    containLabel: true
+  },
+  xAxis: {
+    type: 'category',
+    // boundaryGap: false,
+    axisTick: {
+      show: false
+    },
+    offset: 15,
+    axisLine: {
+      lineStyle: {
+        type: 'solid',
+        color: 'rgba(179,223,255, 0.5)'
+      }
+    },
+    axisLabel: {
+      color: '#fff',
+      fontSize: 18,
+      fontFamily: 'PingFangSC, sans-serif'
+    },
+    data: [] as string[]
+  },
+  yAxis: [{
+    type: 'value',
+    position: 'left',
+    nameTextStyle: {
+      color: '#fff',
+      fontSize: 20,
+      padding: [0, 55, 0, 0]
+    },
+    splitLine: {
+      show: true,
+      lineStyle: {
+        type: 'dashed',
+        color: 'rgba(217,231,255, 0.2)'
+      }
+    },
+    axisLabel: {
+      color: '#fff',
+      fontSize: 20,
+      fontFamily: 'PingFangSC, sans-serif'
+    },
+    axisTick: {
+      show: false
+    }
+  }
+  ],
+  series: [] as any
+})
+const dataListTiggle = usePolling(async () => {
+  if (filterWaterValue.value === 'short') {
+    getShortWaterHandle()
+  } else {
+    getLongWaterHandle()
+  }
+})
+
+async function getShortWaterHandle () {
+  const result: any = await service.xfqs.getShortPosition({
+    time: dayjs().format('YYYY-MM-DD')
+  })
+
+  if (result[0].list && result[0].cropType) {
+    const dataSeries = []
+    const legendList = []
+    for (let index = 0; index < result[0].cropType.length; index++) {
+      legendList.push({ name: result[0].cropType[index], icon: 'rect' })
+      dataSeries.push({
+        name: result[0].cropType[index],
+        data: [] as any,
+        type: 'bar',
+        smooth: true,
+        showSymbol: false,
+        stack: 'a',
+        barWidth: 16
+      })
+    }
+    echartOption2.value.legend.data = legendList
+    const nameKeys = []
+    for (let index = 0; index < result[0].list.length; index++) {
+      nameKeys.push(result[0].list[index].time)
+      for (const element of result[0].list[index].data) {
+        for (let j = 0; j < dataSeries.length; j++) {
+          if (element.crop === dataSeries[j].name) {
+            dataSeries[j].data.push(element.water)
+          }
+        }
+      }
+    }
+    echartOption2.value.xAxis.data = nameKeys
+    echartOption2.value.series = dataSeries
+  }
+}
+
+async function getLongWaterHandle () {
+  const result: any = await service.xfqs.getLongPosition({
+    time: dayjs().format('YYYY')
+  })
+
+  if (result.length && result.length > 0) {
+    const dataSeries = []
+    const legendList = []
+    for (let index = 0; index < result[0].cropType.length; index++) {
+      legendList.push({ name: result[0].cropType[index], icon: 'rect' })
+      dataSeries.push({
+        name: result[0].cropType[index],
+        data: [] as any,
+        type: 'bar',
+        smooth: true,
+        showSymbol: false,
+        stack: 'a',
+        barWidth: 16
+      })
+    }
+    echartOption.value.legend.data = legendList
+    const nameKeys = []
+    for (let index = 0; index < result[0].list.length; index++) {
+      nameKeys.push(result[0].list[index].txun)
+      for (const element of result[0].list[index].data) {
+        for (let j = 0; j < dataSeries.length; j++) {
+          if (element.crop === dataSeries[j].name) {
+            dataSeries[j].data.push(element.water)
+          }
+        }
+      }
+    }
+    echartOption.value.xAxis.data = nameKeys
+    echartOption.value.series = dataSeries
+  }
+}
 </script>
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 45px 53px;
+  padding: 78px 53px;
 }
 
-.reservoir-item {
-  display: flex;
-  align-items: center;
-  font-family: PingFangSC, sans-serif;
+.app-select {
+  width: 496px;
 
-  .reservoir-item__label {
-    font-size: 30px;
+  &:deep(.el-select__wrapper.is-focused) {
+    .el-input__inner {
+      color: #fff;
+    }
   }
 
-  .reservoir-item__value {
-    font-family: Quantico, sans-serif;
-    font-size: 32px;
-    font-weight: bold;
-    color: #50FFFC;
-  }
+  &:deep(.el-popper) {
+    background: rgb(14 47 66 / 0.6);
+    border: none;
+    top: 70px !important;
+    left: 0 !important;
 
-  .reservoir-item__unit {
-    font-size: 24px;
-    color: #BEEEFF;
-  }
-}
+    .el-popper__arrow {
+      display: none;
+    }
 
-.header-title {
-  position: relative;
-  display: flex;
-  font-size: 34px;
-  color: #FFF;
-  margin-bottom: 36px;
-  font-family: DINMedium, sans-serif;
+    .el-select-dropdown__item {
+      height: 60px;
+      color: #81E6FF;
+      font-size: 30px;
+      font-family: PingFangSC, sans-serif;
+      line-height: 60px;
 
-  &::after {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: -38px;
-    content: "";
-    display: block;
-    width: 100%;
-    height: 100%;
-    background: url('@/assets/global/images/card-title-icon.png') no-repeat;
-    background-position: left center;
-  }
-}
-
-.progress-container {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 10px;
-  background-color: #98C1FF36;
-
-  .progress {
-    width: 0%;
-    height: 10px;
-    background: linear-gradient(-90deg, rgb(36 145 200 / 0.4) 0%, #5CE4FF 100%);
-    transition: all 0.8s;
-    animation: width-transition 1s;
-
-    @keyframes width-transition {
-      0% {
-        width: 0;
-      }
-
-      100% {
-        // width: 100%
+      &.is-hovering {
+        background: rgb(92 133 255 / 0.51);
       }
     }
   }
 
-  .progress-right-side {
-    width: 18px;
-    height: 18px;
-    background: #FFF;
-    box-shadow: 0 0 4px 0 #98EEFF;
-    border-radius: 100%;
-  }
-}
+  &:deep(.el-select__wrapper) {
+    background: rgb(14 47 66 / 0.6);
+    border: 1px solid #4896C6;
+    box-shadow: none;
 
-.progress-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-family: PingFangSC, sans-serif;
-  margin-bottom: 10px;
+    &:hover,
+    &:active {
+      box-shadow: none !important;
+    }
 
-  .progress-item__label {
-    font-size: 30px;
-  }
+    .el-select__selection {
+      height: 60px;
+      line-height: 60px;
+      font-size: 30px;
+      font-family: PingFangSC, sans-serif;
+      letter-spacing: 5px;
 
-  .progress-item__value {
-    font-family: Quantico, sans-serif;
-    font-size: 24px;
-    font-weight: bold;
-    color: #50FFFC;
-    margin-right: 16px;
-  }
+      .el-select__placeholder {
+        color: #81E6FF;
+      }
+    }
 
-  .progress-item__unit {
-    font-size: 24px;
-    color: #BEEEFF;
+    .el-select__suffix {
+      display: flex;
+      align-items: center;
+
+      .el-select__icon {
+        width: 30px;
+        height: 30px;
+        background: url('@/assets/floor/preview/guide-triangle.svg') no-repeat;
+        background-size: 100%;
+      }
+    }
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <PageCard title="配水调度" bg-class="left">
     <div class="page-container">
-      <div class="h-[557px] overflow-y-auto">
+      <div class="h-[747px] overflow-y-auto">
         <div class="dispatch-item" v-for="item in dataList" :key="item.id">
           <div class="dispatch-item__header">
             <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">

@@ -1,6 +1,7 @@
 <template>
   <div class="video" :class="`video--${props.ratio}`">
-    <VideoPlayHls v-if="isUseHls" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" />
+    <VideoPlayHls v-if="usePlusType === 'hls'" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" />
+    <VideoPlayFlv v-else-if="usePlusType === 'flv'" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" />
     <video v-else-if="props.src" class="video__inner" :src="props.src" :controls="props.controls" :muted="props.muted" :loop="props.loop" autoplay />
     <div v-else class="video__error">
       <span>{{ props.emptyText }}</span>
@@ -27,7 +28,15 @@ const props = withDefaults(defineProps<{
   emptyText: '视频地址为空'
 })
 
-const isUseHls = computed(() => props.src.endsWith('.m3u8'))
+const usePlusType = computed(() => {
+  let plusValue = ''
+  if (props.src.includes('.m3u8')) {
+    plusValue = 'hls'
+  } else if (props.src.includes('.flv')) {
+    plusValue = 'flv'
+  }
+  return plusValue
+})
 </script>
 
 <style lang="scss" scope>

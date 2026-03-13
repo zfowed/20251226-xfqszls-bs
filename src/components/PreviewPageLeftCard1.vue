@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
+// import { SeededRandom } from 'zf-utilz'
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Autoplay, Pagination } from 'swiper'
 // @ts-ignore: Swiper CSS has no type declarations
@@ -82,12 +82,13 @@ const dataList = reactive([
 ])
 
 usePolling(async () => {
-  let countTotal = 0
-  dataList.forEach((item) => {
-    item.value = SeededRandom.randomNumber(200, 900)
-    countTotal += item.value
-  })
-  completeRate.value = countTotal
+  dataList[0].value = 113.9
+  dataList[1].value = 785.2
+  dataList[2].value = 749.6
+  dataList[3].value = 633
+  completeRate.value = 3282.5
+
+  // completeRate.value = dataList.reduce((sum, item) => sum + item.value, 0)
 })
 </script>
 

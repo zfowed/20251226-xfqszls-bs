@@ -7,6 +7,10 @@ export default defineConfig({
       '/xfq_service': {
         target: 'http://223.76.158.56:7000/',
         changeOrigin: true
+      },
+      '/file': {
+        target: 'http://223.76.158.56:7000/',
+        changeOrigin: true
       }
     }
   }

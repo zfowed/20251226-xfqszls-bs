@@ -1,7 +1,7 @@
 <template>
   <PageCard title="水闸状态" bg-class="right">
     <div class="page-container">
-      <div class="h-[640px]">
+      <div class="h-[455px]">
         <PageTable :thead-col="theadCol" :data-list="dataList" :limit-scroll="6">
           <template #code="scope">
             <span class="text-[#fff]">{{ scope.row.code }}</span>

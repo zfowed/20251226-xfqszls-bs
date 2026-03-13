@@ -31,6 +31,8 @@
     "swiper": "^8.4.7",
     "vue": "^3.4.23",
     "vue-router": "^4.3.2",
+    "xgplayer": "^3.0.23",
+    "xgplayer-flv": "^3.0.23",
     "zf-dbs": "^0.1.21",
     "zf-utilz": "^0.1.19",
     "zf-vue-use": "^0.1.4"

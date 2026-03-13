@@ -8,8 +8,8 @@
 
     <template #middle />
     <template #right>
-      <FloodPageRightCard1 class="mb-[50px]" />
-      <FloodPageRightCard2 class="mb-[50px]" />
+      <FloodPageRightCard1 class="mb-[48px]" />
+      <FloodPageRightCard2 class="mb-[48px]" />
       <FloodPageRightCard3 />
     </template>
   </PageScreen>

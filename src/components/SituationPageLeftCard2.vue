@@ -15,8 +15,7 @@
           </div>
         </div>
       </div>
-
-      <div class="h-[498px] mt-[60px]">
+      <div class="h-[528px] mt-[60px]">
         <VueEcharts :option="echartOption" />
       </div>
     </div>

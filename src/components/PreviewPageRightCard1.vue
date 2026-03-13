@@ -64,7 +64,7 @@
       </div>
 
       <!-- 水源工程 -->
-      <div class="header-title mb-[15px]">
+      <div class="header-title mb-[25px]">
         <img
           src="@/assets/global/images/card-title-icon.png"
           class="w-[30px] h-[32px] mr-[9px]"
@@ -72,7 +72,7 @@
         <span>水源工程</span>
       </div>
 
-      <img src="@/assets/global/images/preview/card-right1.png" class="mb-[25px]">
+      <img src="@/assets/global/images/preview/card-right1.png" class="mb-[55px]">
 
       <div class="app-table mb-[35px]">
         <div class="table-header">
@@ -131,7 +131,7 @@
           </div>
         </div>
       </div>
-      <div class="app-table mb-[35px]">
+      <div class="app-table mb-[65px]">
         <div class="table-header">
           <div
             class="sluice-btns"
@@ -221,18 +221,16 @@ const ditchList = ref<Record<string, any>[]>([])
 
 // 水源工程
 const sluiceList1 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '计划泄洪流量', value: 0, unit: 'm³/s' },
-  { id: 'sluiceList2', name: '校核泄洪流量', value: 0, unit: 'm³/s' }
+  { id: 'sluiceList1', name: '流域面积', value: 0, unit: 'km2' },
+  { id: 'sluiceList2', name: '平均来水量', value: 0, unit: '万m³' }
 ])
 const sluiceList2 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '计划泄洪流量', value: 0, unit: 'm³/s' },
-  { id: 'sluiceList2', name: '校核泄洪流量', value: 0, unit: 'm³/s' }
+  { id: 'sluiceList1', name: '承雨面积', value: 0, unit: 'km2' },
+  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm' }
 ])
 const sluiceList3 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '设计流量（东）', value: 0, unit: 'm³/s' },
-  { id: 'sluiceList2', name: '设计流量（东）', value: 0, unit: 'm³/s' },
-  { id: 'sluiceList1', name: '取水形式：', value: '', unit: '' },
-  { id: 'sluiceList2', name: '闸板形式：', value: '', unit: '' }
+  { id: 'sluiceList1', name: '流域面积', value: 0, unit: 'km2' },
+  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm' }
 ])
 
 const triggerPolling = usePolling(async () => {
@@ -242,20 +240,13 @@ const triggerPolling = usePolling(async () => {
 })
 
 const sluiceBtns = ref<Record<string, any>[]>([
-  { id: 'sluice1', icon: getPhotoUrl('sluice-icon-1'), name: '主坝', active: true },
-  { id: 'sluice2', icon: getPhotoUrl('sluice-icon-2'), name: '副坝#1', active: false },
-  { id: 'sluice3', icon: getPhotoUrl('sluice-icon-2'), name: '副坝#2', active: false }
+  { id: 'sluice1', icon: getPhotoUrl('sluice-icon-1'), name: '熊渡水库', active: true }
 ])
 const sluiceBtns2 = ref<Record<string, any>[]>([
-  { id: 'sluice21', icon: getPhotoUrl('sluice-icon-1'), name: '泄洪闸', active: true }
+  { id: 'sluice21', icon: getPhotoUrl('sluice-icon-1'), name: '望城岗水库', active: true }
 ])
 const sluiceBtns3 = ref<Record<string, any>[]>([
-  {
-    id: 'sluice31',
-    icon: getPhotoUrl('sluice-icon-1'),
-    name: '东西干果渠首闸',
-    active: true
-  }
+  { id: 'sluice31', icon: getPhotoUrl('sluice-icon-1'), name: '张冲水库', active: true }
 ])
 const clickSluiceHandle = (item: Record<string, any>) => {
   sluiceBtns.value.forEach((btn) => {
@@ -267,15 +258,15 @@ const clickSluiceHandle = (item: Record<string, any>) => {
 
 // 渠系建筑物
 const architectureList = ref<Record<string, any>[]>([
-  { id: 'architecture1', name: '水库', value: 0, unit: '个' },
-  { id: 'architecture2', name: '水闸', value: 0, unit: '座' },
-  { id: 'architecture3', name: '桥梁', value: 0, unit: '座' },
-  { id: 'architecture4', name: '渠首', value: 0, unit: '个' },
-  { id: 'architecture5', name: '河道', value: 0, unit: '条' },
-  { id: 'architecture6', name: '渠道', value: 0, unit: '条' },
-  { id: 'architecture7', name: '泵站', value: 0, unit: '座' },
-  { id: 'architecture8', name: '渡槽', value: 0, unit: '座' },
-  { id: 'architecture9', name: '涵洞', value: 0, unit: '个' }
+  { id: 'architecture1', name: '干渠', value: 0, unit: '个' },
+  { id: 'architecture2', name: '支渠', value: 0, unit: '个' },
+  { id: 'architecture3', name: '农桥', value: 0, unit: '条' },
+  { id: 'architecture4', name: '分水闸', value: 0, unit: '座' },
+  { id: 'architecture5', name: '泄洪闸', value: 0, unit: '座' },
+  { id: 'architecture6', name: '节制闸', value: 0, unit: '座' },
+  { id: 'architecture7', name: '直灌口', value: 0, unit: '座' },
+  { id: 'architecture8', name: '渡槽', value: 0, unit: '处' },
+  { id: 'architecture9', name: '涵洞', value: 0, unit: '座' }
 ])
 
 usePolling(async () => {
@@ -300,18 +291,24 @@ usePolling(async () => {
     ditchList.value = groups
   }
 
-  sluiceList2.value.forEach((item) => {
-    item.value = SeededRandom.randomNumber(0, 100)
-  })
+  sluiceList1.value[0].value = 1015
+  sluiceList1.value[1].value = 10.21
 
-  sluiceList3.value[0].value = SeededRandom.randomNumber(0, 100)
-  sluiceList3.value[1].value = SeededRandom.randomNumber(0, 100)
-  sluiceList3.value[2].value = '自流'
-  sluiceList3.value[3].value = '手动启闭机'
+  sluiceList2.value[0].value = 1.14
+  sluiceList2.value[1].value = 109.57
 
-  architectureList.value.forEach((item) => {
-    item.value = SeededRandom.randomNumber(0, 100)
-  })
+  sluiceList3.value[0].value = 6.75
+  sluiceList3.value[1].value = 121.75
+
+  architectureList.value[0].value = 3
+  architectureList.value[1].value = 4
+  architectureList.value[2].value = 232
+  architectureList.value[3].value = 5
+  architectureList.value[4].value = 30
+  architectureList.value[5].value = 3
+  architectureList.value[6].value = 97
+  architectureList.value[7].value = 4
+  architectureList.value[8].value = 21
 })
 </script>
 
@@ -482,7 +479,7 @@ usePolling(async () => {
 .architecture-main {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 40px 81px;
+  row-gap: 40px;
   padding: 0 50px;
 
   .architecture-item {

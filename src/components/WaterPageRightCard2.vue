@@ -15,7 +15,7 @@
           </div>
         </div>
       </div>
-      <div class="h-[566px] overflow-y-auto">
+      <div class="h-[1100px] overflow-y-auto">
         <div class="dispatch-item" v-for="item in dataList" :key="item.id">
           <div class="dispatch-item__header">
             <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">

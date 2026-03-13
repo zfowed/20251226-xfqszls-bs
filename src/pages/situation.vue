@@ -8,8 +8,8 @@
 
     <template #middle />
     <template #right>
-      <SituationPageRightCard1 class="mb-[62px]" />
-      <SituationPageRightCard2 class="mb-[62px]" />
+      <SituationPageRightCard1 class="mb-[40px]" />
+      <SituationPageRightCard2 class="mb-[40px]" />
       <SituationPageRightCard3 />
     </template>
   </PageScreen>

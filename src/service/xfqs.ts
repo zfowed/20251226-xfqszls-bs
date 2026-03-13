@@ -41,6 +41,14 @@ export const getAllstep = defineService<
   return request.post('/api/gq/st/rsvr/stat/allstep', params)
 })
 
+// 工程巡检
+export const getPatrolList = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/patrol/list', { params, ...config })
+})
+
 // 水闸状态 / 水库监测
 export const getGatePageList = defineService<
   Record<string, any>,
@@ -48,7 +56,6 @@ export const getGatePageList = defineService<
 >(async function (params) {
   return request.post('/api/gq/st/gate/page', params)
 })
-
 // 查询视频点位列表
 export const getVideoStationList = defineService<
   Record<string, any>,
@@ -57,12 +64,35 @@ export const getVideoStationList = defineService<
   return request.get('/api/gq/st/stbprpb/getVideoStationList', { params, ...config })
 })
 
+export const getVideoUrl = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/external/dh/getVideoUrl', { params, ...config })
+})
+
 // 可供水量
 export const findSinlgeRsvrData = defineService<
   Record<string, any>,
   Record<string, any>
 >(async function (params) {
   return request.post('/api/gq/st/rsvr/findSinlgeRsvrData', params)
+})
+
+// 需水量
+export const getShortPosition = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/watercontrol/platform-bus-wdd/api/bus/xsShortData/getShortPosition', { params, ...config })
+})
+
+// 长期需水量
+export const getLongPosition = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/watercontrol/platform-bus-wdd/api/bus/xsShortData/getLongPosition', { params, ...config })
 })
 
 // 配水调度
@@ -143,4 +173,20 @@ export const queryMaterialList = defineService<
   Record<string, any>
 >(async function (params, config) {
   return request.get('/api/gq/flood/control/queryMaterialList', { params, ...config })
+})
+
+// 预案调令列表查询
+export const queryFloodPlanFile = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/flood/control/queryFloodPlanFile', { params, ...config })
+})
+
+// 删除预案调令
+export const delFloodPlanFile = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params) {
+  return request.post(`/api/gq/flood/control/delFloodPlanFile/${params.id}`, params)
 })

@@ -7,7 +7,16 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    '副本': typeof import('./../components/VideoPlay/VideoPlayHls - 副本.vue')['default']
     AppLayout: typeof import('./../components/AppLayout/AppLayout.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
+    ElDialog: typeof import('element-plus/es')['ElDialog']
+    ElOption: typeof import('element-plus/es')['ElOption']
+    ElPopconfirm: typeof import('element-plus/es')['ElPopconfirm']
+    ElSelect: typeof import('element-plus/es')['ElSelect']
+    ElTable: typeof import('element-plus/es')['ElTable']
+    ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FloodPageLeftCard1: typeof import('./../components/FloodPageLeftCard1.vue')['default']
     FloodPageLeftCard2: typeof import('./../components/FloodPageLeftCard2.vue')['default']
     FloodPageLeftCard3: typeof import('./../components/FloodPageLeftCard3.vue')['default']
@@ -31,6 +40,7 @@ declare module 'vue' {
     SituationPageRightCard2: typeof import('./../components/SituationPageRightCard2.vue')['default']
     SituationPageRightCard3: typeof import('./../components/SituationPageRightCard3.vue')['default']
     VideoPlay: typeof import('./../components/VideoPlay/VideoPlay.vue')['default']
+    VideoPlayFlv: typeof import('./../components/VideoPlay/VideoPlayFlv.vue')['default']
     VideoPlayHls: typeof import('./../components/VideoPlay/VideoPlayHls.vue')['default']
     VueEcharts: typeof import('./../components/VueEcharts/VueEcharts.vue')['default']
     WaterPageLeftCard1: typeof import('./../components/WaterPageLeftCard1.vue')['default']
