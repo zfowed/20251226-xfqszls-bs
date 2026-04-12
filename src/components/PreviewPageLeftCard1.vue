@@ -75,10 +75,10 @@ const swiperDataList = ref([
 
 const completeRate = ref(0)
 const dataList = reactive([
-  { title: '钱塘江', value: 0, unit: '万m3' },
-  { title: '石河镇', value: 0, unit: '万m3' },
-  { title: '雁门口', value: 0, unit: '万m3' },
-  { title: '九真镇', value: 0, unit: '万m3' }
+  { title: '聂家河镇', value: 0, unit: '万m3' },
+  { title: '无眼泉镇', value: 0, unit: '万m3' },
+  { title: '姚家店', value: 0, unit: '万m3' },
+  { title: '九道河', value: 0, unit: '万m3' }
 ])
 
 usePolling(async () => {

@@ -5,7 +5,9 @@
       <PreviewPageLeftCard2 />
     </template>
 
-    <template #middle />
+    <template #middle>
+      <ToolsSide class="absolute -left-[150px] bottom-[230px]" />
+    </template>
     <template #right>
       <PreviewPageRightCard1 />
     </template>
