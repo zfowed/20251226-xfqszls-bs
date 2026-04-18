@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="工程巡查" bg-class="left">
+  <PageCard title="工程总览" bg-class="left">
     <div class="page-container">
       <div class="app-table mb-[35px]">
         <div class="table-header">
@@ -214,9 +214,6 @@ usePolling(async () => {
   sluiceList1.value.forEach((item) => {
     item.value = SeededRandom.randomNumber(0, 100)
   })
-
-  sluiceList1.value[0].value = 1015
-  sluiceList1.value[1].value = 10.21
 
   const nameKeys = ['渗压计', '水位计', 'GNSS位移测点', '量水堰']
   echartOption.value.xAxis.data = nameKeys

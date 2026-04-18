@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="农情监测" bg-class="right">
+  <PageCard title="航摄农情" bg-class="right">
     <div class="page-container">
       <div class="h-[428px]">
         <VueEcharts :option="echartOption" />

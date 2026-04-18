@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="闸门状态信息" bg-class="right">
+  <PageCard title="遥感工程监测清单" bg-class="right">
     <div class="page-container">
       <div class="px-[14px]">
         <div class="h-[510px]">

@@ -33,6 +33,6 @@
     "ue-web/**/*.ts",
     "ue-web/**/*.tsx",
     "ue-web/**/*.vue"
-  ],
+, "src/components/SituationPageRightCard33vue"  ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

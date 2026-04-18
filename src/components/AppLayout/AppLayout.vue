@@ -30,7 +30,7 @@
     </div>
 
     <div class="layout-footer">
-      <div class="navbar-menu" :class="{'navbar-menu__active': route.path === navbar.path}" v-for="navbar in menuList" :key="navbar.path" @click="navbarBtnHandle(navbar)">
+      <div class="navbar-menu" :class="{'navbar-menu__active': route.path.includes(navbar.path)}" v-for="navbar in menuList" :key="navbar.path" @click="navbarBtnHandle(navbar)">
         {{ navbar.name }}
       </div>
     </div>

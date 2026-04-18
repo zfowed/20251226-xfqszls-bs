@@ -1,7 +1,7 @@
 <template>
-  <PageCard title="可供水量" bg-class="right">
+  <PageCard title="墒情监测" bg-class="right">
     <div class="page-container">
-      <div class="grid grid-cols-[auto_auto] justify-between gap-row-[63px]">
+      <div class="grid grid-cols-3 justify-between gap-row-[63px]">
         <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
           <img
             src="@/assets/global/images/situation/reservoir-icon.png"
@@ -23,28 +23,27 @@
 </template>
 
 <script setup lang="ts">
+import { SeededRandom } from 'zf-utilz'
 
 const reservoirInfo = ref<Record<string, any>>([
-  { name: '当前水位', value: 0, unit: 'm' },
-  { name: '当前水量', value: 0, unit: '万m³' },
-  { name: '入库流量', value: 0, unit: 'm³/s' },
-  { name: '出库流量', value: 0, unit: 'm³/s' }
+  { name: '工作温度', value: 0, unit: '℃' },
+  { name: '土壤湿度', value: 0, unit: '%' },
+  { name: '土壤温度', value: 0, unit: '℃' },
+  { name: '测点间距', value: 0, unit: 'cm' },
+  { name: '供电电流', value: 0, unit: 'V' },
+  { name: '功耗', value: 0, unit: 'W' }
 ])
 
 usePolling(async () => {
-  const result: any = await service.xfqs.findSinlgeRsvrData({
-    stcd: 'RV_001'
+  reservoirInfo.value.forEach((item: any) => {
+    item.value = SeededRandom.randomNumber(0, 100)
   })
-  reservoirInfo.value[0].value = result[0].z ? result[0].z : 0
-  reservoirInfo.value[1].value = result[0].v ? result[0].v : 0
-  reservoirInfo.value[2].value = result[0].q ? result[0].q : 0
-  reservoirInfo.value[3].value = result[0].otq ? result[0].otq : 0
 })
 </script>
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 68px 96px;
+  padding: 68px 45px;
 }
 
 .reservoir-item {

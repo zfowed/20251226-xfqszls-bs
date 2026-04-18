@@ -13,7 +13,6 @@
 
 const router = useRouter()
 const route = useRoute()
-console.log('route', route)
 
 const navList = defineModel({
   type: Array as PropType<Record<string, any>[]>,

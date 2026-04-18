@@ -76,7 +76,7 @@ const swiperDataList = ref([
 const completeRate = ref(0)
 const dataList = reactive([
   { title: '聂家河镇', value: 0, unit: '万m3' },
-  { title: '无眼泉镇', value: 0, unit: '万m3' },
+  { title: '五眼泉镇', value: 0, unit: '万m3' },
   { title: '姚家店', value: 0, unit: '万m3' },
   { title: '九道河', value: 0, unit: '万m3' }
 ])

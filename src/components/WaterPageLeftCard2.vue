@@ -1,7 +1,12 @@
 <template>
   <PageCard title="灌片需水" bg-class="left">
     <div class="page-container">
-      <div class="h-[343px]">
+      <div class="datetime-list">
+        <div class="btns" v-for="item in dateBtns" :key="item.value" :class="{ active: item.value === currentDateBtn }" @click="currentDateBtn = item.value">
+          {{ item.label }}
+        </div>
+      </div>
+      <div class="h-[443px]">
         <VueEcharts :option="echartOption" />
       </div>
     </div>
@@ -10,6 +15,14 @@
 
 <script setup lang="ts">
 import dayjs from 'dayjs'
+import { SeededRandom } from 'zf-utilz'
+
+const currentDateBtn = ref('7d')
+const dateBtns = reactive([
+  { label: '周', value: '7d' },
+  { label: '月', value: '30d' },
+  { label: '年', value: '360d' }
+])
 
 const echartOption = ref({
   tooltip: {
@@ -17,7 +30,7 @@ const echartOption = ref({
   },
   legend: {
     top: -5,
-    left: 'center',
+    left: 'right',
     itemWidth: 30,
     itemHeight: 10,
     itemGap: 20,
@@ -27,10 +40,10 @@ const echartOption = ref({
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 8]
     },
-    data: [] as any
+    data: [{ name: '降雨流量' }]
   },
   grid: {
-    top: '15%',
+    top: '12%',
     left: '3%',
     right: '3%',
     bottom: '5%',
@@ -38,7 +51,8 @@ const echartOption = ref({
   },
   xAxis: {
     type: 'category',
-    // boundaryGap: false,
+    // 柱状图建议留左右间距，避免柱子超出坐标系
+    boundaryGap: false,
     axisTick: {
       show: false
     },
@@ -56,74 +70,107 @@ const echartOption = ref({
     },
     data: [] as string[]
   },
-  yAxis: [{
-    type: 'value',
-    position: 'left',
-    nameTextStyle: {
-      color: '#fff',
-      fontSize: 20,
-      padding: [0, 55, 0, 0]
-    },
-    splitLine: {
-      show: true,
-      lineStyle: {
-        type: 'dashed',
-        color: 'rgba(217,231,255, 0.2)'
+  yAxis: [
+    {
+      name: '（mm)',
+      nameGap: 25,
+      type: 'value',
+      position: 'left',
+      offset: 10,
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 20
+      },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          type: 'dashed',
+          color: 'rgba(217,231,255, 0.2)'
+        }
+      },
+      axisLabel: {
+        color: '#fff',
+        fontSize: 20,
+        fontFamily: 'PingFangSC, sans-serif'
+      },
+      axisTick: {
+        show: false
       }
-    },
-    axisLabel: {
-      color: '#fff',
-      fontSize: 20,
-      fontFamily: 'PingFangSC, sans-serif'
-    },
-    axisTick: {
-      show: false
     }
-  }
   ],
-  series: [] as any
+  series: [
+    {
+      name: '降雨流量',
+      data: [] as any,
+      type: 'line',
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: 10,
+      areaStyle: {
+        color: {
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(136, 229, 120, 50)' },
+            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
+          ]
+        }
+      },
+      lineStyle: { color: '#5DFF68' },
+      itemStyle: {
+        color: '#5DFF68'
+      }
+    }
+  ]
 })
 
+const last7Days = Array.from({ length: 7 }, (_, i) => dayjs().subtract(6 - i, 'day').format('MM-DD'))
 usePolling(async () => {
-  const result: any = await service.xfqs.getShortPosition({
-    time: dayjs().format('YYYY-MM-DD')
-  })
-
-  if (result[0].list && result[0].cropType) {
-    const dataSeries = []
-    const legendList = []
-    for (let index = 0; index < result[0].cropType.length; index++) {
-      legendList.push({ name: result[0].cropType[index], icon: 'rect' })
-      dataSeries.push({
-        name: result[0].cropType[index],
-        data: [] as any,
-        type: 'bar',
-        smooth: true,
-        showSymbol: false,
-        stack: 'a',
-        barWidth: 16
-      })
-    }
-    echartOption.value.legend.data = legendList
-    const nameKeys = []
-    for (let index = 0; index < result[0].list.length; index++) {
-      nameKeys.push(result[0].list[index].time)
-      for (const element of result[0].list[index].data) {
-        for (let j = 0; j < dataSeries.length; j++) {
-          if (element.crop === dataSeries[j].name) {
-            dataSeries[j].data.push(element.water)
-          }
-        }
-      }
-    }
-    echartOption.value.xAxis.data = nameKeys
-    echartOption.value.series = dataSeries
-  }
+  echartOption.value.xAxis.data = last7Days
+  echartOption.value.series[0].data = [
+    SeededRandom.randomNumber(0, 10000),
+    SeededRandom.randomNumber(0, 10000),
+    SeededRandom.randomNumber(0, 10000),
+    SeededRandom.randomNumber(0, 10000),
+    SeededRandom.randomNumber(0, 10000),
+    SeededRandom.randomNumber(0, 10000),
+    SeededRandom.randomNumber(0, 10000)
+  ]
 })
 </script>
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 78px 96px;
+  padding: 45px 35px;
+}
+
+.datetime-list {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 30px;
+
+  .btns {
+    padding: 3px 13px;
+    background: rgb(58 74 97 / 80);
+    margin-right: 20px;
+    min-width: 80px;
+    min-height: 34px;
+    text-align: center;
+    cursor: pointer;
+    text-shadow: 0 0 10px #0091FF;
+
+    &:last-child {
+      margin-right: 0;
+    }
+
+    &:hover,
+    &.active {
+      background: url("@/assets/global/images/water/btns-active-bg.png") no-repeat;
+      background-size: 100% 100%;
+    }
+  }
 }
 </style>

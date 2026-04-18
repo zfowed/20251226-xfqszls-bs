@@ -221,16 +221,16 @@ const ditchList = ref<Record<string, any>[]>([])
 
 // 水源工程
 const sluiceList1 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '流域面积', value: 0, unit: 'km2' },
+  { id: 'sluiceList1', name: '流域面积', value: 0, unit: '㎡' },
   { id: 'sluiceList2', name: '平均来水量', value: 0, unit: '万m³' }
 ])
 const sluiceList2 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '承雨面积', value: 0, unit: 'km2' },
-  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm' }
+  { id: 'sluiceList1', name: '承雨面积', value: 0, unit: '㎡' },
+  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm³' }
 ])
 const sluiceList3 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '流域面积', value: 0, unit: 'km2' },
-  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm' }
+  { id: 'sluiceList1', name: '流域面积', value: 0, unit: '㎡' },
+  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm³' }
 ])
 
 const triggerPolling = usePolling(async () => {
