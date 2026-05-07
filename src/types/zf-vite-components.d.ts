@@ -81,6 +81,7 @@ declare module 'vue' {
     SituationPageRightCard3: typeof import('./../components/SituationPageRightCard3.vue')['default']
     SituationPageRightCard33: typeof import('./../components/SituationPageRightCard33.vue')['default']
     ToolsSide: typeof import('./../components/ToolsSide/index.vue')['default']
+    ToolsSide2: typeof import('./../components/ToolsSide2/index.vue')['default']
     VideoPlay: typeof import('./../components/VideoPlay/VideoPlay.vue')['default']
     VideoPlayFlv: typeof import('./../components/VideoPlay/VideoPlayFlv.vue')['default']
     VideoPlayHls: typeof import('./../components/VideoPlay/VideoPlayHls.vue')['default']

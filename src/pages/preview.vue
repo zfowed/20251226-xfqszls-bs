@@ -6,7 +6,8 @@
     </template>
 
     <template #middle>
-      <ToolsSide class="absolute -left-[150px] bottom-[230px]" />
+      <ToolsSide class="absolute -left-[150px] bottom-[230px] z-[1]" />
+      <ToolsSide2 class="absolute -right-[150px] bottom-[230px] z-[10]" />
     </template>
     <template #right>
       <PreviewPageRightCard1 />

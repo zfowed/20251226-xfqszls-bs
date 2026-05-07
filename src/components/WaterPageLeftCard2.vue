@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="灌片需水" bg-class="left">
+  <PageCard title="来水预报" bg-class="left">
     <div class="page-container">
       <div class="datetime-list">
         <div class="btns" v-for="item in dateBtns" :key="item.value" :class="{ active: item.value === currentDateBtn }" @click="currentDateBtn = item.value">

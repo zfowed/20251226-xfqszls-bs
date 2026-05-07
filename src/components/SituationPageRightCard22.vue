@@ -26,7 +26,7 @@ const echartOption = ref({
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 8]
     },
-    data: [{ name: '水位', icon: 'rect' }]
+    data: [{ name: '降水量', icon: 'rect' }]
   },
   grid: {
     top: '12%',
@@ -58,6 +58,8 @@ const echartOption = ref({
   },
   yAxis: [
     {
+      name: 'mm',
+      nameGap: 25,
       type: 'value',
       position: 'left',
       offset: 10,
@@ -84,7 +86,7 @@ const echartOption = ref({
   ],
   series: [
     {
-      name: '水位',
+      name: '降水量',
       data: [] as any,
       type: 'bar',
       smooth: true,

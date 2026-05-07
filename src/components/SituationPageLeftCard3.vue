@@ -4,10 +4,17 @@
       <div class="h-[507px]">
         <PageTable :thead-col="theadCol" :data-list="dataList" :limit-scroll="5">
           <template #name="{ row }">
-            <div class="flex flex-col leading-[45.5px]">
-              <span>{{ row.stnm }}</span>
-              <span class="text-[24px] text-[#BEEEFF]">{{ row.stcd }}</span>
-            </div>
+            <el-tooltip
+              class="box-item"
+              effect="dark"
+              :content="`${row.stnm} (${row.stcd})`"
+              placement="top-start"
+            >
+              <div class="flex flex-col leading-[45.5px]">
+                <span>{{ row.stnm }}</span>
+                <span class="text-[24px] text-[#BEEEFF]">{{ row.stcd }}</span>
+              </div>
+            </el-tooltip>
           </template>
 
           <template #date="{ row }">

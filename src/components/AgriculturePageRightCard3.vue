@@ -3,17 +3,7 @@
     <div class="page-container">
       <div class="px-[14px]">
         <div class="h-[510px]">
-          <PageTable :thead-col="theadCol" :data-list="dataList" :index="true" :limit-scroll="7">
-            <template #index="scope">
-              <div class="table-index">
-                {{ scope.index }}
-              </div>
-            </template>
-            <template #area="scope">
-              <ZfTweenNumber :value="Number(scope.row.area)" />
-              <span class="text-[24px] text-[#BEEEFF] ml-[14px]">亩</span>
-            </template>
-          </PageTable>
+          <PageTable :thead-col="theadCol" :data-list="dataList" :index="false" :limit-scroll="7" />
         </div>
       </div>
     </div>
@@ -21,6 +11,7 @@
 </template>
 
 <script setup lang="ts">
+import { SeededRandom } from 'zf-utilz'
 
 const theadCol = ref([
   {
@@ -40,6 +31,17 @@ const theadCol = ref([
 ])
 
 const dataList = ref<{[key:string]: any}[]>([])
+usePolling(async () => {
+  const tempList = []
+  for (let i = 0; i < 20; i++) {
+    tempList.push({
+      index: i + 1,
+      code: `种植结构监测${i + 1}`,
+      type: SeededRandom.randomNumber(0, 20)
+    })
+    dataList.value = tempList
+  }
+})
 
 </script>
 
