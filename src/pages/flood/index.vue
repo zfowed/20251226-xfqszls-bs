@@ -10,7 +10,8 @@
     </template>
 
     <template #right>
-      <FloodIndexPageRightCard1 />
+      <FloodIndexPageRightCard1 class="mb-[50px]" />
+      <FloodIndexPageRightCard2 />
     </template>
   </PageScreen>
 </template>
