@@ -9,12 +9,12 @@
 import type { EChartsCoreOption, EChartsType } from 'echarts/core'
 import * as echarts from 'echarts/core'
 import { CanvasRenderer } from 'echarts/renderers'
-import { GraphicComponent, GridComponent, LegendComponent, TitleComponent, ToolboxComponent, TooltipComponent } from 'echarts/components'
+import { GraphicComponent, GridComponent, LegendComponent, MarkLineComponent, TitleComponent, ToolboxComponent, TooltipComponent } from 'echarts/components'
 import { BarChart, GraphChart, LineChart, PieChart, RadarChart, GaugeChart, PictorialBarChart } from 'echarts/charts'
 import ResizeObserver from 'resize-observer-polyfill'
 
 echarts.use([CanvasRenderer])
-echarts.use([GraphicComponent, GridComponent, LegendComponent, TitleComponent, ToolboxComponent, TooltipComponent])
+echarts.use([GraphicComponent, GridComponent, LegendComponent, MarkLineComponent, TitleComponent, ToolboxComponent, TooltipComponent])
 echarts.use([BarChart, GraphChart, LineChart, PieChart, RadarChart, GaugeChart, PictorialBarChart])
 
 const props = defineProps<{

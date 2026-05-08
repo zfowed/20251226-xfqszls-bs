@@ -1,308 +1,262 @@
 <template>
-  <PageCard title="预警信息" bg-class="right">
+  <PageCard title="水库洪水预报" bg-class="right">
     <div class="page-container">
-      <div class="h-[588px] mb-[60px]">
+      <div class="forecast-chart">
         <VueEcharts :option="echartOption" />
       </div>
-      <ElTable :data="dataList" class="files-table mt-[30px]" height="1410px">
-        <ElTableColumn type="index" label="序号" width="100">
-          <template #default="scope">
-            <div class="leading-[40px]">
-              {{ scope.row.index }}
-            </div>
-          </template>
-        </ElTableColumn>
-
-        <ElTableColumn prop="code" label="时间">
-          <template #default="scope">
-            <div class="leading-[40px]">
-              {{ scope.row.code }}
-            </div>
-          </template>
-        </ElTableColumn>
-        <ElTableColumn prop="type" label="预测流量（m3/s)" width="260" />
-        <ElTableColumn prop="status" label="实测流量（mm)" width="260" />
-      </ElTable>
     </div>
   </PageCard>
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
+/** 正常蓄水位、讯限蓄水位（m），与设计稿刻度一致 */
+const NORMAL_STORAGE_M = 400
+const FLOOD_LIMIT_STORAGE_M = 125
 
-const dataList = ref<{[key:string]: any}[]>([])
+const X_LABELS = ['12.20', '12.21', '12.22', '12.23', '12.24', '12.25', '12.25']
+
+/** 入库 / 出库流量演示数据（m³/s），与设计稿走势相近 */
+const INFLOW_DEMO = [18, 32, 48, 42, 28, 22, 26]
+const OUTFLOW_DEMO = [12, 22, 52, 46, 32, 24, 30]
+
+const greenArea = {
+  type: 'linear' as const,
+  x: 0,
+  y: 0,
+  x2: 0,
+  y2: 1,
+  colorStops: [
+    { offset: 0, color: 'rgba(140, 230, 90, 0.55)' },
+    { offset: 1, color: 'rgba(140, 230, 90, 0)' }
+  ]
+}
+
+const orangeArea = {
+  type: 'linear' as const,
+  x: 0,
+  y: 0,
+  x2: 0,
+  y2: 1,
+  colorStops: [
+    { offset: 0, color: 'rgba(255, 150, 60, 0.55)' },
+    { offset: 1, color: 'rgba(255, 150, 60, 0)' }
+  ]
+}
+
+/** 水位参考线：用 markLine 画线并带文字（数据点 label 在 symbol:none 时往往不渲染） */
+const levelMarkLine = {
+  silent: true,
+  symbol: 'none' as const,
+  animation: false,
+  lineStyle: {
+    type: 'dashed' as const,
+    color: 'rgba(255, 236, 160, 0.95)',
+    width: 1
+  },
+  label: {
+    show: true,
+    color: 'rgba(255,255,255,0.95)',
+    fontSize: 14,
+    fontFamily: 'PingFangSC, sans-serif'
+  },
+  data: [
+    {
+      yAxis: NORMAL_STORAGE_M,
+      label: {
+        formatter: `正常蓄水位${NORMAL_STORAGE_M}m`,
+        position: 'start' as const,
+        align: 'left' as const,
+        verticalAlign: 'bottom' as const,
+        offset: [10, -18]
+      }
+    },
+    {
+      yAxis: FLOOD_LIMIT_STORAGE_M,
+      label: {
+        formatter: `讯限蓄水位${FLOOD_LIMIT_STORAGE_M}m`,
+        position: 'start' as const,
+        align: 'left' as const,
+        verticalAlign: 'bottom' as const,
+        offset: [10, -18]
+      }
+    }
+  ]
+}
 
 const echartOption = ref({
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis' as const,
+    axisPointer: { type: 'line' as const, lineStyle: { color: 'rgba(255,255,255,0.35)', type: 'dashed' as const } },
+    backgroundColor: 'rgba(20, 40, 60, 0.92)',
+    borderColor: 'rgba(120, 200, 255, 0.35)',
+    textStyle: { color: '#fff', fontSize: 16 },
+    formatter (items: Record<string, any>[]) {
+      if (!items?.length) return ''
+      const axis = items[0].axisValueLabel ?? items[0].name
+      const lines: string[] = [String(axis)]
+      for (const it of items) {
+        const name = it.seriesName as string
+        if (name.includes('蓄水位') || name === '__水位标线') continue
+        const v = it.value
+        const n = typeof v === 'object' && v !== null && 'value' in v ? Number((v as { value: number }).value) : Number(v)
+        if (Number.isNaN(n)) continue
+        if (name === '入库流量' || name === '出库流量') {
+          lines.push(`${name}：${n} m³/s`)
+        }
+      }
+      return lines.join('<br/>')
+    }
   },
   legend: {
-    top: 0,
+    top: 8,
     left: 'center',
-    itemWidth: 30,
-    itemHeight: 10,
+    itemWidth: 28,
+    itemHeight: 3,
+    itemGap: 36,
     textStyle: {
       color: '#FFFFFF',
-      fontSize: 20,
+      fontSize: 18,
       fontFamily: 'PingFangSC, sans-serif',
-      padding: [0, 0, 0, 8]
+      padding: [0, 0, 0, 10]
     },
-    data: [{ name: '面雨量', icon: 'rect' }, { name: '预报流量' }, { name: '实测流量' }]
+    data: [
+      { name: '入库流量', icon: 'roundRect', itemStyle: { color: '#9AE66E' } },
+      { name: '出库流量', icon: 'roundRect', itemStyle: { color: '#FF9A3C' } }
+    ]
   },
   grid: {
-    top: '12%',
-    left: '3%',
-    right: '3%',
-    bottom: '5%',
+    top: '22%',
+    left: '4%',
+    right: '5%',
+    bottom: '12%',
     containLabel: true
   },
   xAxis: {
-    type: 'category',
-    // 柱状图建议留左右间距，避免柱子超出坐标系
-    // boundaryGap: false,
-    axisTick: {
-      show: false
-    },
-    offset: 15,
+    type: 'category' as const,
+    boundaryGap: false,
+    axisTick: { show: false },
+    offset: 10,
     axisLine: {
       lineStyle: {
-        type: 'solid',
-        color: 'rgba(179,223,255, 0.5)'
+        color: 'rgba(179, 223, 255, 0.5)'
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 18,
+      fontSize: 17,
       fontFamily: 'PingFangSC, sans-serif'
     },
-    data: [] as string[]
+    data: [...X_LABELS]
   },
   yAxis: [
     {
-      name: '水位（m)',
-      nameGap: 25,
-      type: 'value',
-      position: 'left',
-      offset: 10,
+      type: 'value' as const,
+      position: 'left' as const,
+      name: '水位 (m)',
+      min: 0,
+      max: 600,
+      interval: 150,
+      nameLocation: 'end' as const,
+      nameGap: 12,
       nameTextStyle: {
-        color: '#FFA163',
-        fontSize: 20
+        color: '#fff',
+        fontSize: 17,
+        fontFamily: 'PingFangSC, sans-serif'
       },
+      axisLine: { show: false },
+      axisTick: { show: false },
       splitLine: {
         show: true,
         lineStyle: {
-          type: 'dashed',
-          color: 'rgba(217,231,255, 0.2)'
+          type: 'dashed' as const,
+          color: 'rgba(217, 231, 255, 0.2)'
         }
       },
       axisLabel: {
-        color: '#FFA163',
-        fontSize: 20,
-        fontFamily: 'PingFangSC, sans-serif'
-      },
-      axisTick: {
-        show: false
+        color: '#fff',
+        fontSize: 17,
+        fontFamily: 'Quantico, PingFangSC, sans-serif'
       }
     },
     {
-      name: '流量（m³/s）',
-      nameLocation: 'start',
-      nameGap: 25,
-      type: 'value',
-      position: 'right',
-      inverse: true,
-      // 保证柱子从 x 轴开始向上画，不会穿过 x 轴
+      type: 'value' as const,
+      position: 'right' as const,
+      name: '流量 (m³/s)',
       min: 0,
+      max: 60,
+      interval: 15,
+      nameLocation: 'end' as const,
+      nameGap: 12,
       nameTextStyle: {
-        color: '#4882FF',
-        fontSize: 20
-      },
-      splitLine: {
-        show: true,
-        lineStyle: {
-          type: 'dashed',
-          color: 'rgba(217,231,255, 0.2)'
-        }
-      },
-      axisLabel: {
-        color: '#4882FF',
-        fontSize: 20,
+        color: '#fff',
+        fontSize: 17,
         fontFamily: 'PingFangSC, sans-serif'
       },
-      axisTick: {
-        show: false
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { show: false },
+      axisLabel: {
+        color: '#fff',
+        fontSize: 17,
+        fontFamily: 'Quantico, PingFangSC, sans-serif'
       }
     }
   ],
   series: [
     {
-      name: '预报流量',
-      data: [] as any,
-      type: 'line',
-      smooth: true,
-      showSymbol: true,
-      symbol: 'circle',
-      symbolSize: 6,
+      name: '__水位标线',
+      type: 'line' as const,
       yAxisIndex: 0,
-      areaStyle: {
-        color: {
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(136, 229, 120, 0.5)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
-          ]
-        }
-      },
-      lineStyle: { color: '#5DFF68' },
-      itemStyle: {
-        color: '#5DFF68'
-      }
-    },
-    {
-      name: '实测流量',
-      data: [] as any,
-      type: 'line',
-      smooth: true,
-      showSymbol: true,
-      symbol: 'circle',
-      symbolSize: 6,
-      yAxisIndex: 0,
-      areaStyle: {
-        color: {
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(255, 162, 55, 0.34)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
-          ]
-        }
-      },
-      lineStyle: { color: '#FF932F' },
-      itemStyle: {
-        color: '#FF932F'
-      }
-    },
-    {
-      name: '面雨量',
-      data: [] as any,
-      type: 'bar',
-      smooth: true,
+      xAxisIndex: 0,
+      data: X_LABELS.map(() => 0),
       showSymbol: false,
+      lineStyle: { width: 0, opacity: 0 },
+      emphasis: { disabled: true },
+      showInLegend: false,
+      silent: true,
+      tooltip: { show: false },
+      markLine: levelMarkLine,
+      z: 8
+    },
+    {
+      name: '入库流量',
+      type: 'line' as const,
       yAxisIndex: 1,
-      barWidth: 16,
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 1,
-          x2: 0,
-          y2: 0,
-          colorStops: [
-            { offset: 0, color: 'rgba(17, 46, 74, 0.2)' },
-            { offset: 1, color: '#3C80C0' }
-          ]
-        }
-      }
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: 8,
+      data: [...INFLOW_DEMO],
+      lineStyle: { color: '#9AE66E', width: 2 },
+      itemStyle: { color: '#9AE66E' },
+      areaStyle: { color: greenArea },
+      z: 3
+    },
+    {
+      name: '出库流量',
+      type: 'line' as const,
+      yAxisIndex: 1,
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: 8,
+      data: [...OUTFLOW_DEMO],
+      lineStyle: { color: '#FF9A3C', width: 2 },
+      itemStyle: { color: '#FF9A3C' },
+      areaStyle: { color: orangeArea },
+      z: 2
     }
   ]
-})
-
-usePolling(async () => {
-  echartOption.value.xAxis.data = Array.from({ length: 7 }, (_, i) => dayjs().subtract(6 - i, 'day').format('MM.DD'))
-  for (let i = 0; i < 7; i++) {
-    echartOption.value.series[0].data[i] = Math.floor(Math.random() * 1000)
-    echartOption.value.series[1].data[i] = Math.floor(Math.random() * 1000)
-    echartOption.value.series[2].data[i] = Math.floor(Math.random() * 1000)
-  }
-
-  dataList.value = Array.from({ length: 20 }).map((_, index) => ({
-    index: index + 1,
-    code: dayjs().format('YYYY-MM-DD HH:mm:ss'),
-    type: `${Math.floor(Math.random() * 1000)}`,
-    status: `${Math.floor(Math.random() * 1000)}`
-  }))
 })
 </script>
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 40px 30px;
-  overflow: hidden;
+  padding: 28px 36px 32px;
+  box-sizing: border-box;
 }
 
-:deep(.el-table) {
-  /* 透明度为0，不显示背景色 */
-  background-color: rgb(255 240 240 / 0);
-}
-
-.files-table {
-  :deep(.el-table__inner-wrapper) {
-    &::before {
-      display: none;
-    }
-
-    tr {
-      background: transparent;
-    }
-
-    .el-table__header-wrapper {
-      th.el-table__cell {
-        background: rgb(19 96 160 / 0.46);
-        cursor: pointer;
-        margin-bottom: 4px;
-        border-bottom: none;
-        color: #fff;
-        font-family: PIngFangSC, sans-serif;
-        font-size: 30px;
-
-        // border: 1px solid #527191;
-      }
-    }
-
-    .el-table__body {
-      border-spacing: 0 4px;
-
-      tr {
-        background: transparent;
-
-        &:hover {
-          background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
-        }
-      }
-    }
-
-    .el-table__body-wrapper {
-      margin-top: 4px;
-
-      td.el-table__cell {
-        background: rgb(19 79 135 / 0.2);
-        cursor: pointer;
-        margin-bottom: 4px;
-        color: #81E6FF;
-        font-family: PIngFangSC, sans-serif;
-        font-size: 30px;
-        border: 1px solid #527191;
-
-        &:not(:last-child) {
-          border-right: none;
-        }
-
-        &:not(:first-child) {
-          border-left: none;
-        }
-      }
-    }
-
-    .cell {
-      height: 80px;
-      line-height: 80px;
-    }
-
-  }
+.forecast-chart {
+  height: 480px;
 }
 </style>
