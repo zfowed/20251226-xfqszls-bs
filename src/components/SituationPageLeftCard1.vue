@@ -31,7 +31,7 @@
           </div>
           <img :src="weatherItem.weather" class="mb-[7px] min-h-[41px]">
           <div class="mb-[7px]">
-            {{ weatherItem?.night?.wind?.direct }}/{{ weatherItem?.day?.wind?.power }}
+            {{ weatherItem?.night?.wind?.direct }}
           </div>
           <div class="mb-[7px]">
             {{ weatherItem.weatherText }}
