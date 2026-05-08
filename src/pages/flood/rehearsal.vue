@@ -23,6 +23,3 @@ const navList = ref<Record<string, any>[]>([
   { name: '预案', path: '/flood/plan' }
 ])
 </script>
-
-<style lang="scss" scoped>
-</style>
