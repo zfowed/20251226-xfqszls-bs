@@ -12,6 +12,7 @@
     <template #right>
       <FloodPlanPageRightCard1 class="mb-[61px]" />
       <FloodPlanPageRightCard2 class="mb-[61px]" />
+      <FloodPlanPageRightCard3 />
     </template>
   </PageScreen>
 </template>
@@ -24,6 +25,3 @@ const navList = ref<Record<string, any>[]>([
   { name: '预案', path: '/flood/plan' }
 ])
 </script>
-
-<style lang="scss" scoped>
-</style>

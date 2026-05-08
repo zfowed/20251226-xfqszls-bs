@@ -1,299 +1,189 @@
 <template>
-  <PageCard title="调度预案" bg-class="left">
-    <div class="page-container">
-      <div class="flex mb-[20px]">
-        <div class="flex flex-1 items-center">
-          <span>文件名称：</span>
-          <ElSelect
-            v-model="filterWaterValue1"
-            placeholder="请选择"
-            :teleported="false"
-            class="app-select flex-1"
-          >
-            <ElOption
-              v-for="item in optionsList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </ElSelect>
-        </div>
-        <ElButton class="ml-[20px] app-button" @click="filterWaterValue1 = ''">
-          搜索
-        </ElButton>
-      </div>
-      <div class="flex">
-        <div class="flex flex-1 items-center">
-          <span>预案类型：</span>
-          <ElSelect
-            v-model="filterWaterValue2"
-            placeholder="请选择"
-            :teleported="false"
-            class="app-select flex-1"
-          >
-            <ElOption
-              v-for="item in optionsList"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </ElSelect>
-        </div>
-        <ElButton class="ml-[20px] app-button" @click="filterWaterValue2 = ''">
-          重置
-        </ElButton>
-      </div>
+  <PageCard title="队伍保障" bg-class="left">
+    <div class="team-support">
+      <div class="top-divider" />
 
-      <ElTable :data="dataList" class="files-table mt-[40px]" height="1015px">
-        <el-table-column type="index" label="序号" width="100" />
-        <ElTableColumn prop="name" label="文件" :show-overflow-tooltip="true" />
-        <ElTableColumn prop="value1" label="预案类型" :show-overflow-tooltip="true" />
-        <ElTableColumn prop="value2" label="格式" :show-overflow-tooltip="true" />
-        <ElTableColumn prop="value3" label="时间" :show-overflow-tooltip="true" />
-        <ElTableColumn label="操作" width="180">
-          <template #default>
-            <div class="flex items-center">
-              <div>
-                <img class="mr-[20px]" src="@/assets/global/images/check.png">
-              </div>
-              <div>
-                <img class="mr-[20px]" src="@/assets/global/images/download.png">
-              </div>
-              <el-popconfirm
-                class="box-item"
-                title="是否确认删除？"
-                placement="top-start"
-                effect="dark"
-                confirm-button-text="确定"
-                cancel-button-text="取消"
-              >
-                <template #reference>
-                  <div>
-                    <img src="@/assets/global/images/del.png">
-                  </div>
-                </template>
-              </el-popconfirm>
-            </div>
-          </template>
-        </ElTableColumn>
-      </ElTable>
+      <div
+        v-for="item in teamRows"
+        :key="item.label"
+        class="team-row"
+        :class="{ 'team-row--multi': item.values.length > 1 }"
+      >
+        <div class="row-icon">
+          <div class="row-icon__inner">
+            <div class="row-icon__bookmark" />
+          </div>
+        </div>
+
+        <div class="row-panel">
+          <p class="row-line">
+            <span class="row-label">{{ item.label }}：</span>
+            <span class="row-value">{{ item.values[0] }}</span>
+          </p>
+          <p v-for="(line, index) in item.values.slice(1)" :key="index" class="row-line row-line--extra">
+            <span class="row-value">{{ line }}</span>
+          </p>
+        </div>
+      </div>
     </div>
   </PageCard>
 </template>
 
 <script setup lang="ts">
+interface TeamRow {
+  label: string
+  values: string[]
+}
 
-const filterWaterValue1 = ref('2026')
-const filterWaterValue2 = ref('2025')
-const optionsList = [
-  { value: '2026', label: '1' },
-  { value: '2025', label: '2' }
+const teamRows: TeamRow[] = [
+  {
+    label: '负责单位',
+    values: ['XXX管理局']
+  },
+  {
+    label: '组成人员',
+    values: ['全局在职同志']
+  },
+  {
+    label: '职能',
+    values: [
+      'XXXXXXXXXXXXXXXXXXXXXXX',
+      'XXXXXXXXXXXXXXXXXXXXXXX',
+      'XXXXXXXXXXXXXXXXXXXXXXX'
+    ]
+  }
 ]
-
-const dataList = ref<{ [key: string]: any }[]>([])
-usePolling(async () => {
-  dataList.value = [{
-    name: '熊渡水库防洪抢险应急预案',
-    value1: '防汛预案',
-    value2: 'doc.',
-    value3: '2026-04-12 12:00:12'
-  }, {
-    name: '熊渡水库防洪抢险应急预案',
-    value1: '防汛预案',
-    value2: 'doc.',
-    value3: '2026-04-12 12:00:12'
-  }, {
-    name: '熊渡水库防洪抢险应急预案',
-    value1: '防汛预案',
-    value2: 'doc.',
-    value3: '2026-04-12 12:00:12'
-  }, {
-    name: '熊渡水库防洪抢险应急预案',
-    value1: '防汛预案',
-    value2: 'doc.',
-    value3: '2026-04-12 12:00:12'
-  }]
-})
 </script>
 
 <style lang="scss" scoped>
-.page-container {
-  padding: 35px 40px;
+.team-support {
+  padding: 30px 40px 35px;
 }
 
-.app-select {
-  &:deep(.el-select__wrapper.is-focused) {
-    .el-input__inner {
-      color: #fff;
-    }
-  }
+.top-divider {
+  position: relative;
+  height: 3px;
+  margin: 0 -40px 48px;
+  background: linear-gradient(90deg,
+      rgb(88 199 255 / 0.7) 0%,
+      rgb(88 199 255 / 0.08) 100%);
+  box-shadow: 0 0 20px rgb(51 165 241 / 0.45);
 
-  &:deep(.el-popper) {
-    background: rgb(14 47 66 / 0.6);
-    border: none;
-    top: 70px !important;
-    left: 0 !important;
-
-    .el-popper__arrow {
-      display: none;
-    }
-
-    .el-select-dropdown__item {
-      height: 60px;
-      color: #81E6FF;
-      font-size: 30px;
-      font-family: PingFangSC, sans-serif;
-      line-height: 60px;
-
-      &.is-hovering {
-        background: rgb(92 133 255 / 0.51);
-      }
-    }
-  }
-
-  &:deep(.el-select__wrapper) {
-    background: rgb(14 47 66 / 0.6);
-    border: 1px solid #4896C6;
-    box-shadow: none;
-
-    &:hover,
-    &:active {
-      box-shadow: none !important;
-    }
-
-    .el-select__selection {
-      height: 60px;
-      line-height: 60px;
-      font-size: 30px;
-      font-family: PingFangSC, sans-serif;
-      letter-spacing: 5px;
-
-      .el-select__placeholder {
-        color: #81E6FF;
-      }
-    }
-
-    .el-select__suffix {
-      display: flex;
-      align-items: center;
-
-      .el-select__icon {
-        width: 30px;
-        height: 30px;
-        background: url('@/assets/global/images/flood/guide-triangle.png') no-repeat;
-        background-size: 100%;
-      }
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 34px;
+    height: 5px;
+    background: #33a5f1;
   }
 }
 
-.app-input {
-  &:deep(.el-input__wrapper) {
-    height: 65px;
-    font-size: 28px;
-    background: rgb(14 47 66 / 0.6);
-    border: 1px solid #4896C6;
-    box-shadow: none;
+.team-row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
 
-    .el-input__inner {
-      color: #4BDBFF;
-    }
+  &:last-child {
+    margin-bottom: 0;
   }
 }
 
-.app-button {
-  background: rgb(14 47 66 / 0.6);
-  border: 1px solid #4896C6;
-  color: #81E6FF;
-  font-size: 30px;
-  font-family: PingFangSC, sans-serif;
-  height: 65px;
-  padding: 0 30px;
-
-  &:hover {
-    background: rgb(92 133 255 / 0.51);
-    border-color: #4896C6;
-    color: #81E6FF;
-    box-shadow: none !important;
-   }
-
-   &:active {
-    background: rgb(92 133 255 / 0.51);
-    border-color: #4896C6;
-    color: #81E6FF;
-    box-shadow: none !important;
-   }
-
+.row-icon {
+  width: 70px;
+  height: 70px;
+  padding: 6px;
+  border: 1px solid #2987bb;
+  background: linear-gradient(180deg,
+      rgb(20 87 130 / 0.88),
+      rgb(9 56 88 / 0.88));
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
-:deep(.el-table) {
-  /* 透明度为0，不显示背景色 */
-  background-color: rgb(255 240 240 / 0);
+.row-icon__inner {
+  width: 100%;
+  height: 100%;
+  border: 1px solid rgb(142 198 233 / 0.8);
+  background: radial-gradient(circle at 90% 12%,
+      rgb(85 164 203 / 0.55),
+      rgb(8 63 98 / 0.8) 38%,
+      rgb(3 29 51 / 0.85) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.files-table {
-  :deep(.el-table__inner-wrapper) {
-    &::before {
-      display: none;
-    }
+.row-icon__bookmark {
+  width: 24px;
+  height: 31px;
+  background: #d8f4ff;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+  position: relative;
 
-    tr {
-      background: transparent;
-    }
+  &::before {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    transform: translateX(-50%);
+    background: #6fa7be;
+  }
+}
 
-    .el-table__header-wrapper {
-      th.el-table__cell {
-        background: rgb(19 96 160 / 0.46);
-        cursor: pointer;
-        margin-bottom: 4px;
-        border-bottom: none;
-        color: #fff;
-        font-family: PIngFangSC, sans-serif;
-        font-size: 30px;
+.row-panel {
+  flex: 1;
+  min-height: 70px;
+  padding: 0 20px;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  box-sizing: border-box;
+  background: linear-gradient(90deg,
+      rgb(33 87 135 / 0.9) 0%,
+      rgb(2 62 112 / 0) 100%);
+}
 
-        // border: 1px solid #527191;
-      }
-    }
+.row-line {
+  margin: 0;
+  line-height: 1.45;
+  font-size: 28px;
+  color: #fff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.4px;
+}
 
-    .el-table__body {
-      border-spacing: 0 4px;
+.row-label {
+  display: inline-block;
+  min-width: 140px;
+}
 
-      tr {
-        background: transparent;
+.row-value {
+  display: inline-block;
+}
 
-        &:hover {
-          background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
-        }
-      }
-    }
+.team-row--multi {
+  .row-icon {
+    margin-top: 7px;
+  }
 
-    .el-table__body-wrapper {
-      margin-top: 4px;
+  .row-panel {
+    min-height: 215px;
+    justify-content: flex-start;
+    padding-top: 10px;
+  }
 
-      td.el-table__cell {
-        background: rgb(19 79 135 / 0.2);
-        cursor: pointer;
-        margin-bottom: 4px;
-        color: #81E6FF;
-        font-family: PIngFangSC, sans-serif;
-        font-size: 30px;
-        border: 1px solid #527191;
+  .row-line {
+    line-height: 56px;
+  }
 
-        &:not(:last-child) {
-          border-right: none;
-        }
-
-        &:not(:first-child) {
-          border-left: none;
-        }
-      }
-    }
-
-    .cell {
-      height: 80px;
-      line-height: 80px;
-    }
-
+  .row-line--extra {
+    padding-left: 140px;
   }
 }
 </style>
