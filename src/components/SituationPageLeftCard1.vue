@@ -31,6 +31,9 @@
           </div>
           <img :src="weatherItem.weather" class="mb-[7px] min-h-[41px]">
           <div class="mb-[7px]">
+            {{ weatherItem?.night?.wind?.direct }}/{{ weatherItem?.day?.wind?.power }}
+          </div>
+          <div class="mb-[7px]">
             {{ weatherItem.weatherText }}
           </div>
           <div class="mb-[7px]">
@@ -47,6 +50,20 @@ import dayjs from 'dayjs'
 
 const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/weather/${icon}.png`, import.meta.url).href
+}
+
+const weekTextMap: Record<number, string> = {
+  0: '星期日',
+  1: '星期一',
+  2: '星期二',
+  3: '星期三',
+  4: '星期四',
+  5: '星期五',
+  6: '星期六'
+}
+
+const formatWeekText = (date: string) => {
+  return weekTextMap[dayjs(date).day()] ?? ''
 }
 
 const todayWeather = ref<Record<string, any>>({
@@ -67,8 +84,9 @@ usePolling(async () => {
   const dayWeatherList = []
   for (const dayItem of result.predict.detail) {
     dayWeatherList.push({
+      ...dayItem,
       date: dayjs(dayItem.date).format('MM-DD'),
-      week: dayItem.week,
+      week: formatWeekText(dayItem.date),
       weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(dayItem.night.weather.info) : getPhotoUrl(dayItem.day.weather.info),
       weatherText: dayItem.textDay,
       tempMin: dayItem.night.weather.temperature,

@@ -5,9 +5,9 @@
         灌区概述
       </div>
       <div class="details-text">
-        熊渡水库位于宜都市聂家河镇境内、长江二级支流渔洋河中下游，系渔洋河流域梯级开发的龙头水库。水库总库容9552万m³，大坝为常态混凝土单曲拱坝，最大坝高74m，属Ⅲ等中型水库，主要建筑物级别为3级。
+        宜都市幸福渠灌区位于湖北省宜昌市宜都市，建成于1959年，设计灌溉面积8.12万亩，农作物主要以种植水稻、玉米、油料等为主，灌溉主水源为熊渡水库（中型），是一座以灌溉为主，兼有防洪、发电等综合效益的自流型中型灌区。灌区现有骨干干支渠7条，总长为74.21km（其中，干渠46.15km、支渠28.06km），各类渠系建筑物430余处。
       </div>
-      <div class="h-[245px] mb-[65px]">
+      <div class="h-[245px] mb-[45px]">
         <Swiper
           :modules="[Autoplay, Pagination]"
           :loop="true"
@@ -76,9 +76,9 @@ const swiperDataList = ref([
 const completeRate = ref(0)
 const dataList = reactive([
   { title: '聂家河镇', value: 0, unit: '万m3' },
-  { title: '五眼泉镇', value: 0, unit: '万m3' },
-  { title: '姚家店', value: 0, unit: '万m3' },
-  { title: '九道河', value: 0, unit: '万m3' }
+  { title: '姚家店乡', value: 0, unit: '万m3' },
+  { title: '枝城镇', value: 0, unit: '万m3' },
+  { title: '陆城街道', value: 0, unit: '万m3' }
 ])
 
 usePolling(async () => {
