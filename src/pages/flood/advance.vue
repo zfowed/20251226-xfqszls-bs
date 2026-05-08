@@ -9,10 +9,6 @@
     <template #middle>
       <NavSide v-model="navList" class="absolute -left-[100px] top-[30px]" />
     </template>
-
-    <template #right>
-      <FloodAdvancePageRightCard1 class="mb-[61px]" />
-    </template>
   </PageScreen>
 </template>
 
