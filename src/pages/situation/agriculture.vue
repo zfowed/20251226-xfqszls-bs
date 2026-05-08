@@ -1,7 +1,8 @@
 <template>
   <PageScreen>
     <template #left>
-      <AgriculturePageLeftCard1 />
+      <AgriculturePageLeftCard11 />
+      <AgriculturePageLeftCard12 />
     </template>
 
     <template #middle>
