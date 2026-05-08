@@ -1,21 +1,19 @@
 <template>
   <PageCard title="未来24h水库水情" bg-class="right">
     <div class="page-container">
-      <div class="grid grid-cols-3 gap-col-[29px]">
-        <div class="reservoir-item" v-for="(item, index) in reservoirInfo" :key="index">
-          <img
-            :src="item.icon"
-            class="reservoir-item__icon mr-[14px]"
-          >
+      <div class="header-title flex items-center mb-[30px]">
+        <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+        <span>熊渡水库水位</span>
+      </div>
+
+      <div class="reservoir-summary">
+        <div v-for="item in reservoirInfo" :key="item.name" class="reservoir-item">
+          <img :src="item.icon" :alt="item.name" class="reservoir-item__icon">
           <div>
             <div class="reservoir-item__label">
               {{ item.name }}
             </div>
-            <div v-if="typeof item.value == 'string'">
-              <span class="text-[30px] mr-[8px]">{{ item.value }}</span>
-              <span class="text-[16px]">{{ item.unit }}</span>
-            </div>
-            <div v-else>
+            <div class="reservoir-item__value-row">
               <ZfTweenNumber :value="item.value" class="reservoir-item__value" />
               <span class="reservoir-item__unit">{{ item.unit }}</span>
             </div>
@@ -23,8 +21,35 @@
         </div>
       </div>
 
-      <div class="h-[428px] mt-[50px]">
+      <div class="reservoir-chart">
         <VueEcharts :option="echartOption" />
+      </div>
+
+      <div class="header-title flex items-center mb-[30px]">
+        <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+        <span>渠道水位</span>
+      </div>
+
+      <div class="reservoir-table">
+        <PageTable :thead-col="theadCol" :data-list="tableDataList" :limit-scroll="5">
+          <template #siteName="scope">
+            <div class="reservoir-table__site">
+              <img
+                src="@/components/PageTable/assets/index-bg-1.png"
+                class="flow-table__site-icon"
+              >
+              <span>{{ scope.row.siteName }}</span>
+            </div>
+          </template>
+          <template #waterLevel="scope">
+            <span class="reservoir-table__value">{{ scope.row.waterLevel }}</span>
+            <span class="reservoir-table__unit">m</span>
+          </template>
+          <template #waterDepth="scope">
+            <span class="reservoir-table__value">{{ scope.row.waterDepth }}</span>
+            <span class="reservoir-table__unit">m</span>
+          </template>
+        </PageTable>
       </div>
     </div>
   </PageCard>
@@ -33,187 +58,153 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 
-const getPhotoUrl = (icon: string) => {
-  return new URL(`../assets/global/images/flood/${icon}.png`, import.meta.url).href
+const getSituationPhotoUrl = (icon: string) => {
+  return new URL(`../assets/global/images/situation/SituationPageLeftCard3/${icon}.png`, import.meta.url).href
+}
+
+const getWaterPhotoUrl = (icon: string) => {
+  return new URL(`../assets/global/images/water/${icon}.png`, import.meta.url).href
 }
 
 const reservoirInfo = ref<Record<string, any>>([
-  { icon: getPhotoUrl('day-water-icon'), name: '当日供水', value: 0, unit: 'm' },
-  { icon: getPhotoUrl('watch-time-icon'), name: '监测时间', value: '', unit: '' },
-  { icon: getPhotoUrl('alarm-status-icon'), name: '警戒状态', value: '', unit: '' }
+  { icon: getSituationPhotoUrl('q1'), name: '总库容', value: 12.3, unit: '万m3' },
+  { icon: getWaterPhotoUrl('home-icon'), name: '较上年度', value: 0.8, unit: '万m3' },
+  { icon: getSituationPhotoUrl('q2'), name: '较多年同期', value: -2.3, unit: '万m3' }
+])
+const theadCol = ref([
+  {
+    key: 'siteName',
+    name: '站点',
+    width: 230
+  },
+  {
+    key: 'waterLevel',
+    name: '水位',
+    width: 120,
+    align: 'center'
+  },
+  {
+    key: 'waterDepth',
+    name: '水深',
+    width: 120,
+    align: 'center'
+  },
+  {
+    key: 'time',
+    name: '时间',
+    width: 240,
+    align: 'center'
+  }
+])
+const tableDataList = ref<Record<string, any>[]>([
+  { siteName: 'XXX站点', waterLevel: 2, waterDepth: 2, time: '26/4/23 10:00' },
+  { siteName: 'XXX站点', waterLevel: 1, waterDepth: 1, time: '26/4/22 13:00' },
+  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/21 12:00' },
+  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/20 9:00' },
+  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/20 16:00' }
 ])
 
 const echartOption = ref({
   tooltip: {
     trigger: 'axis'
   },
+  title: {
+    text: '水位mm',
+    top: 8,
+    left: 0,
+    textStyle: {
+      color: '#FFFFFF',
+      fontSize: 20,
+      fontWeight: 'normal',
+      fontFamily: 'PingFangSC, sans-serif'
+    }
+  },
   legend: {
-    top: 0,
-    left: 'center',
-    itemWidth: 30,
-    itemHeight: 10,
+    top: 8,
+    right: 20,
+    itemWidth: 24,
+    itemHeight: 8,
     textStyle: {
       color: '#FFFFFF',
       fontSize: 20,
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 8]
     },
-    data: [{ name: '水位', icon: 'rect' }, { name: '入库流量' }, { name: '出库流量' }]
+    data: [{ name: '熊渡水库', icon: 'roundRect' }]
   },
   grid: {
-    top: '12%',
-    left: '3%',
-    right: '3%',
-    bottom: '5%',
+    top: '22%',
+    left: '6%',
+    right: '6%',
+    bottom: '10%',
     containLabel: true
   },
   xAxis: {
     type: 'category',
-    // 柱状图建议留左右间距，避免柱子超出坐标系
-    // boundaryGap: false,
+    boundaryGap: false,
     axisTick: {
       show: false
     },
-    offset: 15,
     axisLine: {
       lineStyle: {
-        type: 'solid',
-        color: 'rgba(179,223,255, 0.5)'
+        color: 'rgba(179,223,255, 0.45)',
+        width: 2
       }
     },
     axisLabel: {
       color: '#fff',
       fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif'
+      fontFamily: 'PingFangSC, sans-serif',
+      margin: 18
     },
     data: [] as string[]
   },
-  yAxis: [
-    {
-      name: '水位（m)',
-      nameGap: 25,
-      type: 'value',
-      position: 'left',
-      offset: 10,
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 20
-      },
-      splitLine: {
-        show: true,
-        lineStyle: {
-          type: 'dashed',
-          color: 'rgba(217,231,255, 0.2)'
-        }
-      },
-      axisLabel: {
-        color: '#fff',
-        fontSize: 20,
-        fontFamily: 'PingFangSC, sans-serif'
-      },
-      axisTick: {
-        show: false
-      }
+  yAxis: {
+    type: 'value',
+    splitNumber: 3,
+    axisLine: {
+      show: false
     },
-    {
-      name: '流量（m³/s）',
-      nameGap: 25,
-      type: 'value',
-      position: 'right',
-      // 保证柱子从 x 轴开始向上画，不会穿过 x 轴
-      min: 0,
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 20
-      },
-      splitLine: {
-        show: true,
-        lineStyle: {
-          type: 'dashed',
-          color: 'rgba(217,231,255, 0.2)'
-        }
-      },
-      axisLabel: {
-        color: '#fff',
-        fontSize: 20,
-        fontFamily: 'PingFangSC, sans-serif'
-      },
-      axisTick: {
-        show: false
+    axisTick: {
+      show: false
+    },
+    axisLabel: {
+      color: '#d9efff',
+      fontSize: 16,
+      fontFamily: 'Quantico, sans-serif'
+    },
+    splitLine: {
+      show: true,
+      lineStyle: {
+        type: 'dashed',
+        color: 'rgba(217,231,255, 0.16)'
       }
     }
-  ],
+  },
   series: [
     {
-      name: '入库流量',
-      data: [] as any,
+      name: '熊渡水库',
+      data: [] as number[],
       type: 'line',
-      smooth: true,
-      showSymbol: true,
-      symbol: 'circle',
-      symbolSize: 6,
-      yAxisIndex: 1,
-      areaStyle: {
-        color: {
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(136, 229, 120, 0.5)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
-          ]
-        }
-      },
-      lineStyle: { color: '#5DFF68' },
-      itemStyle: {
-        color: '#5DFF68'
-      }
-    },
-    {
-      name: '出库流量',
-      data: [] as any,
-      type: 'line',
-      smooth: true,
-      showSymbol: true,
-      symbol: 'circle',
-      symbolSize: 6,
-      yAxisIndex: 1,
-      areaStyle: {
-        color: {
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(255, 162, 55, 0.34)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
-          ]
-        }
-      },
-      lineStyle: { color: '#FF932F' },
-      itemStyle: {
-        color: '#FF932F'
-      }
-    },
-    {
-      name: '水位',
-      data: [] as any,
-      type: 'bar',
       smooth: true,
       showSymbol: false,
-      yAxisIndex: 0,
-      barWidth: 16,
+      lineStyle: {
+        color: '#72FF62',
+        width: 3
+      },
       itemStyle: {
+        color: '#72FF62'
+      },
+      areaStyle: {
         color: {
           type: 'linear',
           x: 0,
-          y: 1,
+          y: 0,
           x2: 0,
-          y2: 0,
+          y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(17, 46, 74, 0.2)' },
-            { offset: 1, color: '#3C80C0' }
+            { offset: 0, color: 'rgba(114, 255, 98, 0.55)' },
+            { offset: 1, color: 'rgba(114, 255, 98, 0)' }
           ]
         }
       }
@@ -223,36 +214,59 @@ const echartOption = ref({
 
 usePolling(async () => {
   const warnInfoResult: any = await service.xfqs.getRsvrWarnInfo({})
-  reservoirInfo.value[0].value = Number(warnInfoResult.currntZ)
-  reservoirInfo.value[1].value = dayjs(warnInfoResult.tm).format('MM.DD')
-  reservoirInfo.value[1].unit = dayjs(warnInfoResult.tm).format('HH:mm')
-  reservoirInfo.value[2].value = warnInfoResult.msg
-
   const pageResult: any = await service.xfqs.hsybForecastccFindPage({
     start: 1,
     limit: 1,
     lx: 1
   })
+
+  let xAxisData = ['12.20', '12.21', '12.22', '12.23', '12.24', '12.25']
+  let seriesData = [50.1, 56.1, 53.2, 54.8, 50.5, 56.4]
+
   if (pageResult.list.length > 0) {
-    // 获取hsybForecastccFindPage 接口的第一个id，调用 hsybForecastccFindById 接口获取水库水情预测数据
     const echartsResult: any = await service.xfqs.hsybForecastccFindById({
       id: pageResult.list[0].id
     })
-    const hsybForecastList = echartsResult.hsybForecastccDdfafExtList[0].hsybForecastcExtList[0].hsybForecastList
-    const nameKeys = []
-    const arrList1 = []
-    const arrList2 = []
-    const arrList3 = []
-    for (const hsybItem of hsybForecastList) {
-      nameKeys.push(dayjs(hsybItem.tm).format('MM.DD'))
-      arrList1.push(hsybItem.q)
-      arrList2.push(hsybItem.otq)
-      arrList3.push(hsybItem.z)
+    const hsybForecastList =
+      echartsResult?.hsybForecastccDdfafExtList?.[0]?.hsybForecastcExtList?.[0]?.hsybForecastList || []
+
+    if (hsybForecastList.length > 0) {
+      xAxisData = hsybForecastList.map((item: Record<string, any>) => dayjs(item.tm).format('MM.DD'))
+      seriesData = hsybForecastList.map((item: Record<string, any>) => Number(item.z) || 0)
     }
-    echartOption.value.xAxis.data = nameKeys
-    echartOption.value.series[0].data = arrList1
-    echartOption.value.series[1].data = arrList2
-    echartOption.value.series[2].data = arrList3
+  }
+
+  const currentValue = Number(warnInfoResult?.currntZ) || seriesData[seriesData.length - 1] || 12.3
+  const previousYearValue = seriesData.length > 1 ? currentValue - Number(seriesData[seriesData.length - 2] || 0) : 0.8
+  const multiYearValue = seriesData.length > 0
+    ? currentValue - seriesData.reduce((sum: number, item: number) => sum + item, 0) / seriesData.length
+    : -2.3
+
+  reservoirInfo.value[0].value = Number((currentValue || 12.3).toFixed(1))
+  reservoirInfo.value[1].value = Number((previousYearValue || 0.8).toFixed(1))
+  reservoirInfo.value[2].value = Number((multiYearValue || -2.3).toFixed(1))
+
+  echartOption.value.xAxis.data = xAxisData
+  echartOption.value.series[0].data = seriesData
+
+  const dataMin = Math.min(...seriesData)
+  const dataMax = Math.max(...seriesData)
+  echartOption.value.yAxis.min = Number((dataMin - 3).toFixed(1))
+  echartOption.value.yAxis.max = Number((dataMax + 3).toFixed(1))
+
+  const gateResult: any = await service.xfqs.getGatePageList({
+    start: 1,
+    limit: 5,
+    sttp: 'DD'
+  })
+
+  if (gateResult?.list?.length > 0) {
+    tableDataList.value = gateResult.list.slice(0, 5).map((item: Record<string, any>) => ({
+      siteName: item.stnm || 'XXX站点',
+      waterLevel: Number(item.inz || 0),
+      waterDepth: Number(item.otz || 0),
+      time: item.tm ? dayjs(item.tm).format('YY/M/DD H:mm') : '--'
+    }))
   }
 })
 </script>
@@ -262,13 +276,40 @@ usePolling(async () => {
   padding: 35px 40px;
 }
 
+.flow-table__site-icon {
+  width: 42px;
+  height: 42px;
+  margin-right: 14px;
+}
+
+.reservoir-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  column-gap: 29px;
+}
+
 .reservoir-item {
   display: flex;
   align-items: center;
   font-family: PingFangSC, sans-serif;
 
+  .reservoir-item__icon {
+    width: 76px;
+    height: 84px;
+    margin-right: 14px;
+    flex-shrink: 0;
+  }
+
   .reservoir-item__label {
+    margin-bottom: 6px;
     font-size: 30px;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  .reservoir-item__value-row {
+    display: flex;
+    align-items: baseline;
   }
 
   .reservoir-item__value {
@@ -276,11 +317,46 @@ usePolling(async () => {
     font-size: 32px;
     font-weight: bold;
     color: #50fffc;
+    text-shadow: 0 0 10px rgb(80 255 252 / 0.3);
   }
 
   .reservoir-item__unit {
+    margin-left: 8px;
     font-size: 24px;
     color: #beeeff;
   }
+}
+
+.reservoir-chart {
+  height: 428px;
+  margin: 50px 0 30px;
+}
+
+.reservoir-table {
+  height: 405px;
+}
+
+.reservoir-table__site {
+  display: flex;
+  align-items: center;
+  color: #81e6ff;
+}
+
+.reservoir-table__site-icon {
+  width: 28px;
+  height: 28px;
+  margin-right: 14px;
+}
+
+.reservoir-table__value {
+  color: #50fffc;
+  font-size: 22px;
+  font-family: Quantico, sans-serif;
+}
+
+.reservoir-table__unit {
+  margin-left: 6px;
+  color: #d8edff;
+  font-size: 18px;
 }
 </style>

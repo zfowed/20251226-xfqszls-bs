@@ -12,7 +12,7 @@
     <template #right>
       <SituationPageRightCard11 class="mb-[40px]" />
       <SituationPageRightCard22 class="mb-[40px]" />
-      <SituationPageRightCard33 />
+      <!-- <SituationPageRightCard33 /> -->
     </template>
   </PageScreen>
 </template>

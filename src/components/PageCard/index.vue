@@ -3,7 +3,7 @@
     <div class="card-container">
       <div class="card-header">
         <div class="card-title ml-[117px] mt-[-60px]">
-          {{ props.title }}
+          <slot name="title">{{ props.title }}</slot>
         </div>
         <div class="card-title-right">
           <slot name="right-side" />
@@ -17,7 +17,7 @@
 </template>
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
-  title: string,
+  title?: string,
   bgClass: 'left' | 'right' | 'middle'
 }>(), {
   title: '',
