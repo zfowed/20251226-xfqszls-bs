@@ -42,8 +42,7 @@ usePolling(async () => {
 
 <style lang="scss" scoped>
 .page-container {
-  height: 424px;
-  padding: 30px 40px;
+  padding: 30px;
   overflow: auto;
   box-sizing: border-box;
 }
@@ -74,7 +73,14 @@ usePolling(async () => {
 }
 
 .dispatch-file {
-  padding: 11px 11px 5px;
+  padding: 11px;
   background: #1fc6ff;
+  box-sizing: border-box;
+
+  img {
+    display: block;
+    line-height: 1;
+    width: 100%;
+  }
 }
 </style>

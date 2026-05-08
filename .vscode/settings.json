@@ -1,0 +1,24 @@
+{
+  // 一个制表符等于的空格数。
+  "editor.tabSize": 2,
+  // 按 Tab 键时插入空格。
+  "editor.insertSpaces": true,
+  // 在保存时运行的代码操作类型。
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.fixAll.stylelint": "explicit"
+  },
+  "editor.formatOnSave": false, // 保存时自动格式化
+  "typescript.updateImportsOnFileMove.enabled": "never",
+  "stylelint.validate": [
+    "css",
+    "less",
+    "postcss",
+    "scss",
+    "vue",
+    "sass"
+  ],
+  "fileheader.configObj": { // 头部注释（koroFileHeader插件）
+    "autoAdd": false // 自动添加头部注释开启才能自动添加
+  },
+}

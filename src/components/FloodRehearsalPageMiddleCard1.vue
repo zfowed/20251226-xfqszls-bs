@@ -108,7 +108,7 @@ const dataList = ref<RehearsalPlanItem[]>([
   padding: 0 14px;
   border: 1px solid #7dc8f5;
   border-radius: 4px;
-  margin-bottom: 32px;
+  margin-bottom: 12px;
   color: #dff4ff;
   font-size: 20px;
   line-height: 32px;
