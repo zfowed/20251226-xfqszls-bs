@@ -9,7 +9,7 @@
       <div class="px-[14px]">
         <div class="header-title">
           <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
-          <span>灌区概述</span>
+          <span>幸福渠灌区</span>
           <!-- <span class="header-title__tag">西干果</span> -->
         </div>
         <div class="h-[640px]">
@@ -36,7 +36,7 @@
 const currentType = ref<string>('agriculture')
 const btnsList = reactive([
   { label: '农业灌溉供水', value: 'agriculture', active: true },
-  { label: '城镇生活供水', value: 'town', active: false },
+  // { label: '城镇生活供水', value: 'town', active: false },
   { label: '生态环境供水', value: 'ecology', active: false }
 ])
 const clickOperationHandle = (item: Record<string, any>) => {
@@ -51,11 +51,11 @@ const clickOperationHandle = (item: Record<string, any>) => {
 const theadCol = ref([
   {
     key: 'name',
-    name: '灌区名称'
+    name: '行政村名称'
   },
   {
     key: 'area',
-    name: '灌溉面积'
+    name: '有效灌溉面积'
   }
 ])
 

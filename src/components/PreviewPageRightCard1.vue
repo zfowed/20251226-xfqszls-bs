@@ -35,32 +35,27 @@
           </div>
         </div>
 
-        <Swiper
-          :slides-per-view="1"
-          :grid="{ rows: 1, fill: 'row' }"
-          :modules="[Autoplay]"
-          :autoplay="{ delay: 3000 }"
-          :space-between="30"
-          class="h-[362px]"
-        >
-          <SwiperSlide v-for="(group, groupIdx) in ditchList" :key="groupIdx">
-            <div class="grid grid-cols-3 gap-col-[71px] gap-row-[48px]">
-              <div class="ditch-item" v-for="item in group" :key="item.id">
-                <img :src="item.icon" class="w-[35px] h-[45px] mt-[20px] mb-[10px]">
-                <div class="ditch-item__title">
-                  {{ item.name }}
+        <div class="ditch-grid">
+          <div
+            v-for="(row, rowIndex) in ditchRows"
+            :key="rowIndex"
+            class="ditch-grid__row"
+            :class="`ditch-grid__row--${row.length}`"
+          >
+            <div v-for="item in row" :key="item.id" class="ditch-item">
+              <img :src="item.icon" :alt="item.name" class="ditch-item__icon">
+              <div class="ditch-item__title">
+                {{ item.name }}
+              </div>
+              <div class="ditch-item__value-group">
+                <div class="ditch-item__value">
+                  <ZfTweenNumber :value="Number(item.len)" />
                 </div>
-                <div class="flex items-baseline mb-[9px]">
-                  <div class="ditch-item__value">
-                    <ZfTweenNumber :value="Number(item.len)" />
-                  </div>
-                  <span class="ditch-item__unit">km</span>
-                </div>
+                <span class="ditch-item__unit">km</span>
               </div>
             </div>
-          </SwiperSlide>
-        </Swiper>
-        <div class="my-swiper-pagination" />
+          </div>
+        </div>
       </div>
 
       <!-- 水源工程 -->
@@ -72,96 +67,47 @@
         <span>水源工程</span>
       </div>
 
-      <img src="@/assets/global/images/preview/card-right1.png" class="mb-[55px]">
+      <img src="@/assets/global/images/preview/card-right2.png" class="mb-[55px]">
 
-      <div class="app-table mb-[35px]">
-        <div class="table-header">
-          <div
-            class="sluice-btns"
-            :class="{ active: item.active }"
-            v-for="item in sluiceBtns"
-            :key="item.id"
-            @click="clickSluiceHandle(item)"
-          >
-            <img :src="item.icon" class="mr-[20px]">
-            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{
-              item.name
-            }}</span>
-          </div>
-        </div>
-        <div class="table-tbody">
-          <div v-for="item in sluiceList1" :key="item.id" class="table-tbody__tr">
-            <div class="sluice-item">
-              <div class="sluice-item__title">
-                {{ item.name }}
-              </div>
-              <div class="sluice-item__value">
-                <ZfTweenNumber :value="item.value" />
-              </div>
-              <span class="sluice-item__unit">{{ item.unit }}</span>
-            </div>
-          </div>
-        </div>
+      <!-- 水库信息 -->
+      <div class="header-title mb-[25px]">
+        <img
+          src="@/assets/global/images/card-title-icon.png"
+          class="w-[30px] h-[32px] mr-[9px]"
+        >
+        <span>水库信息</span>
       </div>
-      <div class="app-table mb-[35px]">
-        <div class="table-header">
-          <div
-            class="sluice-btns"
-            :class="{ active: item.active }"
-            v-for="item in sluiceBtns2"
-            :key="item.id"
-          >
-            <img :src="item.icon" class="mr-[20px]">
-            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{
-              item.name
-            }}</span>
+      <div class="reservoir-card">
+        <div class="reservoir-card__header">
+          <div class="reservoir-card__label">
+            水库名称:
           </div>
+          <ElSelect
+            v-model="selectedReservoirId"
+            class="reservoir-card__select"
+            popper-class="reservoir-card__select-popper"
+            placeholder="请选择水库"
+          >
+            <ElOption
+              v-for="item in reservoirList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            />
+          </ElSelect>
         </div>
-        <div class="table-tbody">
-          <div v-for="item in sluiceList2" :key="item.id" class="table-tbody__tr">
-            <div class="sluice-item">
-              <div class="sluice-item__title">
-                {{ item.name }}
-              </div>
-              <div class="sluice-item__value">
-                <ZfTweenNumber :value="item.value" />
-              </div>
-              <span class="sluice-item__unit">{{ item.unit }}</span>
+        <div class="reservoir-card__table">
+          <div
+            v-for="metric in currentReservoir?.metrics || []"
+            :key="metric.id"
+            class="reservoir-card__column"
+          >
+            <div class="reservoir-card__column-title">
+              {{ metric.name }}
             </div>
-          </div>
-        </div>
-      </div>
-      <div class="app-table mb-[65px]">
-        <div class="table-header">
-          <div
-            class="sluice-btns"
-            :class="{ active: item.active }"
-            v-for="item in sluiceBtns3"
-            :key="item.id"
-          >
-            <img :src="item.icon" class="mr-[20px]">
-            <span :class="item.active ? 'text-white' : 'text-[#9BA7B3]'">{{
-              item.name
-            }}</span>
-          </div>
-        </div>
-        <div class="table-tbody">
-          <div v-for="item in sluiceList3" :key="item.id" class="table-tbody__tr">
-            <div class="sluice-item">
-              <div class="sluice-item__title">
-                {{ item.name }}
-              </div>
-              <div class="flex" v-if="typeof item.value === 'string'">
-                <div class="sluice-item__title ml-[15px]">
-                  {{ item.value }}
-                </div>
-              </div>
-              <div class="flex items-baseline" v-else>
-                <div class="sluice-item__value">
-                  <ZfTweenNumber :value="item.value" />
-                </div>
-                <span class="sluice-item__unit">{{ item.unit }}</span>
-              </div>
+            <div class="reservoir-card__column-value">
+              <ZfTweenNumber :value="metric.value" />
+              <span class="reservoir-card__column-unit">{{ metric.unit }}</span>
             </div>
           </div>
         </div>
@@ -199,15 +145,6 @@
 </template>
 
 <script setup lang="ts">
-import { Swiper, SwiperSlide } from 'swiper/vue'
-import { Autoplay } from 'swiper'
-// @ts-ignore: Swiper CSS has no type declarations
-import 'swiper/css'
-// @ts-ignore: Swiper CSS has no type declarations
-import 'swiper/css/grid'
-
-import { SeededRandom } from 'zf-utilz'
-
 const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/preview/${icon}.png`, import.meta.url).href
 }
@@ -218,55 +155,62 @@ const totalInfo = reactive({
   totalDitchLength: 0
 })
 const ditchList = ref<Record<string, any>[]>([])
-
-// 水源工程
-const sluiceList1 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '流域面积', value: 0, unit: '㎡' },
-  { id: 'sluiceList2', name: '平均来水量', value: 0, unit: '万m³' }
-])
-const sluiceList2 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '承雨面积', value: 0, unit: '㎡' },
-  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm³' }
-])
-const sluiceList3 = ref<Record<string, any>[]>([
-  { id: 'sluiceList1', name: '流域面积', value: 0, unit: '㎡' },
-  { id: 'sluiceList2', name: '正常蓄水位', value: 0, unit: 'm³' }
-])
-
-const triggerPolling = usePolling(async () => {
-  sluiceList1.value.forEach((item) => {
-    item.value = SeededRandom.randomNumber(0, 100)
-  })
+const ditchRows = computed(() => {
+  return [ditchList.value.slice(0, 3), ditchList.value.slice(3, 7)].filter((row) => row.length)
 })
 
-const sluiceBtns = ref<Record<string, any>[]>([
-  { id: 'sluice1', icon: getPhotoUrl('sluice-icon-1'), name: '熊渡水库', active: true }
+// 水源工程
+const selectedReservoirId = ref('reservoir1')
+const reservoirList = ref<Record<string, any>[]>([
+  {
+    id: 'reservoir1',
+    name: '熊渡水库',
+    metrics: [
+      { id: 'reservoir1-m1', name: '水库库容', value: 0, unit: '万m³' },
+      { id: 'reservoir1-m2', name: '坝体高度', value: 0, unit: 'm' },
+      { id: 'reservoir1-m3', name: '长度', value: 0, unit: 'km2' },
+      { id: 'reservoir1-m4', name: '渠首设计流量', value: 0, unit: '万m³' },
+      { id: 'reservoir1-m5', name: '泄洪流量', value: 0, unit: '万m³' }
+    ]
+  },
+  {
+    id: 'reservoir2',
+    name: '望城岗水库',
+    metrics: [
+      { id: 'reservoir2-m1', name: '水库库容', value: 0, unit: '万m³' },
+      { id: 'reservoir2-m2', name: '坝体高度', value: 0, unit: 'm' },
+      { id: 'reservoir2-m3', name: '长度', value: 0, unit: 'km2' },
+      { id: 'reservoir2-m4', name: '渠首设计流量', value: 0, unit: '万m³' },
+      { id: 'reservoir2-m5', name: '泄洪流量', value: 0, unit: '万m³' }
+    ]
+  },
+  {
+    id: 'reservoir3',
+    name: '张冲水库',
+    metrics: [
+      { id: 'reservoir3-m1', name: '水库库容', value: 0, unit: '万m³' },
+      { id: 'reservoir3-m2', name: '坝体高度', value: 0, unit: 'm' },
+      { id: 'reservoir3-m3', name: '长度', value: 0, unit: 'km2' },
+      { id: 'reservoir3-m4', name: '渠首设计流量', value: 0, unit: '万m³' },
+      { id: 'reservoir3-m5', name: '泄洪流量', value: 0, unit: '万m³' }
+    ]
+  }
 ])
-const sluiceBtns2 = ref<Record<string, any>[]>([
-  { id: 'sluice21', icon: getPhotoUrl('sluice-icon-1'), name: '望城岗水库', active: true }
-])
-const sluiceBtns3 = ref<Record<string, any>[]>([
-  { id: 'sluice31', icon: getPhotoUrl('sluice-icon-1'), name: '张冲水库', active: true }
-])
-const clickSluiceHandle = (item: Record<string, any>) => {
-  sluiceBtns.value.forEach((btn) => {
-    btn.active = false
-  })
-  item.active = true
-  triggerPolling.trigger()
-}
+const currentReservoir = computed(() => {
+  return reservoirList.value.find(item => item.id === selectedReservoirId.value) || reservoirList.value[0]
+})
 
 // 渠系建筑物
 const architectureList = ref<Record<string, any>[]>([
-  { id: 'architecture1', name: '干渠', value: 0, unit: '个' },
-  { id: 'architecture2', name: '支渠', value: 0, unit: '个' },
-  { id: 'architecture3', name: '农桥', value: 0, unit: '条' },
-  { id: 'architecture4', name: '分水闸', value: 0, unit: '座' },
-  { id: 'architecture5', name: '泄洪闸', value: 0, unit: '座' },
-  { id: 'architecture6', name: '节制闸', value: 0, unit: '座' },
-  { id: 'architecture7', name: '直灌口', value: 0, unit: '座' },
-  { id: 'architecture8', name: '渡槽', value: 0, unit: '处' },
-  { id: 'architecture9', name: '涵洞', value: 0, unit: '座' }
+  { id: 'architecture1', name: '渡槽', value: 0, unit: '个' },
+  { id: 'architecture2', name: '闸门', value: 0, unit: '个' }
+  // { id: 'architecture3', name: '农桥', value: 0, unit: '条' },
+  // { id: 'architecture4', name: '分水闸', value: 0, unit: '座' },
+  // { id: 'architecture5', name: '泄洪闸', value: 0, unit: '座' },
+  // { id: 'architecture6', name: '节制闸', value: 0, unit: '座' },
+  // { id: 'architecture7', name: '直灌口', value: 0, unit: '座' },
+  // { id: 'architecture8', name: '渡槽', value: 0, unit: '处' },
+  // { id: 'architecture9', name: '涵洞', value: 0, unit: '座' }
 ])
 
 usePolling(async () => {
@@ -275,30 +219,31 @@ usePolling(async () => {
   totalInfo.totalDitchCount = ditchResult.size
   totalInfo.totalDitchLength = ditchResult.allLen
   if (ditchResult.channelList.length > 0) {
-    const processed = ditchResult.channelList.map((it: any, index: number) => {
+    ditchList.value = ditchResult.channelList.slice(0, 7).map((it: any, index: number) => {
       return {
         ...it,
         icon: index === 3 ? getPhotoUrl('ditch-icon-2') : getPhotoUrl('ditch-icon-1')
       }
     })
-
-    // 分列处理
-    const groups = []
-    const perPage = 6 // 2行3列
-    for (let i = 0; i < processed.length; i += perPage) {
-      groups.push(processed.slice(i, i + perPage))
-    }
-    ditchList.value = groups
   }
 
-  sluiceList1.value[0].value = 1015
-  sluiceList1.value[1].value = 10.21
+  reservoirList.value[0].metrics[0].value = 9508
+  reservoirList.value[0].metrics[1].value = 177.5
+  reservoirList.value[0].metrics[2].value = 2377.5
+  reservoirList.value[0].metrics[3].value = 265.54
+  reservoirList.value[0].metrics[4].value = 178
 
-  sluiceList2.value[0].value = 1.14
-  sluiceList2.value[1].value = 109.57
+  reservoirList.value[1].metrics[0].value = 4280
+  reservoirList.value[1].metrics[1].value = 96.8
+  reservoirList.value[1].metrics[2].value = 1184.2
+  reservoirList.value[1].metrics[3].value = 132.6
+  reservoirList.value[1].metrics[4].value = 84.3
 
-  sluiceList3.value[0].value = 6.75
-  sluiceList3.value[1].value = 121.75
+  reservoirList.value[2].metrics[0].value = 3865
+  reservoirList.value[2].metrics[1].value = 88.4
+  reservoirList.value[2].metrics[2].value = 956.3
+  reservoirList.value[2].metrics[3].value = 120.75
+  reservoirList.value[2].metrics[4].value = 73.8
 
   architectureList.value[0].value = 3
   architectureList.value[1].value = 4
@@ -328,7 +273,7 @@ usePolling(async () => {
 
 .ditch-main {
   padding: 0 35px;
-  margin-bottom: 40px;
+  margin-bottom: 60px;
 
   .ditch-total {
     position: relative;
@@ -366,14 +311,27 @@ usePolling(async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     height: 157px;
     background: url("@/assets/global/images/preview/ditch-item-bg.png") no-repeat;
     background-size: 100% 100%;
     color: #beeeff;
     font-family: PingFangSC, sans-serif;
 
+    &__icon {
+      width: 35px;
+      height: 45px;
+      margin-bottom: 8px;
+    }
+
     &__title {
       font-size: 20px;
+    }
+
+    &__value-group {
+      display: flex;
+      align-items: baseline;
+      margin-top: 8px;
     }
 
     &__value {
@@ -388,92 +346,126 @@ usePolling(async () => {
       font-size: 20px;
     }
   }
+
+  .ditch-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 35px;
+    margin-top: 16px;
+  }
+
+  .ditch-grid__row {
+    display: grid;
+    justify-content: space-between;
+  }
+
+  .ditch-grid__row--3 {
+    grid-template-columns: repeat(3, 220px);
+  }
+
+  .ditch-grid__row--3 .ditch-item {
+    width: 220px;
+  }
+
+  .ditch-grid__row--4 {
+    grid-template-columns: repeat(4, 180px);
+  }
+
+  .ditch-grid__row--4 .ditch-item {
+    width: 180px;
+  }
 }
 
-.app-table {
-  .table-header {
-    display: flex;
-    align-items: center;
-    height: 78px;
-    width: 100%;
-    background: rgb(0 42 93 / 0.52);
-    border: 1px solid #92bbff;
-    border-bottom: none;
-    padding: 0 20px;
-    box-sizing: border-box;
+.reservoir-card {
+  margin-bottom: 65px;
+}
+
+.reservoir-card__header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 0 32px;
+}
+
+.reservoir-card__label {
+  margin-right: 22px;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.reservoir-card__select {
+  width: 410px;
+}
+
+.reservoir-card__table {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  border: 1px solid rgb(113 182 239 / 0.45);
+  background: linear-gradient(180deg, rgb(10 53 95 / 0.76) 0%, rgb(8 31 59 / 0.72) 100%);
+  overflow: hidden;
+}
+
+.reservoir-card__column {
+  border-right: 1px solid rgb(113 182 239 / 0.35);
+
+  &:last-child {
+    border-right: none;
   }
+}
 
-  .table-tbody {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    width: 100%;
-    background: rgb(48 142 212 / 0.58);
-    border: 1px solid #92bbff;
-    box-sizing: border-box;
+.reservoir-card__column-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 58px;
+  color: #d9efff;
+  font-size: 20px;
+  text-align: center;
+  background: linear-gradient(180deg, rgb(32 93 149 / 0.7) 0%, rgb(20 70 119 / 0.56) 100%);
+  border-bottom: 1px solid rgb(113 182 239 / 0.35);
+}
 
-    &__tr {
-      border-right: 1px solid #92bbff;
+.reservoir-card__column-value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 62px;
+  color: #50fffc;
+  font-size: 22px;
+  font-family: Quantico, sans-serif;
+  font-weight: bold;
+  text-shadow: 0 0 10px rgb(80 255 252 / 0.28);
+}
 
-      &:nth-child(2n) {
-        border-right: none;
-      }
+.reservoir-card__column-unit {
+  margin-left: 8px;
+  color: #c8e8ff;
+  font-size: 16px;
+  font-family: PingFangSC, sans-serif;
+  font-weight: normal;
+}
 
-      &:last-child {
-        border-right: none;
-      }
-    }
-  }
+:deep(.reservoir-card__select .el-select__wrapper) {
+  min-height: 40px;
+  background: linear-gradient(180deg, rgb(30 89 146 / 0.36) 0%, rgb(8 42 80 / 0.46) 100%);
+  border-radius: 0;
+  box-shadow:
+    inset 0 0 18px rgb(78 187 255 / 0.12),
+    0 0 0 1px rgb(102 190 255 / 0.65);
+}
 
-  .sluice-btns {
-    display: flex;
-    align-items: center;
-    margin-right: 112px;
-    cursor: pointer;
+:deep(.reservoir-card__select .el-select__placeholder),
+:deep(.reservoir-card__select .el-select__selected-item),
+:deep(.reservoir-card__select .el-select__input-text) {
+  color: #dff7ff;
+  font-size: 22px;
+}
 
-    &.active {
-      text-shadow: 0 0 3.6px #2bdfff;
-    }
-  }
-
-  .sluice-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    font-family: PingFangSC, sans-serif;
-    height: 78px;
-    padding-left: 55px;
-
-    &::before {
-      position: absolute;
-      top: 50%;
-      left: 30px;
-      transform: translateY(-50%);
-      content: "";
-      width: 10px;
-      height: 10px;
-      background: #03e6ff;
-      border-radius: 50%;
-      box-shadow: 0 0 4px #03e6ff;
-    }
-
-    &__title {
-      color: #fff;
-      font-size: 28px;
-    }
-
-    &__value {
-      font-size: 24px;
-      color: #50fffc;
-      font-family: Quantico, sans-serif;
-      font-weight: bold;
-      margin: 0 15px;
-    }
-
-    &__unit {
-      color: #beeeff;
-      font-size: 24px;
-    }
-  }
+:deep(.reservoir-card__select .el-select__caret) {
+  color: #72dfff;
+  font-size: 16px;
 }
 
 .architecture-main {
@@ -481,6 +473,8 @@ usePolling(async () => {
   grid-template-columns: repeat(3, 1fr);
   row-gap: 40px;
   padding: 0 50px;
+  align-content: start;
+  min-height: 400px;
 
   .architecture-item {
     display: flex;
