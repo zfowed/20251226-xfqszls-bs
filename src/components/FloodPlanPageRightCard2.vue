@@ -45,43 +45,43 @@ const levelTabs: LevelTab[] = [
 const levelContentMap: Record<LevelValue, LevelGroup[]> = {
   1: [
     {
-      title: '管理单位负责人',
-      details: ['启动I级应急响应，组织会商研判并全程指挥调度。']
+      title: '启动条件',
+      details: ['未来24小时降雨量']
     },
     {
       title: '应急响应措施',
       details: [
-        '按预案立即进入战时值守状态，重点部位安排专人24小时巡查。',
-        '抢险队伍、机械设备、应急物资前置到位，确保随调随用。',
-        '及时发布预警信息并组织受影响区域人员转移避险。'
+        '未来24小时降雨量',
+        '未来24小时降雨量',
+        '未来24小时降雨量'
       ]
     }
   ],
   2: [
     {
-      title: '管理单位负责人',
-      details: ['启动II级应急响应，组织部门联动并加强过程督导。']
+      title: '启动条件',
+      details: ['未来24小时降雨量']
     },
     {
       title: '应急响应措施',
       details: [
-        '加密雨情、水情、工情监测频次，动态评估风险变化。',
-        '落实重点险工险段防守责任，按需启用应急处置力量。',
-        '做好转移预案准备，确保群众撤离路线和安置点可用。'
+        '未来24小时降雨量',
+        '未来24小时降雨量',
+        '未来24小时降雨量'
       ]
     }
   ],
   3: [
     {
-      title: '管理单位负责人',
-      details: ['启动III级应急响应，强化值班值守和信息报送。']
+      title: '启动条件',
+      details: ['未来24小时降雨量']
     },
     {
       title: '应急响应措施',
       details: [
-        '开展重点区域巡查检查，及时消除隐患并闭环整改。',
-        '做好防汛抢险物资盘点，确保储备充足、调运畅通。',
-        '加强会商分析，视情提级响应并提前部署防御措施。'
+        '未来24小时降雨量',
+        '未来24小时降雨量',
+        '未来24小时降雨量'
       ]
     }
   ]
@@ -108,7 +108,7 @@ const currentLevelData = computed(() => levelContentMap[activeLevel.value] ?? []
   flex: 1;
   height: 106px;
   margin-right: 20px;
-  padding-left: 34px;
+  padding-left: 40px;
   box-sizing: border-box;
   border: none;
   outline: none;
