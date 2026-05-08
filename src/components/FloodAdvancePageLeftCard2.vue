@@ -5,11 +5,12 @@
         <div class="warning-status">
           <div class="warning-status__icon">
             <span class="warning-status__thermometer">
-              <img src="@/assets/flood-advance-water-temperature-icon.svg" class="warning-status__thermometer-image" alt="">
+              <img
+                src="@/assets/flood-advance-page-left-card2-water-temperature-icon.svg"
+                class="warning-status__thermometer-image"
+                alt=""
+              >
             </span>
-            <div class="warning-status__text">
-              正常
-            </div>
           </div>
         </div>
         <div class="warning-content">
@@ -234,8 +235,8 @@ function midTickBottomPercent (k: number): string {
     .warning-status__thermometer {
       position: relative;
       display: block;
-      width: 40px;
-      height: 40px;
+      width: 58px;
+      height: 58px;
     }
 
     .warning-status__thermometer-image {
