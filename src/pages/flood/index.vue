@@ -1,8 +1,8 @@
 <template>
   <PageScreen>
     <template #left>
-      <FloodPageLeftCard11 class="mb-[50px]" />
-      <FloodPageLeftCard22 />
+      <FloodIndexPageLeftCard1 class="mb-[50px]" />
+      <FloodIndexPageLeftCard2 />
     </template>
 
     <template #middle>
@@ -10,7 +10,7 @@
     </template>
 
     <template #right>
-      <FloodPageRightCard11 />
+      <FloodIndexPageRightCard1 />
     </template>
   </PageScreen>
 </template>
