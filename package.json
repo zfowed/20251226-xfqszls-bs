@@ -1,5 +1,5 @@
 {
-  "name": "20240414-jnkszhdp-bs",
+  "name": "20251226-xfqszls-bs",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -33,7 +33,7 @@
     "vue-router": "^4.3.2",
     "xgplayer": "^3.0.23",
     "xgplayer-flv": "^3.0.23",
-    "zf-dbs": "^0.1.21",
+    "zf-dbs": "^1.1.0",
     "zf-utilz": "^0.1.19",
     "zf-vue-use": "^0.1.4"
   },
