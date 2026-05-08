@@ -1,9 +1,9 @@
 <template>
   <PageScreen>
     <template #left>
-      <FloodAdvancePageLeftCard1 class="mb-[76px]" />
-      <FloodAdvancePageLeftCard2 class="mb-[76px]" />
-      <FloodAdvancePageLeftCard3 class="mb-[76px]" />
+      <FloodAdvancePageLeftCard1 class="mb-[20px]" />
+      <FloodAdvancePageLeftCard2 class="mb-[20px]" />
+      <FloodAdvancePageLeftCard3 class="mb-[20px]" />
     </template>
 
     <template #middle>

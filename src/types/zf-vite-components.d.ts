@@ -32,7 +32,6 @@ declare module 'vue' {
     FloodAdvancePageLeftCard1: typeof import('./../components/FloodAdvancePageLeftCard1.vue')['default']
     FloodAdvancePageLeftCard2: typeof import('./../components/FloodAdvancePageLeftCard2.vue')['default']
     FloodAdvancePageLeftCard3: typeof import('./../components/FloodAdvancePageLeftCard3.vue')['default']
-    FloodAdvancePageRightCard1: typeof import('./../components/FloodAdvancePageRightCard1.vue')['default']
     FloodPageLeftCard1: typeof import('./../components/FloodPageLeftCard1.vue')['default']
     FloodPageLeftCard11: typeof import('./../components/FloodPageLeftCard11.vue')['default']
     FloodPageLeftCard2: typeof import('./../components/FloodPageLeftCard2.vue')['default']
