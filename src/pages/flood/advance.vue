@@ -3,6 +3,7 @@
     <template #left>
       <FloodAdvancePageLeftCard1 class="mb-[76px]" />
       <FloodAdvancePageLeftCard2 class="mb-[76px]" />
+      <FloodAdvancePageLeftCard3 class="mb-[76px]" />
     </template>
 
     <template #middle>

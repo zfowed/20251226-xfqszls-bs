@@ -5,7 +5,7 @@
         <div class="warning-status">
           <div class="warning-status__icon">
             <span class="warning-status__thermometer">
-              <img :src="warningStatusIcon" class="warning-status__thermometer-image" alt="">
+              <img src="@/assets/flood-advance-water-temperature-icon.svg" class="warning-status__thermometer-image" alt="">
             </span>
             <div class="warning-status__text">
               正常
@@ -63,8 +63,6 @@ const metrics = ref<MetricItem[]>([
     percent: 59
   }
 ])
-
-const warningStatusIcon = 'https://www.figma.com/api/mcp/asset/086aa724-63dc-4f99-9d66-e469332aee94'
 </script>
 
 <style lang="scss" scoped>
@@ -77,94 +75,83 @@ const warningStatusIcon = 'https://www.figma.com/api/mcp/asset/086aa724-63dc-4f9
   display: flex;
   align-items: center;
   gap: 52px;
-  height: 174px;
-  padding: 0 34px 0 36px;
+  width: 750px;
+  height: 185px;
+  margin: 0 auto;
   margin-bottom: 40px;
-  border: 2px solid #3dc7ff;
   border-radius: 8px;
-  background:
-    linear-gradient(90deg, rgb(21 74 129 / 0.2) 0%, rgb(8 43 82 / 0.2) 100%),
-    repeating-linear-gradient(-35deg,
-      rgb(125 205 255 / 0.1) 0,
-      rgb(125 205 255 / 0.1) 2px,
-      transparent 2px,
-      transparent 14px);
-  box-shadow: inset 0 0 26px rgb(38 176 241 / 0.18);
-}
+  background: url("@/assets/flood-advance-page-left-card1-warning-panel-bg.png") no-repeat center / contain;
 
-.warning-status {
-  width: 116px;
+  .warning-status {
+    width: 116px;
+    margin-left: 40px;
 
-  .warning-status__icon {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    justify-content: center;
-    width: 114px;
-    height: 114px;
-    padding: 10px;
-    box-sizing: border-box;
-    border: 2px solid #2ebaf1;
-    border-radius: 6px;
-    background: rgb(31 125 178 / 0.18);
-    box-shadow: inset 0 0 18px rgb(98 210 255 / 0.2);
+    .warning-status__icon {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      justify-content: center;
+      width: 114px;
+      height: 114px;
+      box-sizing: border-box;
+    }
+
+    .warning-status__thermometer {
+      position: relative;
+      display: block;
+      width: 40px;
+      height: 40px;
+    }
+
+    .warning-status__thermometer-image {
+      position: absolute;
+      inset: -17.37% -18.13%;
+      width: 136.26%;
+      height: 134.74%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .warning-status__text {
+      margin-top: 10px;
+      text-align: center;
+      color: #fff;
+      font-size: 20px;
+      line-height: 28px;
+      font-weight: 400;
+      font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    }
   }
 
-  .warning-status__thermometer {
-    position: relative;
-    display: block;
-    width: 52px;
-    height: 52px;
-  }
-
-  .warning-status__thermometer-image {
-    position: absolute;
-    inset: -17.37% -18.13%;
-    width: 136.26%;
-    height: 134.74%;
-    display: block;
-    object-fit: contain;
-  }
-
-  .warning-status__text {
-    margin-top: 10px;
-    text-align: center;
-    color: #fff;
-    font-size: 20px;
-    line-height: 28px;
-    font-weight: 400;
+  .warning-content {
+    flex: 1;
+    min-width: 0;
     font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
-  }
-}
 
-.warning-content {
-  flex: 1;
-  min-width: 0;
-  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    .warning-content__title {
+      color: #fff;
+      font-size: 30px;
+      line-height: 42px;
+      font-weight: 400;
+    }
 
-  .warning-content__title {
-    color: #fff;
-    font-size: 30px;
-    line-height: 42px;
-    font-weight: 400;
-  }
+    .warning-content__temperature {
+      margin-top: 20px;
+      color: #f0fbff;
+      font-size: 30px;
+      line-height: 42px;
+      font-weight: 400;
 
-  .warning-content__temperature {
-    margin-top: 20px;
-    color: #f0fbff;
-    font-size: 30px;
-    line-height: 42px;
-    font-weight: 400;
-
-    span {
-      color: #8cefff;
-      font-size: 32px;
-      line-height: 38px;
-      font-weight: 700;
-      font-family: Quantico, DINAlternateBold, sans-serif;
-      text-shadow: 0 0 5px #56ebff;
+      span {
+        color: #fff;
+        font-size: 32px;
+        line-height: 38px;
+        font-weight: 700;
+        font-family: Quantico, DINAlternateBold, sans-serif;
+        text-shadow: 0 0 5px #56ebff;
+      }
     }
   }
 }
