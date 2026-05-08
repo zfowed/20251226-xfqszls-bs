@@ -125,7 +125,7 @@ const echartOption = ref({
     ]
   },
   grid: {
-    top: '22%',
+    top: '24%',
     left: '4%',
     right: '5%',
     bottom: '12%',
@@ -157,7 +157,7 @@ const echartOption = ref({
       max: 600,
       interval: 150,
       nameLocation: 'end' as const,
-      nameGap: 12,
+      nameGap: 24,
       nameTextStyle: {
         color: '#fff',
         fontSize: 17,
@@ -186,7 +186,7 @@ const echartOption = ref({
       max: 60,
       interval: 15,
       nameLocation: 'end' as const,
-      nameGap: 12,
+      nameGap: 24,
       nameTextStyle: {
         color: '#fff',
         fontSize: 17,
