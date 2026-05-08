@@ -18,7 +18,7 @@
 <script setup lang="ts">
 const props = withDefaults(defineProps<{
   title: string,
-  bgClass: string
+  bgClass: 'left' | 'right' | 'middle'
 }>(), {
   title: '',
   bgClass: 'left'
@@ -31,6 +31,15 @@ const props = withDefaults(defineProps<{
   width: 884px;
 }
 
+.middle {
+  display: flex;
+  justify-content: center;
+
+  .card-container {
+    width: 3570px !important;
+  }
+}
+
 .card-header {
   position: relative;
   display: flex;
@@ -39,7 +48,7 @@ const props = withDefaults(defineProps<{
   height: 86.37px;
   justify-content: space-between;
   background: url('./assets/card-header-bg.png') no-repeat;
-  background-size: 100% 100%;
+  background-size: 887px 97px;
 
 }
 
@@ -53,7 +62,7 @@ const props = withDefaults(defineProps<{
   background-image: linear-gradient(to bottom, #91DCFF 20%, #FFF 81%);
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 1px 3px rgb(5 12 25 / 0.6)) drop-shadow(0 0 7px rgb(75 180 229 / 0.69)) ;
+  filter: drop-shadow(0 1px 3px rgb(5 12 25 / 0.6)) drop-shadow(0 0 7px rgb(75 180 229 / 0.69));
 }
 
 .card-title-right {

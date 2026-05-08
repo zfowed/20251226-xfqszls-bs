@@ -6,7 +6,8 @@
           <ComponentSlot v-if="pageLeftVisible" class="page-side__inner">
             <Transition>
               <div v-if="pageLeftDetailKey && $slots[`left:${pageLeftDetailKey}`]" class="page-side__inner">
-                <slot :name="`left:${pageLeftDetailKey}`" :data="pageLeftDetailData" :handle-back="handlePageLeftDetailBack" />
+                <slot :name="`left:${pageLeftDetailKey}`" :data="pageLeftDetailData"
+                  :handle-back="handlePageLeftDetailBack" />
               </div>
               <div v-else class="page-side__inner">
                 <slot name="left" :to-detail="handlePageLeftToDetail" />
@@ -25,7 +26,8 @@
           <ComponentSlot v-if="pageRightVisible" class="page-side__inner">
             <Transition>
               <div v-if="pageRightDetailKey && $slots[`right:${pageRightDetailKey}`]" class="page-side__inner">
-                <slot :name="`right:${pageRightDetailKey}`" :data="pageRightDetailData" :handle-back="handlePageRightDetailBack" />
+                <slot :name="`right:${pageRightDetailKey}`" :data="pageRightDetailData"
+                  :handle-back="handlePageRightDetailBack" />
               </div>
               <div v-else class="page-side__inner">
                 <slot name="right" :to-detail="handlePageRightToDetail" />
@@ -103,7 +105,7 @@ $side-height: 1981px;
   }
 }
 
-.page-side__left{
+.page-side__left {
   padding-left: 70px;
 
   // padding-top: 110px;
@@ -127,7 +129,7 @@ $side-height: 1981px;
   }
 }
 
-.page-side__right{
+.page-side__right {
   padding-right: 70px;
 
   // padding-top: 110px;
@@ -156,5 +158,4 @@ $side-height: 1981px;
   flex: 1;
   height: 100%;
 }
-
 </style>
