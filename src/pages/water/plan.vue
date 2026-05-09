@@ -1,8 +1,8 @@
 <template>
   <PageScreen>
     <template #left>
-      <FloodPageLeftCard2 class="mb-[76px]" />
-      <PlanPageLeftCard2 class="mb-[76px]" />
+      <WaterPlanPageLeftCard1 class="mb-[76px]" />
+      <WaterPlanPageLeftCard2 class="mb-[76px]" />
     </template>
 
     <template #middle>
@@ -10,9 +10,9 @@
     </template>
 
     <template #right>
-      <PlanPageRightCard1 class="mb-[61px]" />
-      <PlanPageRightCard2 class="mb-[61px]" />
-      <PlanPageRightCard3 />
+      <WaterPlanPageRightCard1 class="mb-[61px]" />
+      <WaterPlanPageRightCard2 class="mb-[61px]" />
+      <WaterPlanPageRightCard3 />
     </template>
   </PageScreen>
 </template>
@@ -26,6 +26,3 @@ const navList = ref<Record<string, any>[]>([
   { name: '执行', path: '/water/execute' }
 ])
 </script>
-
-<style lang="scss" scoped>
-</style>
