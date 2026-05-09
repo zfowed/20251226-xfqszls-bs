@@ -1,18 +1,20 @@
 <template>
   <PageScreen>
     <template #left>
-      <WaterPlanPageLeftCard1 class="mb-[76px]" />
-      <WaterPlanPageLeftCard2 class="mb-[76px]" />
+      <!-- <WaterPlanPageLeftCard1 class="mb-[76px]" />
+      <WaterPlanPageLeftCard2 class="mb-[76px]" /> -->
+      <NavSide v-model="navList" />
     </template>
 
     <template #middle>
-      <NavSide v-model="navList" class="absolute -left-[100px] top-[30px]" />
+      <!-- <NavSide v-model="navList" class="absolute -left-[100px] top-[30px]" /> -->
+      <PlanPageMiddleCard2 class="middle-card absolute bottom-[220px] left-1/2 -translate-x-1/2" />
     </template>
 
     <template #right>
-      <WaterPlanPageRightCard1 class="mb-[61px]" />
+      <!-- <WaterPlanPageRightCard1 class="mb-[61px]" />
       <WaterPlanPageRightCard2 class="mb-[61px]" />
-      <WaterPlanPageRightCard3 />
+      <WaterPlanPageRightCard3 /> -->
     </template>
   </PageScreen>
 </template>

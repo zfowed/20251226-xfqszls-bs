@@ -1,18 +1,19 @@
 <template>
   <PageScreen>
     <template #left>
-      <WaterIndexPageLeftCard1 class="mb-[76px]" />
-      <WaterRehearsalPageLeftCard2 />
+      <!-- <WaterIndexPageLeftCard1 class="mb-[76px]" />
+      <WaterRehearsalPageLeftCard2 /> -->
+      <NavSide v-model="navList" />
     </template>
 
     <template #middle>
-      <NavSide v-model="navList" class="absolute -left-[100px] top-[30px]" />
+      <WaterRehearsalPageMiddleCard1 class="middle-card absolute bottom-[220px] left-1/2 -translate-x-1/2" />
     </template>
 
     <template #right>
-      <WaterRehearsalPageRightCard1 class="mb-[61px]" />
+      <!-- <WaterRehearsalPageRightCard1 class="mb-[61px]" />
       <WaterRehearsalPageRightCard2 class="mb-[61px]" />
-      <WaterRehearsalPageRightCard3 />
+      <WaterRehearsalPageRightCard3 /> -->
     </template>
   </PageScreen>
 </template>
