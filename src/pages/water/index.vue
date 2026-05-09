@@ -1,9 +1,9 @@
 <template>
   <PageScreen>
     <template #left>
-      <WaterIndexPageLeftCard1 class="mb-[76px]" />
-      <WaterIndexPageLeftCard2 class="mb-[76px]" />
-      <WaterIndexPageLeftCard3 />
+      <WaterIndexPageLeftCard11 class="mb-[76px]" />
+      <WaterIndexPageLeftCard12 class="mb-[76px]" />
+      <!-- <WaterIndexPageLeftCard3 /> -->
     </template>
 
     <template #middle>
@@ -13,7 +13,7 @@
     <template #right>
       <WaterIndexPageRightCard1 class="mb-[61px]" />
       <!-- <WaterIndexPageRightCard2 class="mb-[61px]" /> -->
-      <WaterIndexPageRightCard3 />
+      <!-- <WaterIndexPageRightCard3 /> -->
     </template>
   </PageScreen>
 </template>
