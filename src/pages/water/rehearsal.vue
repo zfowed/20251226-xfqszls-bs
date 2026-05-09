@@ -26,6 +26,3 @@ const navList = ref<Record<string, any>[]>([
   { name: '执行', path: '/water/execute' }
 ])
 </script>
-
-<style lang="scss" scoped>
-</style>
