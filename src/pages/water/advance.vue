@@ -1,8 +1,8 @@
 <template>
   <PageScreen>
     <template #left>
-      <AdvancePageLeftCard1 class="mb-[76px]" />
-      <AdvancePageLeftCard2 class="mb-[76px]" />
+      <WaterAdvancePageLeftCard1 class="mb-[76px]" />
+      <WaterAdvancePageLeftCard2 class="mb-[76px]" />
     </template>
 
     <template #middle>
@@ -10,8 +10,8 @@
     </template>
 
     <template #right>
-      <AdvancePageRightCard1 class="mb-[61px]" />
-      <AdvancePageRightCard2 />
+      <WaterAdvancePageRightCard1 class="mb-[61px]" />
+      <WaterAdvancePageRightCard2 />
     </template>
   </PageScreen>
 </template>

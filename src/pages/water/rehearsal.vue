@@ -2,7 +2,7 @@
   <PageScreen>
     <template #left>
       <WaterIndexPageLeftCard1 class="mb-[76px]" />
-      <RehearsalPageLeftCard2 />
+      <WaterRehearsalPageLeftCard2 />
     </template>
 
     <template #middle>
@@ -10,9 +10,9 @@
     </template>
 
     <template #right>
-      <RehearsalPageRightCard1 class="mb-[61px]" />
-      <RehearsalPageRightCard2 class="mb-[61px]" />
-      <RehearsalPageRightCard3 />
+      <WaterRehearsalPageRightCard1 class="mb-[61px]" />
+      <WaterRehearsalPageRightCard2 class="mb-[61px]" />
+      <WaterRehearsalPageRightCard3 />
     </template>
   </PageScreen>
 </template>
