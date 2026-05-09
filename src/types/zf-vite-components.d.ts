@@ -7,6 +7,8 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
+    2: typeof import('./../components/AgriculturePageRightCard1 copy 2.vue')['default']
+    3: typeof import('./../components/AgriculturePageRightCard1 copy 3.vue')['default']
     AdvancePageLeftCard1: typeof import('./../components/AdvancePageLeftCard1.vue')['default']
     AdvancePageLeftCard2: typeof import('./../components/AdvancePageLeftCard2.vue')['default']
     AdvancePageRightCard1: typeof import('./../components/AdvancePageRightCard1.vue')['default']
@@ -15,6 +17,9 @@ declare module 'vue' {
     AgriculturePageLeftCard11: typeof import('./../components/AgriculturePageLeftCard11.vue')['default']
     AgriculturePageLeftCard12: typeof import('./../components/AgriculturePageLeftCard12.vue')['default']
     AgriculturePageRightCard1: typeof import('./../components/AgriculturePageRightCard1.vue')['default']
+    AgriculturePageRightCard11: typeof import('./../components/AgriculturePageRightCard11.vue')['default']
+    AgriculturePageRightCard12: typeof import('./../components/AgriculturePageRightCard12.vue')['default']
+    AgriculturePageRightCard13: typeof import('./../components/AgriculturePageRightCard13.vue')['default']
     AgriculturePageRightCard2: typeof import('./../components/AgriculturePageRightCard2.vue')['default']
     AgriculturePageRightCard3: typeof import('./../components/AgriculturePageRightCard3.vue')['default']
     AppLayout: typeof import('./../components/AppLayout/AppLayout.vue')['default']

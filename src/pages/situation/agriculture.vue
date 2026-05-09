@@ -9,9 +9,9 @@
       <NavSide v-model="navList" class="absolute -left-[100px] top-[30px]" />
     </template>
     <template #right>
-      <AgriculturePageRightCard1 class="mb-[40px]" />
-      <AgriculturePageRightCard2 class="mb-[40px]" />
-      <AgriculturePageRightCard3 />
+      <AgriculturePageRightCard11 class="mb-[40px]" />
+      <AgriculturePageRightCard12 class="mb-[40px]" />
+      <AgriculturePageRightCard13 />
     </template>
   </PageScreen>
 </template>
