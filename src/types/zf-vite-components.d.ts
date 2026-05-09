@@ -29,7 +29,6 @@ declare module 'vue' {
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ElTooltip: typeof import('element-plus/es')['ElTooltip']
     ExecutePageLeftCard1: typeof import('./../components/ExecutePageLeftCard1.vue')['default']
-    'ExecutePageLeftCard1 copy': typeof import('./../components/ExecutePageLeftCard1 copy.vue')['default']
     ExecutePageLeftCard2: typeof import('./../components/ExecutePageLeftCard2.vue')['default']
     ExecutePageRightCard1: typeof import('./../components/ExecutePageRightCard1.vue')['default']
     ExecutePageRightCard2: typeof import('./../components/ExecutePageRightCard2.vue')['default']
