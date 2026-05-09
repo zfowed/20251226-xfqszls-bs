@@ -1,7 +1,7 @@
 <template>
   <PageScreen>
     <template #left>
-      <WaterPageLeftCard1 class="mb-[76px]" />
+      <WaterIndexPageLeftCard1 class="mb-[76px]" />
       <RehearsalPageLeftCard2 />
     </template>
 
