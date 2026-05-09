@@ -1,63 +1,22 @@
 <template>
   <PageCard title="工程巡检" bg-class="right">
-    <div class="page-container">
-      <div class="ditch-main mb-[40px]">
-        <div class="grid grid-cols-2 gap-[106px] mb-[50px] ">
-          <div class="ditch-total">
-            <div class="ditch-total__label">
-              巡查
-            </div>
-            <div class="mt-[10px]">
-              <span>计划巡查次数</span>
-              <ZfTweenNumber :value="totalInfo.planitchCount" class="mx-[10px]" />
-              <span>次</span>
-            </div>
-            <div class="ditch-total__bg" />
+    <div class="inspection-card">
+      <div class="inspection-card__summary">
+        <div v-for="item in summaryList" :key="item.key" class="inspection-card__summary-item">
+          <div class="inspection-card__summary-label">
+            巡查
           </div>
-          <div class="ditch-total">
-            <div class="ditch-total__label">
-              巡查
-            </div>
-            <div class="mt-[10px]">
-              <span>已经巡查次数</span>
-              <ZfTweenNumber :value="totalInfo.doneDitchCount" class="mx-[10px]" />
-              <span>次</span>
-            </div>
-            <div class="ditch-total__bg" />
+          <div class="inspection-card__summary-content">
+            <span>{{ item.label }}</span>
+            <ZfTweenNumber :value="item.value" class="inspection-card__summary-value" />
+            <span>{{ item.unit }}</span>
           </div>
-        </div>
-        <div class="h-[343px]">
-          <VueEcharts :option="echartOption" />
+          <div class="inspection-card__summary-bg" />
         </div>
       </div>
-      <div class="ditch-main">
-        <div class="grid grid-cols-2 gap-[106px] mb-[50px] ">
-          <div class="ditch-total">
-            <div class="ditch-total__label">
-              巡查
-            </div>
-            <div class="mt-[10px]">
-              <span>巡查上报事件</span>
-              <ZfTweenNumber :value="totalInfo.reportEventCount" class="mx-[10px]" />
-              <span>件</span>
-            </div>
-            <div class="ditch-total__bg" />
-          </div>
-          <div class="ditch-total">
-            <div class="ditch-total__label">
-              巡查
-            </div>
-            <div class="mt-[10px]">
-              <span>巡查处理事件</span>
-              <ZfTweenNumber :value="totalInfo.disposeEventCount" class="mx-[10px]" />
-              <span>件</span>
-            </div>
-            <div class="ditch-total__bg" />
-          </div>
-        </div>
-        <div class="h-[343px]">
-          <VueEcharts :option="echartOption2" />
-        </div>
+
+      <div class="inspection-card__chart">
+        <VueEcharts :option="echartOption" />
       </div>
     </div>
   </PageCard>
@@ -66,179 +25,68 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 
-// 渠系信息
 const totalInfo = reactive({
-  planitchCount: 0,
-  doneDitchCount: 0,
-  reportEventCount: 0,
-  disposeEventCount: 0
+  patrolCount: 86,
+  patrolMileage: 86,
+  issueCount: 1,
+  patrolPeopleCount: 0
 })
 
-const echartOption = ref({
-  tooltip: {
-    trigger: 'axis'
-  },
-  legend: {
-    top: -5,
-    left: 'center',
-    itemWidth: 30,
-    itemHeight: 10,
-    itemGap: 62,
-    textStyle: {
-      color: '#FFFFFF',
-      fontSize: 20,
-      fontFamily: 'PingFangSC, sans-serif',
-      padding: [0, 0, 0, 8]
-    },
-    data: [
-      { name: '未巡', icon: 'rect' },
-      { name: '已巡', icon: 'rect' }
-    ]
-  },
-  grid: {
-    top: '15%',
-    left: '3%',
-    right: '3%',
-    bottom: '5%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category',
-    // boundaryGap: false,
-    axisTick: {
-      show: false
-    },
-    offset: 15,
-    axisLine: {
-      lineStyle: {
-        type: 'solid',
-        color: 'rgba(179,223,255, 0.5)'
-      }
-    },
-    axisLabel: {
-      color: '#fff',
-      fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif'
-    },
-    data: [] as string[]
-  },
-  yAxis: [{
-    name: '次数',
-    nameGap: 25,
-    type: 'value',
-    position: 'left',
-    offset: 10,
-    nameTextStyle: {
-      color: '#fff',
-      fontSize: 20,
-      padding: [0, 55, 0, 0]
-    },
-    splitLine: {
-      show: true,
-      lineStyle: {
-        type: 'dashed',
-        color: 'rgba(217,231,255, 0.2)'
-      }
-    },
-    axisLabel: {
-      color: '#fff',
-      fontSize: 20,
-      fontFamily: 'PingFangSC, sans-serif'
-    },
-    axisTick: {
-      show: false
-    }
-  }
-  ],
-  series: [
-    {
-      name: '未巡',
-      data: [] as any,
-      type: 'bar',
-      smooth: true,
-      showSymbol: false,
-      barWidth: 16,
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 1,
-          x2: 0,
-          y2: 0,
-          colorStops: [
-            { offset: 0, color: 'rgba(17, 46, 74, 0.2)' },
-            { offset: 1, color: '#3C80C0' }
-          ]
-        }
-      }
-    },
-    {
-      name: '已巡',
-      data: [] as any,
-      type: 'bar',
-      smooth: true,
-      showSymbol: false,
-      barWidth: 16,
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 1,
-          x2: 0,
-          y2: 0,
-          colorStops: [
-            { offset: 0, color: 'rgba(17, 74, 23, 0.2)' },
-            { offset: 1, color: '#26C061' }
-          ]
-        }
-      }
-    }
+const summaryList = computed(() => {
+  return [
+    { key: 'patrolCount', label: '巡查次数', value: totalInfo.patrolCount, unit: '次' },
+    { key: 'patrolMileage', label: '巡查里程', value: totalInfo.patrolMileage, unit: 'km' },
+    { key: 'issueCount', label: '发现问题', value: totalInfo.issueCount, unit: '个' },
+    { key: 'patrolPeopleCount', label: '巡查人数', value: totalInfo.patrolPeopleCount, unit: '人' }
   ]
 })
 
-const echartOption2 = ref({
+const echartOption = ref({
+  animation: false,
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis',
+    backgroundColor: 'rgba(7, 23, 44, 0.92)',
+    borderColor: 'rgba(122, 210, 255, 0.35)',
+    borderWidth: 1,
+    textStyle: {
+      color: '#EAF7FF',
+      fontSize: 14
+    }
   },
   legend: {
-    top: 0,
-    left: 'center',
-    itemWidth: 30,
+    top: 12,
+    right: 10,
+    itemWidth: 18,
     itemHeight: 10,
-    itemGap: 62,
+    icon: 'rect',
     textStyle: {
-      color: '#FFFFFF',
-      fontSize: 20,
+      color: '#EAF6FF',
+      fontSize: 18,
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 8]
     },
-    data: [
-      { name: '上报问题', icon: 'rect' },
-      { name: '处理问题', icon: 'rect' }
-    ]
+    data: [{ name: '巡检次数', icon: 'rect' }]
   },
   grid: {
-    top: '12%',
-    left: '3%',
-    right: '3%',
-    bottom: '5%',
+    top: 72,
+    left: 18,
+    right: 18,
+    bottom: 10,
     containLabel: true
   },
   xAxis: {
     type: 'category',
-    // 柱状图建议留左右间距，避免柱子超出坐标系
-    // boundaryGap: false,
+    boundaryGap: false,
     axisTick: {
       show: false
     },
-    offset: 15,
     axisLine: {
       lineStyle: {
-        type: 'solid',
         color: 'rgba(179,223,255, 0.5)'
       }
     },
     axisLabel: {
+      margin: 16,
       color: '#fff',
       fontSize: 18,
       fontFamily: 'PingFangSC, sans-serif'
@@ -247,37 +95,51 @@ const echartOption2 = ref({
   },
   yAxis: {
     type: 'value',
-    position: 'left',
-    offset: 10,
+    name: '次数',
+    min: 0,
+    max: 80,
+    interval: 20,
+    nameGap: 24,
     nameTextStyle: {
       color: '#fff',
-      fontSize: 20
+      fontSize: 18,
+      padding: [0, 35, 0, 0]
     },
     splitLine: {
       show: true,
       lineStyle: {
         type: 'dashed',
-        color: 'rgba(217,231,255, 0.2)'
+        color: 'rgba(217,231,255, 0.16)'
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 20,
+      fontSize: 18,
       fontFamily: 'PingFangSC, sans-serif'
     },
     axisTick: {
+      show: false
+    },
+    axisLine: {
       show: false
     }
   },
   series: [
     {
-      name: '处理问题',
-      data: [] as any,
+      name: '巡检次数',
+      data: [] as number[],
       type: 'line',
       smooth: true,
       showSymbol: true,
       symbol: 'circle',
       symbolSize: 6,
+      lineStyle: {
+        width: 2,
+        color: '#67C9FF'
+      },
+      itemStyle: {
+        color: '#67C9FF'
+      },
       areaStyle: {
         color: {
           x: 0,
@@ -285,153 +147,100 @@ const echartOption2 = ref({
           x2: 0,
           y2: 1,
           colorStops: [
-            { offset: 0, color: 'rgba(136, 229, 120, 0.5)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
+            { offset: 0, color: 'rgba(103, 201, 255, 0.45)' },
+            { offset: 1, color: 'rgba(103, 201, 255, 0)' }
           ]
         }
-      },
-      lineStyle: { color: '#5DFF68' },
-      itemStyle: {
-        color: '#5DFF68'
-      }
-    },
-    {
-      name: '上报问题',
-      data: [] as any,
-      type: 'line',
-      smooth: true,
-      showSymbol: true,
-      symbol: 'circle',
-      symbolSize: 6,
-      areaStyle: {
-        color: {
-          x: 0,
-          y: 0,
-          x2: 0,
-          y2: 1,
-          colorStops: [
-            { offset: 0, color: 'rgba(255, 162, 55, 0.34)' },
-            { offset: 1, color: 'rgba(0, 0, 0, 0)' }
-          ]
-        }
-      },
-      lineStyle: { color: '#FF932F' },
-      itemStyle: {
-        color: '#FF932F'
       }
     }
   ]
 })
 
 usePolling(async () => {
-  const nameKeys = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-  echartOption.value.xAxis.data = nameKeys
-  echartOption2.value.xAxis.data = nameKeys
+  const monthList = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+  echartOption.value.xAxis.data = monthList
 
   const result: any = await service.xfqs.getPatrolList({
     tabId: 0,
     year: dayjs().format('YYYY')
   })
-  totalInfo.planitchCount = result.plan_num
-  totalInfo.doneDitchCount = result.comp_num
 
-  // 巡查统计
-  if (result.planStatistic && result.planStatistic.length > 0) {
-    const arrList1 = []
-    const arrList2 = []
-    for (const planItem of result.planStatistic) {
-      arrList1.push(planItem.plan_num - planItem.complete_num)
-      arrList2.push(planItem.complete_num)
-    }
-    echartOption.value.series[0].data = arrList1
-    echartOption.value.series[1].data = arrList2
-  }
+  const planStatistic = Array.isArray(result?.planStatistic) ? result.planStatistic : []
+  const eventList = Array.isArray(result?.event) ? result.event : []
 
-  // 巡查事件统计
-  if (result.event && result.event.length > 0) {
-    const arrList1 = []
-    const arrList2 = []
-    for (const eventItem of result.event) {
-      arrList1.push(eventItem.num)
-    }
-    for (const disposeItem of result.dispose) {
-      arrList2.push(disposeItem.num)
-    }
-    totalInfo.reportEventCount = arrList1.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
-    totalInfo.disposeEventCount = arrList2.reduce((accumulator, currentValue) => accumulator + currentValue, 0)
-    echartOption2.value.series[0].data = arrList1
-    echartOption2.value.series[1].data = arrList2
+  totalInfo.patrolCount = Number(result?.comp_num ?? result?.doneDitchCount ?? 86)
+  totalInfo.patrolMileage = Number(result?.mileage ?? result?.patrolMileage ?? 86)
+  totalInfo.issueCount = eventList.reduce((sum: number, item: any) => sum + Number(item?.num || 0), 0) || Number(result?.issueCount ?? 1)
+  totalInfo.patrolPeopleCount = Number(result?.patrolPeopleCount ?? result?.peopleCount ?? 0)
+
+  if (planStatistic.length > 0) {
+    echartOption.value.series[0].data = planStatistic.map((item: any) => Number(item?.complete_num ?? item?.num ?? 0))
+  } else {
+    echartOption.value.series[0].data = [26, 37, 40, 55, 54, 38, 24, 37, 41, 33, 30, 37]
   }
 })
-
 </script>
 
 <style lang="scss" scoped>
-.page-container {
-  padding: 40px 32px 52px;
+.inspection-card {
+  padding: 24px 26px 20px;
 }
 
-.ditch-main {
-  padding: 0 35px;
-
-  .ditch-total {
-    position: relative;
-    font-size: 28px;
-    font-family: PingFangSC, sans-serif;
-    display: flex;
-    align-items: center;
-
-    .ditch-total__label {
-      height: 40px;
-      line-height: 40px;
-      padding: 0 12px;
-      text-align: center;
-      color: #D1E4FF;
-      margin-right: 14px;
-      background: url('@/assets/global/images/preview/total-label-bg.png') no-repeat;
-      background-size: 100% 100%;
-      font-family: PangMenZhengDao, sans-serif;
-      font-size: 20px;
-      box-sizing: border-box;
-    }
-
-    .ditch-total__bg {
-      position: absolute;
-      left: 4px;
-      bottom: -10px;
-      width: calc(100% - 4px);
-      height: 100%;
-      background: url('@/assets/global/images/preview/total-line-bg.png') no-repeat;
-      background-size: 100% 100%;
-    }
-  }
-
-  .ditch-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    height: 157px;
-    background: url('@/assets/global/images/preview/ditch-item-bg.png') no-repeat;
-    background-size: 100% 100%;
-    color: #BEEEFF;
-    font-family: PingFangSC, sans-serif;
-
-    &__title {
-      font-size: 20px;
-    }
-
-    &__value {
-      font-size: 36px;
-      color: #50FFFC;
-      font-family: Quantico, sans-serif;
-      margin-right: 5px;
-      font-weight: bold;
-    }
-
-    &__unit {
-      font-size: 20px;
-    }
-  }
+.inspection-card__summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 36px;
+  margin-bottom: 66px;
+  padding: 0 22px;
 }
 
+.inspection-card__summary-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  font-size: 28px;
+  font-family: PingFangSC, sans-serif;
+}
+
+.inspection-card__summary-label {
+  height: 40px;
+  line-height: 40px;
+  padding: 0 12px;
+  margin-right: 14px;
+  color: #d1e4ff;
+  text-align: center;
+  background: url('@/assets/global/images/preview/total-label-bg.png') no-repeat;
+  background-size: 100% 100%;
+  font-family: PangMenZhengDao, sans-serif;
+  font-size: 20px;
+  box-sizing: border-box;
+}
+
+.inspection-card__summary-content {
+  display: flex;
+  align-items: baseline;
+  color: #fff;
+}
+
+.inspection-card__summary-value {
+  margin: 0 10px;
+  color: #50fffc;
+  font-size: 36px;
+  font-family: Quantico, sans-serif;
+  font-weight: bold;
+}
+
+.inspection-card__summary-bg {
+  position: absolute;
+  left: 4px;
+  bottom: -10px;
+  width: calc(100% - 4px);
+  height: 100%;
+  background: url('@/assets/global/images/preview/total-line-bg.png') no-repeat;
+  background-size: 100% 100%;
+}
+
+.inspection-card__chart {
+  height: 400px;
+}
 </style>

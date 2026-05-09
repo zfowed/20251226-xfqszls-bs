@@ -1,8 +1,10 @@
 <template>
   <PageScreen>
     <template #left>
-      <IndustryPageLeftCard1 class="mb-[62px]" />
-      <IndustryPageLeftCard2 />
+      <!-- <IndustryPageLeftCard1 class="mb-[62px]" />
+      <IndustryPageLeftCard2 /> -->
+      <IndustryPageLeftCard11 class="mb-[62px]" />
+      <IndustryPageLeftCard12 />
     </template>
 
     <template #middle>
@@ -10,7 +12,7 @@
     </template>
     <template #right>
       <SituationPageRightCard1 class="mb-[40px]" />
-      <IndustryPageRightCard2 class="mb-[40px]" />
+      <!-- <IndustryPageRightCard2 class="mb-[40px]" /> -->
       <SituationPageRightCard3 />
     </template>
   </PageScreen>
