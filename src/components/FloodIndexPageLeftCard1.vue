@@ -61,6 +61,13 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 
+/** 图表样式与 FloodIndexPageRightCard2 对齐 */
+const CHART_FONT = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_AXIS_VALUE = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_X = '"PingFang SC", "Microsoft YaHei", sans-serif'
+const FONT_SIZE = 20
+const LINE_WIDTH = 1
+
 const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/weather/${icon}.png`, import.meta.url).href
 }
@@ -93,8 +100,16 @@ const weatherList = ref<Record<string, any>[]>([])
 const activeForecastIndex = ref(4)
 
 const echartOption = ref({
+  animation: false,
   tooltip: {
-    trigger: 'axis'
+    trigger: 'axis' as const,
+    axisPointer: {
+      type: 'line' as const,
+      lineStyle: { color: 'rgba(255, 255, 255, 0.35)', type: 'dashed' as const, width: LINE_WIDTH }
+    },
+    backgroundColor: 'rgba(20, 40, 60, 0.92)',
+    borderColor: 'rgba(120, 200, 255, 0.35)',
+    textStyle: { color: '#fff', fontSize: FONT_SIZE, fontFamily: CHART_FONT }
   },
   title: {
     text: '当日气温',
@@ -102,40 +117,40 @@ const echartOption = ref({
     left: 0,
     textStyle: {
       color: '#FFFFFF',
-      fontSize: 22,
+      fontSize: FONT_SIZE,
       fontWeight: 'normal',
-      fontFamily: 'PingFangSC, sans-serif'
+      fontFamily: CHART_FONT
     }
   },
   grid: {
-    top: '18%',
-    left: '4%',
-    right: '4%',
-    bottom: '8%',
+    top: '22%',
+    left: '5%',
+    right: '6%',
+    bottom: '14%',
     containLabel: true
   },
   xAxis: {
-    type: 'category',
+    type: 'category' as const,
     boundaryGap: false,
     axisTick: {
       show: false
     },
+    offset: 8,
     axisLine: {
       lineStyle: {
-        color: 'rgba(179,223,255, 0.45)',
-        width: 2
+        color: 'rgba(179, 223, 255, 0.5)',
+        width: LINE_WIDTH
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif',
-      margin: 14
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_X
     },
     data: [] as string[]
   },
   yAxis: {
-    type: 'value',
+    type: 'value' as const,
     axisLine: {
       show: false
     },
@@ -143,15 +158,16 @@ const echartOption = ref({
       show: false
     },
     axisLabel: {
-      color: '#d9efff',
-      fontSize: 18,
-      fontFamily: 'Quantico, sans-serif'
+      color: '#fff',
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_AXIS_VALUE
     },
     splitLine: {
       show: true,
       lineStyle: {
-        type: 'dashed',
-        color: 'rgba(217,231,255, 0.2)'
+        type: 'dashed' as const,
+        color: 'rgba(217, 231, 255, 0.2)',
+        width: LINE_WIDTH
       }
     }
   },
@@ -159,19 +175,19 @@ const echartOption = ref({
     {
       name: '气温',
       data: [] as number[],
-      type: 'line',
+      type: 'line' as const,
       smooth: true,
       showSymbol: true,
       symbol: 'circle',
       symbolSize: 8,
       lineStyle: {
         color: '#FF932F',
-        width: 3
+        width: 2
       },
       itemStyle: {
         color: '#FF932F',
         borderColor: '#fff',
-        borderWidth: 1
+        borderWidth: LINE_WIDTH
       }
     }
   ]

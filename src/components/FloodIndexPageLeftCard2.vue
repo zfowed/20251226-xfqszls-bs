@@ -16,6 +16,13 @@ const DEFAULT_RAIN_MM = [62, 44, 58, 78, 72, 58, 33, 52, 61, 52, 72, 33]
 const SPLIT = 6
 const CHART_LEN = 12
 
+/** 图表样式与 FloodIndexPageRightCard2 对齐 */
+const CHART_FONT = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_AXIS_VALUE = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_X = '"PingFang SC", "Microsoft YaHei", sans-serif'
+const FONT_SIZE = 20
+const LINE_WIDTH = 1
+
 const getNumberByKeys = (source: Record<string, any>, keys: string[]) => {
   for (const key of keys) {
     const value = Number(source?.[key])
@@ -114,12 +121,16 @@ function buildSeriesData (values: number[]) {
 }
 
 const echartOption = ref({
+  animation: false,
   tooltip: {
     trigger: 'axis' as const,
-    axisPointer: { type: 'shadow' as const },
+    axisPointer: {
+      type: 'shadow' as const,
+      shadowStyle: { color: 'rgba(255, 255, 255, 0.08)' }
+    },
     backgroundColor: 'rgba(20, 40, 60, 0.92)',
     borderColor: 'rgba(120, 200, 255, 0.35)',
-    textStyle: { color: '#fff', fontSize: 18 },
+    textStyle: { color: '#fff', fontSize: FONT_SIZE, fontFamily: CHART_FONT },
     formatter: (items: Record<string, any>[]) => {
       if (!items?.length) return ''
       const axis = items[0].axisValueLabel ?? items[0].name
@@ -132,17 +143,17 @@ const echartOption = ref({
     }
   },
   legend: {
-    top: 12,
-    right: 36,
-    itemWidth: 22,
-    itemHeight: 14,
-    itemGap: 28,
+    top: 10,
+    left: 'center',
+    itemWidth: 32,
+    itemHeight: 10,
+    itemGap: 40,
     orient: 'horizontal' as const,
     selectedMode: false,
     textStyle: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif',
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT,
       padding: [0, 0, 0, 10]
     },
     data: [
@@ -151,27 +162,27 @@ const echartOption = ref({
     ]
   },
   grid: {
-    top: '16%',
-    left: '4%',
-    right: '4%',
-    bottom: '10%',
+    top: '26%',
+    left: '5%',
+    right: '6%',
+    bottom: '14%',
     containLabel: true
   },
   xAxis: {
     type: 'category' as const,
     boundaryGap: true,
     axisTick: { show: false },
+    offset: 8,
     axisLine: {
       lineStyle: {
-        color: 'rgba(120, 200, 255, 0.65)',
-        width: 2
+        color: 'rgba(179, 223, 255, 0.5)',
+        width: LINE_WIDTH
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif',
-      margin: 14
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_X
     },
     data: [] as string[]
   },
@@ -182,20 +193,20 @@ const echartOption = ref({
     interval: 22.5,
     name: '降雨量 (mm)',
     nameLocation: 'end' as const,
-    nameGap: 12,
+    nameGap: 28,
     nameTextStyle: {
       color: '#fff',
-      fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif',
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT,
       align: 'left' as const,
       padding: [0, 0, 8, 0]
     },
     axisLine: { show: false },
     axisTick: { show: false },
     axisLabel: {
-      color: 'rgba(230, 245, 255, 0.92)',
-      fontSize: 17,
-      fontFamily: 'Quantico, PingFangSC, sans-serif',
+      color: '#fff',
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_AXIS_VALUE,
       formatter: (val: number) => {
         const rounded = Math.round(val * 2) / 2
         if (rounded === 22.5) return '23'
@@ -206,8 +217,9 @@ const echartOption = ref({
     splitLine: {
       show: true,
       lineStyle: {
-        type: 'dotted' as const,
-        color: 'rgba(255, 255, 255, 0.22)'
+        type: 'dashed' as const,
+        color: 'rgba(217, 231, 255, 0.2)',
+        width: LINE_WIDTH
       }
     }
   },
