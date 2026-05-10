@@ -72,6 +72,71 @@ const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/weather/${icon}.png`, import.meta.url).href
 }
 
+/** 接口用 9999 表示缺测 */
+const isWeatherMissing = (v: unknown) => {
+  if (v === null || v === undefined) return true
+  const s = String(v).trim()
+  return s === '' || s === '9999' || Number(s) === 9999
+}
+
+/** 预报温度转数字，缺测返回 undefined */
+const parseForecastTemp = (v: unknown): number | undefined => {
+  if (isWeatherMissing(v)) return undefined
+  const n = Number(v)
+  return Number.isFinite(n) && n < 9990 ? n : undefined
+}
+
+/** 实况/预报天气文字 → 现有 png 文件名（无对应资源时回退） */
+const resolveWeatherIconName = (info: unknown): string => {
+  if (isWeatherMissing(info)) return '多云'
+  const t = String(info).trim()
+  const alias: Record<string, string> = {
+    阴: '阴天',
+    阴天: '阴天',
+    雾: '阴天',
+    霾: '阴天',
+    小雨: '阴天',
+    中雨: '雷阵雨',
+    大雨: '雷阵雨',
+    暴雨: '雷阵雨',
+    雷阵雨: '雷阵雨',
+    雨: '阴天',
+    雪: '阴天'
+  }
+  return alias[t] ?? t
+}
+
+const getPhotoUrlByInfo = (info: unknown) => {
+  return getPhotoUrl(resolveWeatherIconName(info))
+}
+
+/** 优先用白天预报图标，缺测则用夜间 */
+const pickForecastWeatherInfoForIcon = (daySlot: Record<string, any>, nightSlot: Record<string, any>) => {
+  const d = daySlot?.weather?.info
+  const n = nightSlot?.weather?.info
+  if (!isWeatherMissing(d)) return d
+  if (!isWeatherMissing(n)) return n
+  return '多云'
+}
+
+/** 列表展示：昼夜天气文案（无 textDay 字段） */
+const formatForecastWeatherText = (daySlot: Record<string, any>, nightSlot: Record<string, any>) => {
+  const di = isWeatherMissing(daySlot?.weather?.info) ? '' : String(daySlot.weather.info).trim()
+  const ni = isWeatherMissing(nightSlot?.weather?.info) ? '' : String(nightSlot.weather.info).trim()
+  if (di && ni && di !== ni) return `${di}转${ni}`
+  return di || ni || '—'
+}
+
+/** 与 predict.detail[].date 对齐的 tempchart 行（time 形如 2026/05/10） */
+const findTempchartRow = (tempchart: Record<string, any>[] | undefined, ymd: string) => {
+  if (!tempchart?.length) return undefined
+  const target = dayjs(ymd)
+  return tempchart.find((row) => {
+    const rowDay = row?.time ? dayjs(String(row.time).replace(/\//g, '-')) : null
+    return rowDay?.isValid() && rowDay.isSame(target, 'day')
+  })
+}
+
 const weekTextMap: Record<number, string> = {
   0: '星期日',
   1: '星期一',
@@ -174,7 +239,7 @@ const echartOption = ref({
   series: [
     {
       name: '气温',
-      data: [] as number[],
+      data: [] as (number | null)[],
       type: 'line' as const,
       smooth: true,
       showSymbol: true,
@@ -195,43 +260,77 @@ const echartOption = ref({
 
 usePolling(async () => {
   const result: any = await service.xfqs.queryStationWeather({})
-  const dayWeatherList = []
-  for (const dayItem of result.predict.detail) {
+  const detail = (result?.predict?.detail || []) as Record<string, any>[]
+  const tempchart = (result?.tempchart || []) as Record<string, any>[]
+
+  const dayWeatherList: Record<string, any>[] = []
+  for (const dayItem of detail) {
+    const night = dayItem.night || {}
+    const day = dayItem.day || {}
+    const tcRow = dayItem.date ? findTempchartRow(tempchart, dayItem.date) : undefined
+    const chartMin = tcRow && typeof tcRow.min_temp === 'number' ? tcRow.min_temp : parseForecastTemp(tcRow?.min_temp)
+    const chartMax = tcRow && typeof tcRow.max_temp === 'number' ? tcRow.max_temp : parseForecastTemp(tcRow?.max_temp)
+    const nightT = parseForecastTemp(night?.weather?.temperature) ?? chartMin
+    const dayT = parseForecastTemp(day?.weather?.temperature) ?? chartMax
+    const tMin = nightT ?? dayT ?? 0
+    const tMax = dayT ?? nightT ?? tMin
     dayWeatherList.push({
       ...dayItem,
       date: dayjs(dayItem.date).format('MM-DD'),
       week: formatWeekText(dayItem.date),
-      weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(dayItem.night.weather.info) : getPhotoUrl(dayItem.day.weather.info),
-      weatherText: dayItem.textDay,
-      tempMin: dayItem.night.weather.temperature,
-      tempMax: dayItem.day.weather.temperature,
-      humidity: dayItem.humidity
+      weather: getPhotoUrlByInfo(pickForecastWeatherInfoForIcon(day, night)),
+      weatherText: formatForecastWeatherText(day, night),
+      tempMin: Math.min(tMin, tMax),
+      tempMax: Math.max(tMin, tMax)
     })
   }
   weatherList.value = dayWeatherList.slice(1, 7)
 
+  const first = detail[0]
+  const tc0 = first?.date ? findTempchartRow(tempchart, first.date) : undefined
+  let todayMin = parseForecastTemp(first?.night?.weather?.temperature)
+  let todayMax = parseForecastTemp(first?.day?.weather?.temperature)
+  if (tc0) {
+    const cmin = typeof tc0.min_temp === 'number' ? tc0.min_temp : parseForecastTemp(tc0.min_temp)
+    const cmax = typeof tc0.max_temp === 'number' ? tc0.max_temp : parseForecastTemp(tc0.max_temp)
+    if (todayMin === undefined && cmin !== undefined) todayMin = cmin
+    if (todayMax === undefined && cmax !== undefined) todayMax = cmax
+  }
+  if (todayMin === undefined) todayMin = parseForecastTemp(first?.day?.weather?.temperature)
+  if (todayMax === undefined) todayMax = parseForecastTemp(first?.night?.weather?.temperature)
+  if (todayMin !== undefined && todayMax !== undefined && todayMax < todayMin) {
+    const t = todayMin
+    todayMin = todayMax
+    todayMax = t
+  }
   todayWeather.value = {
     date: '今日',
-    direction: result.real.wind.direct,
-    weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(result.real.weather.info) : getPhotoUrl(result.real.weather.info),
-    weatherText: result.real.weather.info,
-    tempMin: result.predict.detail[0].night.weather.temperature,
-    tempMax: result.predict.detail[0].day.weather.temperature,
-    currentTemp: Math.round(result.real.weather.temperature),
-    humidity: result.real.weather.humidity
+    direction: result.real?.wind?.direct ?? '—',
+    weather: getPhotoUrlByInfo(result.real?.weather?.info),
+    weatherText: isWeatherMissing(result.real?.weather?.info) ? '—' : String(result.real.weather.info),
+    tempMin: todayMin ?? 0,
+    tempMax: todayMax ?? todayMin ?? 0,
+    currentTemp: Math.round(Number(result.real?.weather?.temperature) || 0),
+    humidity: Number(result.real?.weather?.humidity) || 0
   }
 
-  const detail = result.predict?.detail || []
   const chartSlice = detail.slice(0, 12)
   const xData = chartSlice.map((d: Record<string, any>) => dayjs(d.date).format('M.D'))
-  const yData = chartSlice.map((d: Record<string, any>) => Number(d.day?.weather?.temperature ?? 0))
+  const yData = chartSlice.map((d: Record<string, any>) => {
+    const hi = parseForecastTemp(d.day?.weather?.temperature)
+    const lo = parseForecastTemp(d.night?.weather?.temperature)
+    const row = d.date ? findTempchartRow(tempchart, d.date) : undefined
+    const chartMax = row && typeof row.max_temp === 'number' ? row.max_temp : parseForecastTemp(row?.max_temp)
+    return hi ?? chartMax ?? lo ?? null
+  }) as (number | null)[]
 
   echartOption.value.xAxis.data = xData
-  echartOption.value.series[0].data = yData
+  ;(echartOption.value.series[0] as Record<string, any>).data = yData
 
-  if (yData.length > 0) {
-    const dataMin = Math.min(...yData)
-    const dataMax = Math.max(...yData)
+  const validY = yData.filter((v): v is number => v !== null && Number.isFinite(v))
+  if (validY.length > 0) {
+    const dataMin = Math.min(...validY)
+    const dataMax = Math.max(...validY)
     const pad = Math.max(1, Math.round((dataMax - dataMin) * 0.15) || 2)
     ;(echartOption.value.yAxis as Record<string, any>).min = Number((dataMin - pad).toFixed(0))
     ;(echartOption.value.yAxis as Record<string, any>).max = Number((dataMax + pad).toFixed(0))
