@@ -11,6 +11,7 @@
           class="rehearsal-table"
           :thead-col="theadCol"
           :data-list="dataList"
+          :limit-scroll="5"
           :index="true"
         >
           <template #index="scope">
@@ -66,48 +67,14 @@ const theadCol = ref([
   { key: 'action', name: '操作', width: 200, align: 'center' }
 ])
 
-const dataList = ref<RehearsalPlanRow[]>([
-  {
-    planName: '2026-04-21 供水时间最少调度方案',
-    forecastRange: '4天',
-    rainNum: '9.97',
-    baseTime: '2026-04-21 12:00',
-    forecastTime: '2026-04-21 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-22 供水时间最少调度方案',
-    forecastRange: '3天',
-    rainNum: '3.36',
-    baseTime: '2026-04-22 12:00',
-    forecastTime: '2026-04-22 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-23 供水时间最少调度方案',
-    forecastRange: '3天',
-    rainNum: '3.18',
-    baseTime: '2026-04-23 12:00',
-    forecastTime: '2026-04-23 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-24 供水时间最少调度方案',
-    forecastRange: '3天',
-    rainNum: '3.46',
-    baseTime: '2026-04-24 12:00',
-    forecastTime: '2026-04-24 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-25 供水时间最少调度方案',
-    forecastRange: '3天',
-    rainNum: '3.46',
-    baseTime: '2026-04-25 12:00',
-    forecastTime: '2026-04-25 12:00',
-    status: '进行中'
-  }
-])
+const dataList = ref<RehearsalPlanRow[]>(Array.from({ length: 20 }, (_, index) => ({
+  planName: `2026-04-21 供水时间最少调度方案 ${index + 1}`,
+  forecastRange: '4天',
+  rainNum: '9.97',
+  baseTime: '2026-04-21 12:00',
+  forecastTime: '2026-04-21 12:00',
+  status: '进行中'
+})))
 </script>
 
 <style lang="scss" scoped>
