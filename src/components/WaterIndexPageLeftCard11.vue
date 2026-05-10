@@ -157,6 +157,7 @@ const todayWeather = ref<Record<string, any>>({
   currentTemp: 0,
   humidity: 0
 })
+
 const weatherList = ref<Record<string, any>[]>([])
 
 const echartOption = ref({
@@ -341,11 +342,6 @@ usePolling(async () => {
     tempMax: todayMax ?? todayMin ?? 0,
     currentTemp: Math.round(Number(result.real?.weather?.temperature) || 0),
     humidity: Number(result.real?.weather?.humidity) || 0
-  }
-
-  const chartSlice = detail.slice(0, 12)
-  if (chartSlice.length > 0) {
-    echartOption.value.xAxis.data = chartSlice.map((d: Record<string, any>) => dayjs(d.date).format('M.D'))
   }
 })
 </script>
