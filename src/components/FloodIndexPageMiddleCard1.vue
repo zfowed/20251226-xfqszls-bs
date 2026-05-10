@@ -1,210 +1,171 @@
 <template>
   <PageCard title="预报方案" bg-class="middle">
     <div class="page-container">
-      <ElTable
-        ref="tableRef"
-        :data="dataList"
-        class="files-table"
-        row-key="id"
-        height="470px"
-      >
-        <ElTableColumn label="" width="72" align="center">
-          <template #default="scope">
+      <div class="table-wrap">
+        <PageTable
+          class="forecast-table"
+          :thead-col="theadCol"
+          :data-list="dataList"
+          :limit-scroll="5"
+          :index="true"
+        >
+          <template #index="scope">
             <div class="table-index">
-              {{ scope.$index + 1 }}
+              {{ scope.index }}
             </div>
           </template>
-        </ElTableColumn>
-        <ElTableColumn prop="planName" label="方案名称" min-width="540" />
-        <ElTableColumn prop="forecastRange" label="预见期" width="120" align="center" />
-        <ElTableColumn prop="totalRainfall" label="累计降雨" width="150" align="center" />
-        <ElTableColumn prop="baseTime" label="依据时间" width="220" align="center" />
-        <ElTableColumn prop="forecastTime" label="预报时间" width="220" align="center" />
-        <ElTableColumn label="操作" width="120" align="center">
-          <template #default>
+          <template #totalRainfall="scope">
+            <span class="rain-num">{{ scope.row.rainNum }}</span>
+            <span class="rain-unit">m</span>
+          </template>
+          <template #action>
             <button class="action-view" type="button">
+              <span class="action-view__icon" aria-hidden="true">
+                <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 36 36" fill="none">
+                  <path
+                    d="M18 10c-6 0-10 5.2-10 8s4 8 10 8 10-5.2 10-8-4-8-10-8Z"
+                    stroke="#81E6FF"
+                    stroke-width="1.8"
+                  />
+                  <circle cx="18" cy="18" r="3.2" stroke="#81E6FF" stroke-width="1.8" />
+                </svg>
+              </span>
               查看
             </button>
           </template>
-        </ElTableColumn>
-      </ElTable>
+        </PageTable>
+      </div>
     </div>
   </PageCard>
 </template>
 
 <script setup lang="ts">
-type ForecastPlanItem = {
-  id: number
+type ForecastPlanRow = {
   planName: string
   forecastRange: string
-  totalRainfall: string
+  rainNum: string
   baseTime: string
   forecastTime: string
 }
 
-const tableRef = ref<any>()
-
-const dataList = ref<ForecastPlanItem[]>([
-  {
-    id: 1,
-    planName: '2026-04-21 供水时间最少调度方案',
-    forecastRange: '4天',
-    totalRainfall: '9.87 m',
-    baseTime: '2026-04-21 12:00',
-    forecastTime: '自动预报'
-  },
-  {
-    id: 2,
-    planName: '2026-04-22 供水时间最少调度方案',
-    forecastRange: '3天',
-    totalRainfall: '3.36 m',
-    baseTime: '2026-04-22 12:00',
-    forecastTime: '自动预报'
-  },
-  {
-    id: 3,
-    planName: '2026-04-23 供水时间最少调度方案',
-    forecastRange: '3天',
-    totalRainfall: '3.18 m',
-    baseTime: '2026-04-23 12:00',
-    forecastTime: '自动预报'
-  },
-  {
-    id: 4,
-    planName: '2026-04-24 供水时间最少调度方案',
-    forecastRange: '3天',
-    totalRainfall: '3.46 m',
-    baseTime: '2026-04-24 12:00',
-    forecastTime: '自动预报'
-  },
-  {
-    id: 5,
-    planName: '2026-04-25 供水时间最少调度方案',
-    forecastRange: '3天',
-    totalRainfall: '3.46 m',
-    baseTime: '2026-04-25 12:00',
-    forecastTime: '自动预报'
-  }
+const theadCol = ref([
+  { key: 'planName', name: '方案名称' },
+  { key: 'forecastRange', name: '预见期', width: 200, align: 'center' },
+  { key: 'totalRainfall', name: '累计降雨', width: 220, align: 'center' },
+  { key: 'baseTime', name: '依据时间', width: 300, align: 'center' },
+  { key: 'forecastTime', name: '预报时间', width: 300, align: 'center' },
+  { key: 'action', name: '操作', width: 200, align: 'center' }
 ])
 
-onMounted(() => {
-  nextTick(() => {
-    const defaultRow = dataList.value.find((r) => r.id === 3)
-    if (defaultRow) {
-      tableRef.value?.setCurrentRow(defaultRow)
-    }
-  })
-})
+const dataList = ref<ForecastPlanRow[]>(Array.from({ length: 20 }, (_, index) => ({
+  planName: `2026-04-21 供水时间最少调度方案 ${index + 1}`,
+  forecastRange: '4天',
+  rainNum: '9.87',
+  baseTime: '2026-04-21 12:00',
+  forecastTime: '自动预报'
+})))
 </script>
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 20px 140px 0;
+  padding: 12px 80px 24px;
   box-sizing: border-box;
 }
 
+.table-wrap {
+  height: 520px;
+}
+
 .table-index {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  line-height: 34px;
+  width: 49.68px;
+  height: 59.61px;
   color: #fff;
-  font-size: 20px;
+  font-family: JiangChengHeiTi, 'Alibaba PuHuiTi 2.0', sans-serif;
+  font-size: 36px;
   font-weight: 600;
-  background: url('@/components/PageTable/assets/index-bg.png') no-repeat;
+  line-height: 59.61px;
+  background: url('@/components/PageTable/assets/index-bg.png') no-repeat center;
   background-size: 100% 100%;
 }
 
-:deep(.el-table) {
-  background-color: transparent;
+.rain-num {
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
 }
 
-.files-table {
-  :deep(.el-table__inner-wrapper) {
-    &::before {
-      display: none;
-    }
-
-    tr {
-      background: transparent;
-    }
-
-    .el-table__header-wrapper {
-      th.el-table__cell {
-        background: rgb(19 96 160 / 0.55);
-        border-bottom: none;
-        color: #fff;
-        font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
-        font-size: 20px;
-        font-weight: 500;
-      }
-    }
-
-    .el-table__body {
-      border-spacing: 0 2px;
-    }
-
-    .el-table__body-wrapper {
-      margin-top: 2px;
-
-      td.el-table__cell {
-        background: rgb(19 79 135 / 0.25);
-        color: #81e6ff;
-        font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
-        font-size: 19px;
-        border: 1px solid #527191;
-        box-sizing: border-box;
-
-        &:not(:last-child) {
-          border-right: none;
-        }
-
-        &:not(:first-child) {
-          border-left: none;
-        }
-      }
-    }
-
-    .el-table__row:hover > td.el-table__cell {
-      background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
-      color: #fff;
-    }
-
-    .el-table__body tr.current-row > td.el-table__cell {
-      background: linear-gradient(180deg, rgb(30 83 132 / 0.85), rgb(0 132 255 / 0.65)) !important;
-      color: #fff !important;
-      box-shadow: inset 0 0 0 1px rgb(100 200 255 / 0.45);
-    }
-  }
-
-  :deep(.cell) {
-    height: 52px;
-    line-height: 52px;
-    padding: 0 8px;
-    box-sizing: border-box;
-  }
+.rain-unit {
+  margin-left: 6px;
+  color: #beeeff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 24px;
 }
 
 .action-view {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   border: none;
   padding: 0;
-  color: #8ce8ff;
-  font-size: 18px;
+  color: #81e6ff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
   line-height: 1;
+  cursor: pointer;
   background: transparent;
+}
 
-  &::before {
-    content: '';
-    width: 12px;
-    height: 8px;
-    border: 1px solid #8ce8ff;
-    border-radius: 10px / 8px;
-    box-sizing: border-box;
+.action-view__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.forecast-table {
+  height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3) .rain-unit) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3) .action-view) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3) .action-view__icon svg path),
+  :deep(.table-body__tr:nth-child(3) .action-view__icon svg circle) {
+    stroke: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
   }
 }
 </style>
