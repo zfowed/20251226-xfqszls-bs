@@ -442,23 +442,69 @@ usePolling(async () => {
 
 :deep(.reservoir-card__select .el-select__wrapper) {
   min-height: 40px;
-  background: linear-gradient(180deg, rgb(30 89 146 / 0.36) 0%, rgb(8 42 80 / 0.46) 100%);
+  padding: 0 16px;
+  background: linear-gradient(180deg, rgb(20 74 122 / 0.72) 0%, rgb(7 42 83 / 0.76) 100%);
   border-radius: 0;
   box-shadow:
-    inset 0 0 18px rgb(78 187 255 / 0.12),
-    0 0 0 1px rgb(102 190 255 / 0.65);
+    inset 0 0 0 1px rgb(106 197 255 / 0.36),
+    inset 0 0 16px rgb(72 182 255 / 0.14),
+    0 0 0 1px rgb(79 164 219 / 0.56);
+}
+
+:deep(.reservoir-card__select .el-select__wrapper.is-focused) {
+  box-shadow:
+    inset 0 0 0 1px rgb(116 219 255 / 0.5),
+    inset 0 0 20px rgb(87 198 255 / 0.18),
+    0 0 0 1px rgb(106 197 255 / 0.72);
+}
+
+:deep(.reservoir-card__select .el-select__selection) {
+  min-height: 40px;
 }
 
 :deep(.reservoir-card__select .el-select__placeholder),
 :deep(.reservoir-card__select .el-select__selected-item),
 :deep(.reservoir-card__select .el-select__input-text) {
-  color: #dff7ff;
-  font-size: 22px;
+  color: #dff5ff;
+  font-size: 18px;
+  font-family: PingFangSC, sans-serif;
+  font-weight: 600;
+}
+
+:deep(.reservoir-card__select .el-select__placeholder) {
+  color: rgb(223 245 255 / 0.7);
 }
 
 :deep(.reservoir-card__select .el-select__caret) {
-  color: #72dfff;
+  color: #86eaff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+:global(.reservoir-card__select-popper.el-popper) {
+  background: linear-gradient(180deg, rgb(11 43 82 / 0.96) 0%, rgb(6 28 56 / 0.96) 100%);
+  border: 1px solid rgb(96 192 255 / 0.32);
+  border-radius: 0;
+  box-shadow: 0 10px 24px rgb(3 14 30 / 0.42);
+}
+
+:global(.reservoir-card__select-popper .el-popper__arrow) {
+  display: none;
+}
+
+:global(.reservoir-card__select-popper .el-select-dropdown__item) {
+  height: 36px;
+  padding: 0 16px;
+  color: rgb(223 245 255 / 0.88);
   font-size: 16px;
+  font-family: PingFangSC, sans-serif;
+  line-height: 36px;
+}
+
+:global(.reservoir-card__select-popper .el-select-dropdown__item.is-hovering),
+:global(.reservoir-card__select-popper .el-select-dropdown__item.is-selected) {
+  background: rgb(71 154 217 / 0.24);
+  color: #eefbff;
 }
 
 .architecture-main {

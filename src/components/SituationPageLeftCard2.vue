@@ -278,20 +278,25 @@ usePolling(async () => {
   font-family: DINMedium, sans-serif;
 }
 
-.card-title__tab--active {
-  color: #fff;
-  background-image: none;
-  background-clip: border-box;
-  -webkit-text-fill-color: #fff;
+.card-title__tab {
+  cursor: pointer;
+  transition: color 0.2s ease, -webkit-text-fill-color 0.2s ease;
+  position: relative;
+  color: #eeeeee69;
+  font-size: 52px;
+  font-weight: bold;
+  font-family: DINAlternateBold, sans-serif;
+  background-image: linear-gradient(to bottom, #eeeeee69 20%, #eeeeee69 81%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.card-title__tab {
-  color: rgb(155 211 255 / 0.52);
-  background-image: none;
-  background-clip: border-box;
-  -webkit-text-fill-color: rgb(155 211 255 / 0.52);
-  cursor: pointer;
-  transition: color 0.2s ease;
+.card-title__tab--active {
+  color: #f7faff;
+  background-image: linear-gradient(to bottom, #91dcff 20%, #fff 81%);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 3px rgb(5 12 25 / 0.6)) drop-shadow(0 0 7px rgb(75 180 229 / 0.69));
 }
 
 .card-title__divider {

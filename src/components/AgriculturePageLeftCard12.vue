@@ -6,6 +6,7 @@
         :data-list="cropList"
         :index="false"
         class="agriculture-monitor-table"
+        :limit-scroll="7"
       >
         <template #icon="scope">
           <div class="agriculture-monitor-table__icon-cell flex items-center justify-center">
@@ -96,7 +97,7 @@ usePolling(async () => {
 <style lang="scss" scoped>
 .agriculture-monitor-card {
   padding: 26px 34px 18px;
-  height: 488px;
+  height: 608px;
 }
 
 .agriculture-monitor-table {
