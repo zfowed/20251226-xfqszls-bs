@@ -23,11 +23,9 @@
       </div>
       <div class="grid grid-cols-6 gap-col-[12px]">
         <div
-          v-for="(weatherItem, index) in weatherList"
+          v-for="(weatherItem) in weatherList"
           :key="weatherItem.date"
           class="week-weather"
-          :class="{ 'week-weather--active': index === activeForecastIndex }"
-          @click="activeForecastIndex = index"
         >
           <div class="mb-[7px]">
             {{ weatherItem.week }}
@@ -161,8 +159,8 @@ const todayWeather = ref<Record<string, any>>({
   currentTemp: 0,
   humidity: 0
 })
+
 const weatherList = ref<Record<string, any>[]>([])
-const activeForecastIndex = ref(4)
 
 const echartOption = ref({
   animation: false,
