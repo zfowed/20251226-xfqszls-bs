@@ -27,7 +27,12 @@ const theadCol = ref([
   { key: 'status', name: '渠道过流状态', width: 180, align: 'center' }
 ])
 
-const channelList = ref([
+const channelTypeMap: Record<string, string> = {
+  gq: '干渠',
+  zq: '支渠'
+}
+
+const channelList = ref<Record<string, any>[]>([
   {
     id: 'channel-1',
     name: '幸福渠主干渠',
@@ -85,6 +90,20 @@ const channelList = ref([
     active: false
   }
 ])
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getChannelAndStcd({})
+  if (!Array.isArray(result)) return
+
+  channelList.value = result.map((item: Record<string, any>, index: number) => ({
+    id: item.id ?? `channel-${index}`,
+    name: item.name || '--',
+    type: channelTypeMap[item.type] || item.type || '--',
+    flow: item.q ?? '0.00',
+    status: item.isHasQ || '--',
+    active: index === 0
+  }))
+})
 </script>
 
 <style lang="scss" scoped>

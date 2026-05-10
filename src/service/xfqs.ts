@@ -25,6 +25,22 @@ export const getChannelCount = defineService<
   return request.get('/api/gq/st/channelB/getChannelCount', { params, ...config })
 })
 
+// 渠道工程信息
+export const getChannelAndStcd = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/st/channelB/getChannelAndStcd', { params, ...config })
+})
+
+// 渠系建筑物分类统计
+export const getCanalStructureCountGroupByStructureType = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/st/canalStructure/countGroupByStructureType', { params, ...config })
+})
+
 // 天气信息
 export const queryStationWeather = defineService<
   Record<string, any>,
@@ -47,6 +63,14 @@ export const getPatrolList = defineService<
   Record<string, any>
 >(async function (params, config) {
   return request.get('/api/gq/patrol/list', { params, ...config })
+})
+
+// 工程巡检统计
+export const getPatrolAndWorkOrderStatics = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/patrol/record/getPatrolAndWorkOrderStatics', { params, ...config })
 })
 
 // 水闸状态 / 水库监测
@@ -93,6 +117,14 @@ export const getLongPosition = defineService<
   Record<string, any>
 >(async function (params, config) {
   return request.get('/watercontrol/platform-bus-wdd/api/bus/xsShortData/getLongPosition', { params, ...config })
+})
+
+// 当前作物种植面积
+export const getCurrentDateCropArea = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/watercontrol/platform-bus-wdd/api/bus/xsShortData/getCurrentDateCropArea', { params, ...config })
 })
 
 // 配水调度
@@ -165,6 +197,22 @@ export const getSoilWarnInfo = defineService<
   Record<string, any>
 >(async function (params, config) {
   return request.get('/api/gq/baseinfo/oneMap/getSoilWarnInfo', { params, ...config })
+})
+
+// 墒情点位信息
+export const getSoilPage = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.post('/api/gq/st/soil/page', { ...params, ...config })
+})
+
+// 墒情统计过程线
+export const getSoilStatStep = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params) {
+  return request.post('/api/gq/st/soil/stat/step', params)
 })
 
 // 防汛物资列表查询

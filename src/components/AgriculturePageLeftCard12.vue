@@ -8,11 +8,11 @@
         class="agriculture-monitor-table"
       >
         <template #icon="scope">
-          <div class="agriculture-monitor-table__icon-cell">
+          <div class="agriculture-monitor-table__icon-cell flex items-center justify-center">
             <img
               :src="scope.row.icon"
               :alt="scope.row.name"
-              class="agriculture-monitor-table__icon"
+              class="agriculture-monitor-table__icon mt-[10px]"
             >
           </div>
         </template>
@@ -41,6 +41,16 @@ const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/flood/${icon}.png`, import.meta.url).href
 }
 
+const cropIconMap: Record<string, string> = {
+  水稻: 'rice-icon',
+  早稻: 'rice-icon',
+  中稻: 'rice-icon',
+  晚稻: 'rice-icon',
+  玉米: 'corn-icon',
+  油菜: 'rapeseed-icon',
+  小麦: 'wheat-icon'
+}
+
 const theadCol = ref([
   { key: 'icon', name: '', width: 92, align: 'center' },
   { key: 'name', name: '种类', width: 160, align: 'left' },
@@ -57,6 +67,30 @@ const cropList = ref<CropItem[]>([
   { icon: getPhotoUrl('rapeseed'), name: '油菜', sowingDate: '26/5/12', growthStage: '生苗期', dailyWater: '10.21', waterUnit: '万m³' },
   { icon: getPhotoUrl('wheat'), name: '小麦', sowingDate: '26/5/12', growthStage: '生苗期', dailyWater: '10.21', waterUnit: '万m³' }
 ])
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getShortPosition({
+    time: '2026-04-29'
+  })
+
+  const firstPosition = Array.isArray(result) ? result[0] : result
+  const firstDay = Array.isArray(firstPosition?.list) ? firstPosition.list[0] : null
+  const data = Array.isArray(firstDay?.data) ? firstDay.data : []
+  if (data.length === 0) return
+
+  cropList.value = data.map((item: Record<string, any>) => {
+    const cropName = item.crop || '--'
+    const icon = cropIconMap[cropName] || 'rice'
+    return {
+      icon: getPhotoUrl(icon),
+      name: cropName,
+      sowingDate: item.time || firstDay?.time || '--',
+      growthStage: '--',
+      dailyWater: String(item.water ?? 0),
+      waterUnit: '万m³'
+    }
+  })
+})
 </script>
 
 <style lang="scss" scoped>
@@ -70,10 +104,8 @@ const cropList = ref<CropItem[]>([
 }
 
 .agriculture-monitor-table__icon {
-  width: 36px;
-  height: 36px;
-  object-fit: contain;
-  filter: drop-shadow(0 0 8px rgb(154 245 255 / 0.45));
+  width: 50px;
+  height: 50px;
 }
 
 .agriculture-monitor-table__water-value {

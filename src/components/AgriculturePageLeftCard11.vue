@@ -11,6 +11,7 @@
             v-for="item in cropList"
             :key="item.name"
             class="crop-list__item"
+            :style="{ color: item.color }"
           >
             <div class="crop-list__name-row">
               <span
@@ -34,14 +35,14 @@
 </template>
 
 <script setup lang="ts">
-import { SeededRandom } from 'zf-utilz'
-
 interface CropItem {
   name: string
   area: number
   percent: number
   color: string
 }
+
+const cropColors = ['#FFB35B', '#B8D6FF', '#67CCFF', '#FFD97A', '#91FF6E', '#FFE92F']
 
 const cropList = ref<CropItem[]>([
   { name: '水稻', area: 2000, percent: 21, color: '#FFB35B' },
@@ -67,7 +68,7 @@ const echartOption = computed(() => {
   ] as const
 
   const cropSeries = cropList.value.map((item, index) => {
-    const radius = radiusGroup[Math.floor(index / 2)]
+    const radius = radiusGroup[Math.floor(index / 2)] || radiusGroup[radiusGroup.length - 1]
     return {
       name: item.name,
       type: 'pie',
@@ -98,7 +99,7 @@ const echartOption = computed(() => {
           }
         },
         {
-          value: 97 - item.percent,
+          value: Math.max(0, 97 - item.percent),
           itemStyle: {
             color: 'rgba(180, 164, 109, 0.72)',
             borderRadius: 5
@@ -174,15 +175,42 @@ const echartOption = computed(() => {
 })
 
 usePolling(async () => {
-  cropList.value = cropList.value.map((item, index) => {
-    const randomArea = [2000, 2000, 2569, 900, 1100, 1000][index] ?? SeededRandom.randomNumber(800, 2800)
-    return {
-      ...item,
-      area: randomArea
-    }
-  })
+  const result: any = await service.xfqs.getCurrentDateCropArea({})
+  const sourceList = Array.isArray(result)
+    ? result
+    : Array.isArray(result?.list)
+      ? result.list
+      : Array.isArray(result?.data)
+        ? result.data
+        : result && typeof result === 'object'
+          ? Object.values(result)
+          : []
+  if (sourceList.length === 0) return
 
-  activeCropName.value = '晚稻'
+  const nextCropList = sourceList
+    .map((item: Record<string, any>, index: number) => {
+      const name = item.cropName || item.name || item.cropsName || item.zwmc || item.crop || `作物${index + 1}`
+      const area = Number(item.area ?? item.value ?? item.mj ?? item.cropArea ?? item.zdmj ?? 0)
+      const rate = Number(item.rate ?? item.percent ?? item.ratio)
+      return {
+        name,
+        area,
+        percent: Number.isFinite(rate) ? rate : 0,
+        color: cropColors[index % cropColors.length]
+      }
+    })
+    .filter((item: CropItem) => item.area > 0)
+    .slice(0, 6)
+
+  const totalArea = nextCropList.reduce((sum: number, item: CropItem) => sum + item.area, 0)
+  if (totalArea <= 0) return
+
+  cropList.value = nextCropList.map((item: CropItem) => ({
+    ...item,
+    percent: item.percent > 0 ? item.percent : Number(((item.area / totalArea) * 100).toFixed(1))
+  }))
+
+  activeCropName.value = cropList.value.reduce((maxItem, item) => item.area > maxItem.area ? item : maxItem, cropList.value[0]).name
 })
 </script>
 

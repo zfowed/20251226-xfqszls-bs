@@ -6,15 +6,15 @@
         <ElTable
           ref="tableRef"
           :data="instructionList"
-          class="files-table"
+          class="files-table water-warn-table"
           row-key="id"
           highlight-current-row
           height="579px"
           @current-change="onInstructionChange"
         >
-          <ElTableColumn label="" width="72" align="center">
+          <ElTableColumn label="" width="90" align="center">
             <template #default="scope">
-              <div class="table-index">
+              <div class="table-index mt-[10px]">
                 {{ scope.$index + 1 }}
               </div>
             </template>
@@ -54,44 +54,45 @@
 
       <!-- 调度详情 -->
       <div class="section">
-        <div class="section-title">
-          <span class="section-title__chev">»</span>
-          调度详情
+        <div class="header-title flex items-center mb-[30px] mt-[60px]">
+          <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+          <span>调度详情</span>
         </div>
         <div class="detail-layout">
-          <div class="doc-frame" aria-hidden="true">
-            <div class="doc-frame__corners" />
-            <div class="doc-frame__page">
-              <div class="doc-frame__line" />
-              <div class="doc-frame__line" />
-              <div class="doc-frame__line doc-frame__line--short" />
+          <div class="plan-preview" aria-hidden="true">
+            <div class="plan-preview__page">
+              <div class="plan-preview__watermark plan-preview__watermark--top">
+                应急预案
+              </div>
+              <div class="plan-preview__watermark plan-preview__watermark--bottom">
+                应急预案
+              </div>
+              <h4 class="plan-preview__title">
+                调度应急预案
+              </h4>
+              <div class="plan-preview__content">
+                <p>第 1 章：调度响应及实施</p>
+                <p>引调水运行总体安排</p>
+                <p>1. 水库闸门启闭、流量控制一体化调度。</p>
+                <p>2. 各站点实时监测供水线路运行状态。</p>
+                <p>3. 联动保障渠道、水闸及泵站设备安全。</p>
+                <p>4. 按计划完成总供水量与开闸流量控制。</p>
+              </div>
             </div>
           </div>
+
           <div class="dispatch-detail">
             <div
               v-for="item in detailRows"
               :key="item.label"
-              class="team-row"
-              :class="{ 'team-row--multi': item.values.length > 1 }"
+              class="detail-row"
             >
-              <div class="row-icon">
-                <div class="row-icon__inner">
-                  <div class="row-icon__bookmark" />
-                </div>
+              <div class="detail-row__icon">
+                <span class="detail-row__bookmark" />
               </div>
-
-              <div class="row-panel">
-                <p class="row-line">
-                  <span class="row-label">{{ item.label }}：</span>
-                  <span class="row-value">{{ item.values[0] }}</span>
-                </p>
-                <p
-                  v-for="(line, index) in item.values.slice(1)"
-                  :key="index"
-                  class="row-line row-line--extra"
-                >
-                  <span class="row-value">{{ line }}</span>
-                </p>
+              <div class="detail-row__panel">
+                <span class="detail-row__label">{{ item.label }}</span>
+                <span class="detail-row__value">{{ item.values[0] }}</span>
               </div>
             </div>
           </div>
@@ -100,9 +101,9 @@
 
       <!-- 执行情况 -->
       <div class="section section--last">
-        <div class="section-title">
-          <span class="section-title__chev">»</span>
-          执行情况
+        <div class="header-title flex items-center mb-[30px] mt-[60px]">
+          <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
+          <span>执行情况</span>
         </div>
         <div class="status-summary">
           <div class="status-summary__accent" />
@@ -116,7 +117,11 @@
           class="status-card"
         >
           <div class="status-card__head">
-            <span class="status-card__arrows">&lt;&lt;&lt;</span>
+            <span class="status-card__arrows" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
             {{ item.title }}
           </div>
           <div class="status-card__body">
@@ -279,12 +284,13 @@ onMounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
+  width: 50px;
+  height: 59.61px;
+  line-height: 59.61px;
   color: #fff;
-  font-size: 18px;
+  font-size: 40px;
   font-weight: 600;
-  background: url('@/components/PageTable/assets/index-bg.png') no-repeat;
+  background: url("@/components/PageTable/assets/index-bg.png") no-repeat;
   background-size: 100% 100%;
 }
 
@@ -306,7 +312,7 @@ onMounted(() => {
   white-space: nowrap;
 }
 
-.files-table {
+.files-table.water-warn-table {
   :deep(.el-table__inner-wrapper) {
     &::before {
       display: none;
@@ -319,8 +325,6 @@ onMounted(() => {
     .el-table__header-wrapper {
       th.el-table__cell {
         background: rgb(19 96 160 / 0.46);
-        cursor: pointer;
-        margin-bottom: 4px;
         border-bottom: none;
         color: #fff;
         font-family: PIngFangSC, sans-serif;
@@ -330,14 +334,6 @@ onMounted(() => {
 
     .el-table__body {
       border-spacing: 0 4px;
-
-      tr {
-        background: transparent;
-
-        &:hover {
-          background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
-        }
-      }
     }
 
     .el-table__body-wrapper {
@@ -345,11 +341,9 @@ onMounted(() => {
 
       td.el-table__cell {
         background: rgb(19 79 135 / 0.2);
-        cursor: pointer;
-        margin-bottom: 4px;
         color: #81e6ff;
         font-family: PIngFangSC, sans-serif;
-        font-size: 30px;
+        font-size: 26px;
         border: 1px solid #527191;
 
         &:not(:last-child) {
@@ -362,18 +356,15 @@ onMounted(() => {
       }
     }
 
-    .el-table__body tr.current-row > td.el-table__cell {
-      background: linear-gradient(180deg, rgb(30 83 132 / 0.85), rgb(0 132 255 / 0.65)) !important;
-      color: #fff !important;
-      box-shadow:
-        inset 0 0 0 1px rgb(100 200 255 / 0.45),
-        0 0 14px rgb(0 180 255 / 0.25);
+    .el-table__row:hover > td.el-table__cell {
+      background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
+      color: #fff;
     }
+  }
 
-    .cell {
-      height: 80px;
-      line-height: 80px;
-    }
+  :deep(.cell) {
+    height: 80px;
+    line-height: 80px;
   }
 }
 
@@ -401,215 +392,218 @@ onMounted(() => {
 
 .detail-layout {
   display: flex;
-  gap: 18px;
-  align-items: stretch;
+  align-items: center;
+  gap: 20px;
+  min-height: 288px;
 }
 
-.doc-frame {
+.plan-preview {
   position: relative;
-  flex: 0 0 168px;
-  height: 204px;
+  flex: 0 0 220px;
+  height: 288px;
   padding: 10px;
   box-sizing: border-box;
-  border: 1px solid rgb(79 208 255 / 0.65);
-  background: linear-gradient(165deg, rgb(0 40 80 / 0.5), rgb(0 15 40 / 0.85));
+  border: 2px solid #17b7ff;
+  background:
+    linear-gradient(90deg, #17b7ff 0 9px, transparent 9px calc(100% - 9px), #17b7ff calc(100% - 9px)) top / 100% 2px no-repeat,
+    linear-gradient(90deg, #17b7ff 0 9px, transparent 9px calc(100% - 9px), #17b7ff calc(100% - 9px)) bottom / 100% 2px no-repeat,
+    linear-gradient(180deg, #17b7ff 0 9px, transparent 9px calc(100% - 9px), #17b7ff calc(100% - 9px)) left / 2px 100% no-repeat,
+    linear-gradient(180deg, #17b7ff 0 9px, transparent 9px calc(100% - 9px), #17b7ff calc(100% - 9px)) right / 2px 100% no-repeat,
+    rgb(0 45 82 / 0.3);
+  box-shadow: 0 0 14px rgb(0 185 255 / 0.28);
 
-  &__corners {
+  &::before,
+  &::after {
+    content: '';
     position: absolute;
-    inset: 4px;
-    pointer-events: none;
-    border: 1px solid rgb(79 208 255 / 0.35);
+    width: 6px;
+    height: 6px;
+    border: 1px solid #52d7ff;
+    background: #083a58;
+  }
 
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      width: 12px;
-      height: 12px;
-      border-color: #4fd0ff;
-      border-style: solid;
-    }
+  &::before {
+    top: -4px;
+    right: -4px;
+  }
 
-    &::before {
-      top: -1px;
-      left: -1px;
-      border-width: 2px 0 0 2px;
-    }
-
-    &::after {
-      right: -1px;
-      bottom: -1px;
-      border-width: 0 2px 2px 0;
-    }
+  &::after {
+    bottom: -4px;
+    left: -4px;
   }
 
   &__page {
     position: relative;
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
     height: 100%;
-    padding: 14px 12px;
-    background: linear-gradient(180deg, #f4f7fb 0%, #dfe8f2 100%);
+    overflow: hidden;
+    padding: 24px 24px 18px;
     box-sizing: border-box;
+    background: #f7f8fb;
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.92),
+      0 1px 4px rgb(0 0 0 / 0.18);
+    color: #333f55;
   }
 
-  &__line {
-    height: 6px;
-    border-radius: 2px;
-    background: rgb(30 50 80 / 0.12);
+  &__watermark {
+    position: absolute;
+    left: -20px;
+    font-size: 12px;
+    line-height: 1;
+    color: rgb(160 170 185 / 0.13);
+    white-space: nowrap;
+    transform: rotate(-18deg);
 
-    &--short {
-      width: 55%;
+    &--top {
+      top: 28px;
+    }
+
+    &--bottom {
+      right: -12px;
+      bottom: 36px;
+      left: auto;
+    }
+  }
+
+  &__title {
+    position: relative;
+    z-index: 1;
+    margin: 0 0 16px;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: #37629d;
+  }
+
+  &__content {
+    position: relative;
+    z-index: 1;
+    font-size: 6px;
+    line-height: 2.15;
+    color: #202a3b;
+    transform: scale(0.84);
+    transform-origin: top left;
+    width: 119%;
+
+    p {
+      margin: 0 0 2px;
     }
   }
 }
 
 .dispatch-detail {
   flex: 1;
-  min-width: 0;
-  padding-top: 4px;
-}
-
-.dispatch-detail .team-row {
   display: flex;
-  gap: 12px;
-  margin-bottom: 16px;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
 }
 
-.dispatch-detail .row-icon {
-  width: 70px;
-  height: 70px;
-  padding: 6px;
-  border: 1px solid #2987bb;
-  background: linear-gradient(180deg,
-      rgb(20 87 130 / 0.88),
-      rgb(9 56 88 / 0.88));
-  box-sizing: border-box;
-  flex-shrink: 0;
-}
-
-.dispatch-detail .row-icon__inner {
+.detail-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  border: 1px solid rgb(142 198 233 / 0.8);
-  background: radial-gradient(circle at 90% 12%,
-      rgb(85 164 203 / 0.55),
-      rgb(8 63 98 / 0.8) 38%,
-      rgb(3 29 51 / 0.85) 100%);
-}
+  min-width: 0;
 
-.dispatch-detail .row-icon__bookmark {
-  position: relative;
-  width: 24px;
-  height: 31px;
-  background: #d8f4ff;
-  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 4px;
-    left: 50%;
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #6fa7be;
-    transform: translateX(-50%);
-  }
-}
-
-.dispatch-detail .row-panel {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  min-height: 70px;
-  padding: 0 16px;
-  box-sizing: border-box;
-  background: linear-gradient(90deg,
-      rgb(33 87 135 / 0.9) 0%,
-      rgb(2 62 112 / 0) 100%);
-}
-
-.dispatch-detail .row-line {
-  margin: 0;
-  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  line-height: 1.45;
-  color: #fff;
-  letter-spacing: 0.4px;
-}
-
-.dispatch-detail .row-label {
-  display: inline-block;
-  min-width: 140px;
-}
-
-.dispatch-detail .row-value {
-  display: inline-block;
-  word-break: break-all;
-}
-
-.dispatch-detail .team-row--multi {
-  .row-icon {
-    margin-top: 7px;
+  &__icon {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border: 1px solid #3ac2f6;
+    background: rgb(16 84 121 / 0.78);
+    box-shadow:
+      inset 0 0 0 1px rgb(109 209 255 / 0.22),
+      0 0 12px rgb(27 171 232 / 0.24);
   }
 
-  .row-panel {
-    min-height: 215px;
-    justify-content: flex-start;
-    padding-top: 10px;
+  &__bookmark {
+    position: relative;
+    width: 17px;
+    height: 22px;
+    background: #e7fbff;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 78%, 0 100%);
+    box-shadow: 0 0 9px rgb(169 243 255 / 0.5);
+
+    &::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 50%;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #5aa9c4;
+      transform: translateX(-50%);
+    }
   }
 
-  .row-line {
-    line-height: 56px;
+  &__panel {
+    display: grid;
+    align-items: center;
+    grid-template-columns: minmax(150px, 1fr) minmax(128px, auto);
+    min-width: 0;
+    height: 42px;
+    flex: 1;
+    margin-left: 7px;
+    padding: 0 18px;
+    box-sizing: border-box;
+    background: linear-gradient(90deg, rgb(28 91 142 / 0.9) 0%, rgb(15 83 135 / 0.58) 58%, rgb(0 42 82 / 0) 100%);
   }
 
-  .row-line--extra {
-    padding-left: 140px;
+  &__label,
+  &__value {
+    overflow: hidden;
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 22px;
+    line-height: 1;
+    color: #fff;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  &__value {
+    justify-self: end;
+    font-family: Quantico, DINAlternate, Arial, sans-serif;
+    letter-spacing: 0;
   }
 }
 
 .status-summary {
   position: relative;
   display: flex;
-  min-height: 52px;
-  margin-bottom: 10px;
+  height: 56px;
+  margin-bottom: 38px;
   overflow: hidden;
-  border: 1px solid #527191;
-  background: rgb(19 79 135 / 0.22);
+  background: linear-gradient(90deg, rgb(102 100 51 / 0.82) 0%, rgb(73 79 45 / 0.58) 48%, rgb(27 57 55 / 0) 100%);
 
   &__accent {
-    flex: 0 0 5px;
-    background: linear-gradient(180deg, #f5e6a8, #c9a227);
-    box-shadow: 2px 0 10px rgb(245 214 120 / 0.35);
+    flex: 0 0 7px;
+    background: #ffc83d;
+    box-shadow: 2px 0 12px rgb(255 200 61 / 0.28);
   }
 
   &__body {
     display: flex;
     flex: 1;
     align-items: center;
-    padding: 12px 18px;
-    font-family: PingFangSC, sans-serif;
-    font-size: 20px;
-    color: #e8f4ff;
+    padding: 0 26px;
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+    color: #fff;
   }
 }
 
 .status-card {
-  margin-bottom: 8px;
+  margin-bottom: 28px;
   overflow: hidden;
-  border: 1px solid #527191;
+  border: 1px solid rgb(79 143 186 / 0.72);
+  background: rgb(4 42 75 / 0.43);
+  box-shadow: inset 0 0 24px rgb(33 118 185 / 0.1);
 
   &:last-child {
     margin-bottom: 0;
@@ -618,28 +612,44 @@ onMounted(() => {
   &__head {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 22px;
+    height: 58px;
     padding: 0 14px;
-    height: 40px;
-    font-family: PingFangSC, sans-serif;
-    font-size: 18px;
-    color: #dff6ff;
-    background: linear-gradient(90deg, rgb(19 96 160 / 0.75), rgb(19 79 135 / 0.45));
-    border-bottom: 1px solid rgb(82 113 145 / 0.6);
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: #fff;
+    background: linear-gradient(90deg, rgb(0 102 195 / 0.88) 0%, rgb(25 133 221 / 0.8) 47%, rgb(7 80 146 / 0.76) 100%);
+    border-bottom: 1px solid rgb(64 164 235 / 0.35);
+    box-shadow: inset 0 0 18px rgb(76 190 255 / 0.18);
   }
 
   &__arrows {
-    color: #7ee9ff;
-    font-size: 14px;
-    letter-spacing: -1px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    flex: 0 0 auto;
+
+    i {
+      display: block;
+      width: 0;
+      height: 0;
+      border-top: 11px solid transparent;
+      border-right: 12px solid #26a8e5;
+      border-bottom: 11px solid transparent;
+      filter: drop-shadow(0 0 5px rgb(46 178 239 / 0.34));
+    }
   }
 
   &__body {
-    padding: 14px 16px;
-    font-family: PingFangSC, sans-serif;
-    font-size: 18px;
-    color: #b8e8ff;
-    background: rgb(0 20 45 / 0.45);
+    min-height: 112px;
+    padding: 36px 90px 24px;
+    box-sizing: border-box;
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 26px;
+    line-height: 1.5;
+    color: #fff;
+    background: linear-gradient(180deg, rgb(3 36 69 / 0.35) 0%, rgb(5 44 75 / 0.2) 100%);
   }
 }
 </style>

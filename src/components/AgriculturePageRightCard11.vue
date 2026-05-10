@@ -5,7 +5,8 @@
         v-model="selectedReservoirId"
         class="reservoir-card__select"
         popper-class="reservoir-card__select-popper"
-        placeholder="请选择水库"
+        placeholder="请选择墒情站"
+        @change="handleStationChange"
       >
         <ElOption
           v-for="item in reservoirList"
@@ -16,26 +17,29 @@
       </ElSelect>
     </div>
     <div class="agriculture-moisture-card">
-      <VueEcharts :option="echartOption" class="p-[20px] agriculture-moisture-card__chart" />
+      <VueEcharts
+        :option="echartOption"
+        class="p-[20px] agriculture-moisture-card__chart"
+      />
     </div>
   </PageCard>
 </template>
 
 <script setup lang="ts">
-const selectedReservoirId = ref('station-1')
-const reservoirList = ref([
-  { id: 'station-1', name: '贾家河站' },
-  { id: 'station-2', name: '幸福渠站' },
-  { id: 'station-3', name: '红旗渠站' },
-  { id: 'station-4', name: '沿山河站' }
-])
+import dayjs from 'dayjs'
 
-const xAxisData = ['4.21', '4.22', '4.23', '4.24', '4.25', '4.26', '4.27']
+type SoilStation = {
+  id: string
+  name: string
+  stcd: string
+  raw: Record<string, any>
+}
 
-const moisture10Data = [26, 57, 68, 54, 39, 43, 27]
-const moisture20Data = [40, 71, 82, 68, 52, 54, 41]
-const moisture40Data = [11, 22, 19, 15, 13, 23, 11]
-const riceWaterLevelData = [230, 255, 292, 246, 206, 268, 192]
+const selectedReservoirId = ref('')
+const reservoirList = ref<SoilStation[]>([])
+
+const humiditySeriesNames = ['10cm平均湿度', '20cm平均湿度', '40cm平均湿度']
+const temperatureSeriesNames = ['10cm平均温度', '20cm平均温度', '40cm平均温度']
 
 const createAreaGradient = (topColor: string, bottomColor: string) => {
   return {
@@ -49,10 +53,11 @@ const createAreaGradient = (topColor: string, bottomColor: string) => {
 const createLineSeries = (
   name: string,
   color: string,
-  data: number[],
-  areaColor?: { colorStops: { offset: number, color: string }[] },
+  data: Array<number | null>,
+  areaColor?: { colorStops: { offset: number; color: string }[] },
   yAxisIndex = 0,
-  z = 3
+  z = 3,
+  lineType: 'solid' | 'dashed' = 'solid'
 ) => {
   return {
     name,
@@ -67,6 +72,7 @@ const createLineSeries = (
     lineStyle: {
       width: 2,
       color,
+      type: lineType,
       shadowBlur: 10,
       shadowColor: color
     },
@@ -77,6 +83,9 @@ const createLineSeries = (
       shadowBlur: 10,
       shadowColor: color
     },
+    emphasis: {
+      focus: 'series'
+    },
     areaStyle: areaColor
       ? {
           color: areaColor
@@ -85,7 +94,7 @@ const createLineSeries = (
   }
 }
 
-const echartOption = ref({
+const echartOption = ref<Record<string, any>>({
   animation: false,
   tooltip: {
     trigger: 'axis',
@@ -95,6 +104,11 @@ const echartOption = ref({
     textStyle: {
       color: '#EAF7FF',
       fontSize: 14
+    },
+    valueFormatter: (value: number | string | null) => {
+      return value === null || value === undefined || value === ''
+        ? '--'
+        : value
     },
     axisPointer: {
       type: 'line',
@@ -112,11 +126,11 @@ const echartOption = ref({
     // icon: 'roundRect',
     textStyle: {
       color: 'rgba(233, 244, 255, 0.92)',
-      fontSize: 24,
+      fontSize: 18,
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 6]
     },
-    data: ['10公分含水率', '20公分含水率', '40公分含水率', '稻田水层']
+    data: [...humiditySeriesNames, ...temperatureSeriesNames]
   },
   grid: {
     top: 100,
@@ -127,7 +141,7 @@ const echartOption = ref({
   xAxis: {
     type: 'category',
     boundaryGap: false,
-    data: xAxisData,
+    data: [],
     axisTick: {
       show: false
     },
@@ -140,7 +154,7 @@ const echartOption = ref({
     axisLabel: {
       margin: 18,
       color: 'rgba(228, 240, 255, 0.86)',
-      fontSize: 24,
+      fontSize: 18,
       fontFamily: 'DINAlternate, Arial, sans-serif'
     },
     splitLine: {
@@ -151,8 +165,7 @@ const echartOption = ref({
     {
       type: 'value',
       min: 0,
-      max: 90,
-      interval: 23,
+      max: 60,
       name: '%',
       nameGap: 14,
       nameTextStyle: {
@@ -181,9 +194,16 @@ const echartOption = ref({
     },
     {
       type: 'value',
-      min: 180,
-      max: 360,
-      interval: 30,
+      min: 0,
+      max: 40,
+      name: '℃',
+      nameGap: 14,
+      nameTextStyle: {
+        color: 'rgba(228, 240, 255, 0.9)',
+        fontSize: 24,
+        align: 'right',
+        padding: [0, -28, 0, 0]
+      },
       axisLabel: {
         color: 'rgba(228, 240, 255, 0.9)',
         fontSize: 24
@@ -199,36 +219,197 @@ const echartOption = ref({
       }
     }
   ],
-  series: [
-    createLineSeries(
-      '10公分含水率',
-      '#F2A451',
-      moisture10Data,
-      createAreaGradient('rgba(242, 164, 81, 0.44)', 'rgba(242, 164, 81, 0)')
-    ),
-    createLineSeries(
-      '20公分含水率',
-      '#F3DF48',
-      moisture20Data,
-      createAreaGradient('rgba(243, 223, 72, 0.30)', 'rgba(243, 223, 72, 0)')
-    ),
-    createLineSeries(
-      '40公分含水率',
-      '#56F567',
-      moisture40Data,
-      createAreaGradient('rgba(86, 245, 103, 0.26)', 'rgba(86, 245, 103, 0)'),
-      0,
-      2
-    ),
-    createLineSeries(
-      '稻田水层',
-      '#4EC8FF',
-      riceWaterLevelData,
-      createAreaGradient('rgba(78, 200, 255, 0.28)', 'rgba(78, 200, 255, 0)'),
-      1,
-      4
+  series: []
+})
+
+function toChartNumber (value: unknown) {
+  if (value === null || value === undefined || value === '') {
+    return null
+  }
+
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : null
+}
+
+function getSoilStepRows (result: any) {
+  if (Array.isArray(result?.list)) {
+    return result.list
+  }
+
+  if (Array.isArray(result?.data?.list)) {
+    return result.data.list
+  }
+
+  if (Array.isArray(result)) {
+    return result
+  }
+
+  return []
+}
+
+function updateChartOption (soilStepResult: any) {
+  const rows = getSoilStepRows(soilStepResult)
+    .slice()
+    .sort((prev: Record<string, any>, next: Record<string, any>) => {
+      return (
+        dayjs(prev.tm || prev.tmMin).valueOf() -
+        dayjs(next.tm || next.tmMin).valueOf()
+      )
+    })
+
+  const xAxisData = rows.map((item: Record<string, any>) => {
+    const time = item.tm || item.tmMin
+    return time ? dayjs(time).format('MM.DD HH:mm') : ''
+  })
+
+  const humidity10Data = rows.map((item: Record<string, any>) =>
+    toChartNumber(item.humidityAvg1)
+  )
+  const humidity20Data = rows.map((item: Record<string, any>) =>
+    toChartNumber(item.humidityAvg2)
+  )
+  const humidity40Data = rows.map((item: Record<string, any>) =>
+    toChartNumber(item.humidityAvg3)
+  )
+  const temperature10Data = rows.map((item: Record<string, any>) =>
+    toChartNumber(item.tempAvg1)
+  )
+  const temperature20Data = rows.map((item: Record<string, any>) =>
+    toChartNumber(item.tempAvg2)
+  )
+  const temperature40Data = rows.map((item: Record<string, any>) =>
+    toChartNumber(item.tempAvg3)
+  )
+
+  echartOption.value = {
+    ...echartOption.value,
+    xAxis: {
+      ...echartOption.value.xAxis,
+      data: xAxisData
+    },
+    series: [
+      createLineSeries(
+        humiditySeriesNames[0],
+        '#F2A451',
+        humidity10Data,
+        createAreaGradient('rgba(242, 164, 81, 0.38)', 'rgba(242, 164, 81, 0)')
+      ),
+      createLineSeries(
+        humiditySeriesNames[1],
+        '#F3DF48',
+        humidity20Data,
+        createAreaGradient('rgba(243, 223, 72, 0.26)', 'rgba(243, 223, 72, 0)')
+      ),
+      createLineSeries(
+        humiditySeriesNames[2],
+        '#56F567',
+        humidity40Data,
+        createAreaGradient('rgba(86, 245, 103, 0.22)', 'rgba(86, 245, 103, 0)')
+      ),
+      createLineSeries(
+        temperatureSeriesNames[0],
+        '#4EC8FF',
+        temperature10Data,
+        undefined,
+        1,
+        4,
+        'dashed'
+      ),
+      createLineSeries(
+        temperatureSeriesNames[1],
+        '#B27DFF',
+        temperature20Data,
+        undefined,
+        1,
+        4,
+        'dashed'
+      ),
+      createLineSeries(
+        temperatureSeriesNames[2],
+        '#FF6F91',
+        temperature40Data,
+        undefined,
+        1,
+        4,
+        'dashed'
+      )
+    ]
+  }
+}
+
+function getStationCode (station: Record<string, any> | undefined) {
+  return (
+    station?.stcd ||
+    station?.stcds ||
+    station?.code ||
+    station?.stCode ||
+    station?.stationCode ||
+    ''
+  )
+}
+
+function buildSoilStepParams (station: SoilStation | undefined) {
+  return {
+    stcd: station?.stcd || getStationCode(station?.raw),
+    startTime: `${dayjs().subtract(1, 'day').format('YYYY-MM-DD')} 08:00:00`,
+    endTime: `${dayjs().format('YYYY-MM-DD')} 08:00:00`,
+    h: '1'
+  }
+}
+
+async function loadSoilStep (station: SoilStation | undefined) {
+  const soilStepParams = buildSoilStepParams(station)
+  console.log('墒情统计 soil/stat/step 请求参数：', soilStepParams)
+
+  if (!soilStepParams.stcd) {
+    console.warn(
+      '当前墒情点位缺少 stcd，无法请求 soil/stat/step：',
+      station?.raw || station
     )
-  ]
+    return
+  }
+
+  const soilStepResult: any = await service.xfqs.getSoilStatStep(soilStepParams)
+  console.log('墒情统计 soil/stat/step：', soilStepResult)
+  updateChartOption(soilStepResult)
+}
+
+async function handleStationChange () {
+  const station = reservoirList.value.find(
+    (item: any) => item.id === selectedReservoirId.value
+  )
+  await loadSoilStep(station)
+}
+
+onMounted(async () => {
+  const soilPageResult: any = await service.xfqs.getSoilPage({
+    limit: 1000,
+    lx: 1,
+    start: 1
+  })
+  console.log('墒情点位信息 soil/page：', soilPageResult)
+
+  const soilStationList = Array.isArray(soilPageResult?.list)
+    ? soilPageResult.list
+    : Array.isArray(soilPageResult)
+      ? soilPageResult
+      : []
+  reservoirList.value = soilStationList.map(
+    (item: Record<string, any>, index: number) => {
+      const stcd = getStationCode(item)
+      return {
+        id: stcd || String(item.id || `station-${index + 1}`),
+        name:
+          item.stnm || item.name || item.stationName || `墒情站${index + 1}`,
+        stcd,
+        raw: item
+      }
+    }
+  )
+
+  selectedReservoirId.value = reservoirList.value[0]?.id || ''
+  console.log('墒情下拉站点列表：', reservoirList.value)
+  await loadSoilStep(reservoirList.value[0])
 })
 </script>
 
@@ -253,7 +434,11 @@ const echartOption = ref({
 :deep(.reservoir-card__select .el-select__wrapper) {
   min-height: 38px;
   padding: 0 14px 0 16px;
-  background: linear-gradient(180deg, rgb(20 74 122 / 0.72) 0%, rgb(7 42 83 / 0.76) 100%);
+  background: linear-gradient(
+    180deg,
+    rgb(20 74 122 / 0.72) 0%,
+    rgb(7 42 83 / 0.76) 100%
+  );
   border-radius: 0;
   box-shadow:
     inset 0 0 0 1px rgb(106 197 255 / 0.36),
@@ -296,7 +481,11 @@ const echartOption = ref({
 }
 
 :global(.reservoir-card__select-popper.el-popper) {
-  background: linear-gradient(180deg, rgb(11 43 82 / 0.96) 0%, rgb(6 28 56 / 0.96) 100%);
+  background: linear-gradient(
+    180deg,
+    rgb(11 43 82 / 0.96) 0%,
+    rgb(6 28 56 / 0.96) 100%
+  );
   border: 1px solid rgb(96 192 255 / 0.32);
   border-radius: 0;
   box-shadow: 0 10px 24px rgb(3 14 30 / 0.42);

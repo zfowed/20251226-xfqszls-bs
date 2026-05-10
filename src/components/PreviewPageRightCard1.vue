@@ -202,15 +202,8 @@ const currentReservoir = computed(() => {
 
 // 渠系建筑物
 const architectureList = ref<Record<string, any>[]>([
-  { id: 'architecture1', name: '渡槽', value: 0, unit: '个' },
-  { id: 'architecture2', name: '闸门', value: 0, unit: '个' }
-  // { id: 'architecture3', name: '农桥', value: 0, unit: '条' },
-  // { id: 'architecture4', name: '分水闸', value: 0, unit: '座' },
-  // { id: 'architecture5', name: '泄洪闸', value: 0, unit: '座' },
-  // { id: 'architecture6', name: '节制闸', value: 0, unit: '座' },
-  // { id: 'architecture7', name: '直灌口', value: 0, unit: '座' },
-  // { id: 'architecture8', name: '渡槽', value: 0, unit: '处' },
-  // { id: 'architecture9', name: '涵洞', value: 0, unit: '座' }
+  { id: 'architecture-渡槽', name: '渡槽', value: 0, unit: '个' },
+  { id: 'architecture-闸门', name: '闸门', value: 0, unit: '个' }
 ])
 
 usePolling(async () => {
@@ -245,15 +238,15 @@ usePolling(async () => {
   reservoirList.value[2].metrics[3].value = 120.75
   reservoirList.value[2].metrics[4].value = 73.8
 
-  architectureList.value[0].value = 3
-  architectureList.value[1].value = 4
-  architectureList.value[2].value = 232
-  architectureList.value[3].value = 5
-  architectureList.value[4].value = 30
-  architectureList.value[5].value = 3
-  architectureList.value[6].value = 97
-  architectureList.value[7].value = 4
-  architectureList.value[8].value = 21
+  const architectureResult: any = await service.xfqs.getCanalStructureCountGroupByStructureType({})
+  if (Array.isArray(architectureResult)) {
+    architectureList.value = architectureResult.map((item: Record<string, any>, index: number) => ({
+      id: `architecture-${item.type || index}`,
+      name: item.type || '--',
+      value: Number(item.num) || 0,
+      unit: '个'
+    }))
+  }
 })
 </script>
 

@@ -35,12 +35,19 @@
 </template>
 
 <script setup lang="ts">
+const soilIcon = new URL('../assets/global/images/situation/reservoir-icon-1.png', import.meta.url).href
+
 const monitorPointList = ref([
-  { id: 'monitor-1', name: '墒情监测点#1', status: '正常', value: '67%', icon: new URL('../assets/global/images/situation/reservoir-icon-1.png', import.meta.url).href },
-  { id: 'monitor-2', name: '墒情监测点#2', status: '正常', value: '45%', icon: new URL('../assets/global/images/situation/reservoir-icon-1.png', import.meta.url).href },
-  { id: 'monitor-3', name: '墒情监测点#3', status: '正常', value: '53%', icon: new URL('../assets/global/images/situation/reservoir-icon-1.png', import.meta.url).href },
-  { id: 'monitor-4', name: '墒情监测点#4', status: '正常', value: '76%', icon: new URL('../assets/global/images/situation/reservoir-icon-1.png', import.meta.url).href }
+  { id: 'monitor-1', name: '墒情监测点#1', status: '正常', value: '67%', icon: soilIcon },
+  { id: 'monitor-2', name: '墒情监测点#2', status: '正常', value: '45%', icon: soilIcon },
+  { id: 'monitor-3', name: '墒情监测点#3', status: '正常', value: '53%', icon: soilIcon },
+  { id: 'monitor-4', name: '墒情监测点#4', status: '正常', value: '76%', icon: soilIcon }
 ])
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getSoilWarnInfo({})
+  console.log('墒情预警数据：', result)
+})
 </script>
 
 <style lang="scss" scoped>

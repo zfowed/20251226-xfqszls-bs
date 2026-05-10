@@ -41,31 +41,39 @@ type VideoItem = {
 }
 
 const currentPlayMonitorId = ref<string>('')
-const selectedVideoId = ref<string>('video-station-1')
+const selectedVideoId = ref<string>('')
 const monitorUrl = ref<string>('')
-const playList = ref<VideoItem[]>([
-  { id: 'video-station-1', name: '视频站01' },
-  { id: 'video-station-2', name: '视频站02' },
-  { id: 'video-station-3', name: '视频站03' }
-])
+const playList = ref<VideoItem[]>([])
 
 const currentVideoItem = computed(() => {
   return playList.value.find(item => item.id === selectedVideoId.value) || playList.value[0]
 })
 
 onMounted(async () => {
-  const videoResult: any[] = await service.xfqs.getVideoStationList({})
-
-  if (videoResult?.length) {
-    playList.value = videoResult.slice(0, 3).map((item: any, index: number) => ({
-      id: item.stcd || `video-station-${index + 1}`,
-      stcd: item.stcd,
-      name: item.stnm || `视频站0${index + 1}`
-    }))
-    selectedVideoId.value = playList.value[0].id
-    await updateCurrentVideoUrl(playList.value[0])
-  }
+  await loadVideoStationList()
 })
+
+async function loadVideoStationList () {
+  const videoResult: any[] = await service.xfqs.getVideoStationList({})
+  if (!Array.isArray(videoResult) || videoResult.length === 0) {
+    playList.value = []
+    selectedVideoId.value = ''
+    monitorUrl.value = ''
+    return
+  }
+
+  playList.value = videoResult.map((item: Record<string, any>, index: number) => {
+    const stcd = String(item.stcd || item.videoStcd || '')
+    return {
+      id: String(item.id || stcd || `video-station-${index + 1}`),
+      stcd,
+      name: item.stnm || item.name || `视频站${index + 1}`
+    }
+  })
+
+  selectedVideoId.value = playList.value[0].id
+  await updateCurrentVideoUrl(playList.value[0])
+}
 
 async function handleVideoChange () {
   if (!currentVideoItem.value) return
@@ -80,7 +88,7 @@ async function updateCurrentVideoUrl (item: VideoItem) {
 
   currentPlayMonitorId.value = item.stcd
   const result: any = await service.xfqs.getVideoUrl({ stcd: item.stcd })
-  monitorUrl.value = result || ''
+  monitorUrl.value = typeof result === 'string' ? result : result?.detail || ''
 }
 </script>
 

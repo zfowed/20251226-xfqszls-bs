@@ -14,13 +14,13 @@
 
 <script setup lang="ts">
 const theadCol = ref([
-  { key: 'siteName', name: '网站' },
+  { key: 'siteName', name: '闸门名称' },
   { key: 'stakeNumber', name: '桩号', width: 180, align: 'center' },
-  { key: 'position', name: '位置', width: 180, align: 'center' },
+  { key: 'position', name: '所属渠道', width: 180, align: 'center' },
   { key: 'status', name: '状态', width: 120, align: 'center' }
 ])
 
-const dataList = ref([
+const dataList = ref<Record<string, any>[]>([
   { siteName: '泄洪闸', stakeNumber: 'X2+600', position: '主干渠', status: '关' },
   { siteName: '泄洪闸', stakeNumber: 'X4+485', position: '主干渠', status: '关' },
   { siteName: '泄洪闸', stakeNumber: 'X7+292', position: '主干渠', status: '关' },
@@ -34,6 +34,24 @@ const dataList = ref([
   { siteName: '泄洪闸', stakeNumber: 'Y3+265', position: '姚店干渠', status: '关' },
   { siteName: '节制闸', stakeNumber: 'Y3+290', position: '姚店干渠', status: '关' }
 ])
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getGatePageList({
+    start: 1,
+    limit: 1000,
+    sttp: 'DD'
+  })
+
+  if (!Array.isArray(result?.list)) return
+
+  dataList.value = result.list.map((item: Record<string, any>, index: number) => ({
+    id: item.id ?? item.stcd ?? `gate-${index}`,
+    siteName: item.stnm || '--',
+    stakeNumber: item.pileNo || '--',
+    position: item.channelName || '--',
+    status: Number(item.gtophgt) > 0 ? '开' : '关'
+  }))
+})
 </script>
 
 <style lang="scss" scoped>

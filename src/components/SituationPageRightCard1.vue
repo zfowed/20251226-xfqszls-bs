@@ -4,7 +4,7 @@
       <div class="inspection-card__summary">
         <div v-for="item in summaryList" :key="item.key" class="inspection-card__summary-item">
           <div class="inspection-card__summary-label">
-            巡查
+            {{ item.tag }}
           </div>
           <div class="inspection-card__summary-content">
             <span>{{ item.label }}</span>
@@ -23,21 +23,15 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
-
 const totalInfo = reactive({
-  patrolCount: 86,
-  patrolMileage: 86,
-  issueCount: 1,
-  patrolPeopleCount: 0
+  patrolCount: 0,
+  maintenanceCount: 0
 })
 
 const summaryList = computed(() => {
   return [
-    { key: 'patrolCount', label: '巡查次数', value: totalInfo.patrolCount, unit: '次' },
-    { key: 'patrolMileage', label: '巡查里程', value: totalInfo.patrolMileage, unit: 'km' },
-    { key: 'issueCount', label: '发现问题', value: totalInfo.issueCount, unit: '个' },
-    { key: 'patrolPeopleCount', label: '巡查人数', value: totalInfo.patrolPeopleCount, unit: '人' }
+    { key: 'patrolCount', tag: '巡查', label: '巡查次数', value: totalInfo.patrolCount, unit: '次' },
+    { key: 'maintenanceCount', tag: '养护', label: '养护次数', value: totalInfo.maintenanceCount, unit: '次' }
   ]
 })
 
@@ -65,7 +59,10 @@ const echartOption = ref({
       fontFamily: 'PingFangSC, sans-serif',
       padding: [0, 0, 0, 8]
     },
-    data: [{ name: '巡检次数', icon: 'rect' }]
+    data: [
+      { name: '巡查次数', icon: 'rect' },
+      { name: '养护次数', icon: 'rect' }
+    ]
   },
   grid: {
     top: 72,
@@ -126,7 +123,7 @@ const echartOption = ref({
   },
   series: [
     {
-      name: '巡检次数',
+      name: '巡查次数',
       data: [] as number[],
       type: 'line',
       smooth: true,
@@ -152,32 +149,56 @@ const echartOption = ref({
           ]
         }
       }
+    },
+    {
+      name: '养护次数',
+      data: [] as number[],
+      type: 'line',
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: 6,
+      lineStyle: {
+        width: 2,
+        color: '#F7C75C'
+      },
+      itemStyle: {
+        color: '#F7C75C'
+      },
+      areaStyle: {
+        color: {
+          x: 0,
+          y: 0,
+          x2: 0,
+          y2: 1,
+          colorStops: [
+            { offset: 0, color: 'rgba(247, 199, 92, 0.34)' },
+            { offset: 1, color: 'rgba(247, 199, 92, 0)' }
+          ]
+        }
+      }
     }
   ]
 })
 
 usePolling(async () => {
-  const monthList = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+  const monthList = Array.from({ length: 12 }, (_, index) => `${index + 1}月`)
   echartOption.value.xAxis.data = monthList
 
-  const result: any = await service.xfqs.getPatrolList({
-    tabId: 0,
-    year: dayjs().format('YYYY')
-  })
+  const result: any = await service.xfqs.getPatrolAndWorkOrderStatics({})
+  const monthInfo = result?.info || {}
+  const patrolData = monthList.map((_, index) => Number(monthInfo[index + 1]?.xj || 0))
+  const maintenanceData = monthList.map((_, index) => Number(monthInfo[index + 1]?.yh || 0))
 
-  const planStatistic = Array.isArray(result?.planStatistic) ? result.planStatistic : []
-  const eventList = Array.isArray(result?.event) ? result.event : []
+  totalInfo.patrolCount = Number(result?.xjSum || 0)
+  totalInfo.maintenanceCount = Number(result?.yhSum || 0)
+  echartOption.value.series[0].data = patrolData
+  echartOption.value.series[1].data = maintenanceData
 
-  totalInfo.patrolCount = Number(result?.comp_num ?? result?.doneDitchCount ?? 86)
-  totalInfo.patrolMileage = Number(result?.mileage ?? result?.patrolMileage ?? 86)
-  totalInfo.issueCount = eventList.reduce((sum: number, item: any) => sum + Number(item?.num || 0), 0) || Number(result?.issueCount ?? 1)
-  totalInfo.patrolPeopleCount = Number(result?.patrolPeopleCount ?? result?.peopleCount ?? 0)
-
-  if (planStatistic.length > 0) {
-    echartOption.value.series[0].data = planStatistic.map((item: any) => Number(item?.complete_num ?? item?.num ?? 0))
-  } else {
-    echartOption.value.series[0].data = [26, 37, 40, 55, 54, 38, 24, 37, 41, 33, 30, 37]
-  }
+  const maxValue = Math.max(...patrolData, ...maintenanceData, 1)
+  const interval = Math.max(1, Math.ceil(maxValue / 4))
+  echartOption.value.yAxis.max = interval * 4
+  echartOption.value.yAxis.interval = interval
 })
 </script>
 
