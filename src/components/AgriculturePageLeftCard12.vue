@@ -12,7 +12,7 @@
             <img
               :src="scope.row.icon"
               :alt="scope.row.name"
-              class="agriculture-monitor-table__icon mt-[10px]"
+              class="agriculture-monitor-table__icon mt-[15px]"
             >
           </div>
         </template>
@@ -101,24 +101,48 @@ usePolling(async () => {
 
 .agriculture-monitor-table {
   height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th),
+  :deep(.table-body__tr:nth-child(3) .agriculture-monitor-table__water-unit) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
 }
 
 .agriculture-monitor-table__icon {
-  width: 50px;
-  height: 50px;
+  width: 42px;
+  height: 42px;
 }
 
 .agriculture-monitor-table__water-value {
-  font-family: DINAlternate, Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  color: #4cf3ff;
-  text-shadow: 0 0 10px rgb(76 243 255 / 0.32);
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
 }
 
 .agriculture-monitor-table__water-unit {
-  font-size: 16px;
-  color: rgb(218 245 255 / 0.8);
+  color: #beeeff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 24px;
 }
 
 .agriculture-monitor-table__icon-cell {
@@ -132,7 +156,7 @@ usePolling(async () => {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 6px;
   width: 100%;
 }
 </style>

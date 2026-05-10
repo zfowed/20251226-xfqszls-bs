@@ -62,5 +62,30 @@ usePolling(async () => {
 
 .channel-site-card__table {
   height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
 }
 </style>

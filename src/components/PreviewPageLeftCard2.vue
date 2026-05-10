@@ -12,16 +12,24 @@
           <span>幸福渠灌区</span>
           <!-- <span class="header-title__tag">西干果</span> -->
         </div>
-        <div class="h-[640px]">
-          <PageTable :thead-col="currentType === 'ecology' ? theadCol2 : theadCol" :data-list="dataList" :index="true" :limit-scroll="7">
+        <div class="table-wrap">
+          <PageTable
+            class="rehearsal-table"
+            :thead-col="currentType === 'ecology' ? theadCol2 : theadCol"
+            :data-list="dataList"
+            :index="true"
+            :limit-scroll="7"
+          >
             <template #index="scope">
               <div class="table-index">
                 {{ scope.index }}
               </div>
             </template>
             <template #area="scope">
-              <ZfTweenNumber :value="Number(scope.row.area)" />
-              <span class="text-[24px] text-[#BEEEFF] ml-[14px]">亩</span>
+              <span class="area-num">
+                <ZfTweenNumber :value="Number(scope.row.area)" />
+              </span>
+              <span class="area-unit">亩</span>
             </template>
           </PageTable>
         </div>
@@ -55,7 +63,8 @@ const theadCol = ref([
   },
   {
     key: 'area',
-    name: '有效灌溉面积'
+    name: '有效灌溉面积',
+    align: 'center'
   }
 ])
 
@@ -150,11 +159,61 @@ const tablePolling = usePolling(async () => {
   justify-content: center;
   width: 49.68px;
   height: 59.61px;
-  line-height: 59.61px;
   color: #fff;
-  font-size: 40px;
-  font-weight: bold;
+  font-family: JiangChengHeiTi, 'Alibaba PuHuiTi 2.0', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 59.61px;
   background: url('@/components/PageTable/assets/index-bg.png') no-repeat;
   background-size: 100% 100%;
+}
+
+.table-wrap {
+  height: 520px;
+}
+
+.area-num {
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
+}
+
+.area-unit {
+  margin-left: 6px;
+  color: #beeeff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 24px;
+}
+
+.rehearsal-table {
+  height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3) .area-unit) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
 }
 </style>
