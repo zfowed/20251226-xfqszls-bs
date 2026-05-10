@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="方案对比" bg-class="middle">
+  <PageCard title="预演方案" bg-class="middle">
     <div class="page-container">
       <div class="toolbar">
         <button class="history-btn" type="button">
