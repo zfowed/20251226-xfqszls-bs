@@ -22,16 +22,22 @@
         </div>
       </div>
       <div class="grid grid-cols-6 gap-col-[12px]">
-        <div v-for="weatherItem in weatherList" :key="weatherItem.date" class="week-weather">
+        <div
+          v-for="weatherItem in weatherList"
+          :key="weatherItem.date"
+          class="week-weather"
+        >
           <div class="mb-[7px]">
             {{ weatherItem.week }}
           </div>
           <div class="mb-[7px]">
             {{ weatherItem.date }}
           </div>
-          <img :src="weatherItem.weather" class="mb-[7px] min-h-[41px]">
+          <div class="week-weather__icon-wrap mb-[7px]">
+            <img :src="weatherItem.weather" class="min-h-[41px]">
+          </div>
           <div class="mb-[7px]">
-            {{ weatherItem?.night?.wind?.direct }}
+            {{ weatherItem?.day?.wind?.power }}
           </div>
           <div class="mb-[7px]">
             {{ weatherItem.weatherText }}
@@ -41,7 +47,7 @@
           </div>
         </div>
       </div>
-      <div class="chart">
+      <div class="rain-chart">
         <VueEcharts :option="echartOption" />
       </div>
     </div>
@@ -51,8 +57,80 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 
+/** 图表样式与 FloodIndexPageLeftCard1 对齐 */
+const CHART_FONT = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_AXIS_VALUE = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_X = '"PingFang SC", "Microsoft YaHei", sans-serif'
+const FONT_SIZE = 20
+const LINE_WIDTH = 1
+
 const getPhotoUrl = (icon: string) => {
   return new URL(`../assets/global/images/weather/${icon}.png`, import.meta.url).href
+}
+
+/** 接口用 9999 表示缺测 */
+const isWeatherMissing = (v: unknown) => {
+  if (v === null || v === undefined) return true
+  const s = String(v).trim()
+  return s === '' || s === '9999' || Number(s) === 9999
+}
+
+/** 预报温度转数字，缺测返回 undefined */
+const parseForecastTemp = (v: unknown): number | undefined => {
+  if (isWeatherMissing(v)) return undefined
+  const n = Number(v)
+  return Number.isFinite(n) && n < 9990 ? n : undefined
+}
+
+/** 实况/预报天气文字 → 现有 png 文件名（无对应资源时回退） */
+const resolveWeatherIconName = (info: unknown): string => {
+  if (isWeatherMissing(info)) return '多云'
+  const t = String(info).trim()
+  const alias: Record<string, string> = {
+    阴: '阴天',
+    阴天: '阴天',
+    雾: '阴天',
+    霾: '阴天',
+    小雨: '阴天',
+    中雨: '雷阵雨',
+    大雨: '雷阵雨',
+    暴雨: '雷阵雨',
+    雷阵雨: '雷阵雨',
+    雨: '阴天',
+    雪: '阴天'
+  }
+  return alias[t] ?? t
+}
+
+const getPhotoUrlByInfo = (info: unknown) => {
+  return getPhotoUrl(resolveWeatherIconName(info))
+}
+
+/** 优先用白天预报图标，缺测则用夜间 */
+const pickForecastWeatherInfoForIcon = (daySlot: Record<string, any>, nightSlot: Record<string, any>) => {
+  const d = daySlot?.weather?.info
+  const n = nightSlot?.weather?.info
+  if (!isWeatherMissing(d)) return d
+  if (!isWeatherMissing(n)) return n
+  return '多云'
+}
+
+/** 列表展示：昼夜天气文案（无 textDay 字段） */
+const formatForecastWeatherText = (daySlot: Record<string, any>, nightSlot: Record<string, any>) => {
+  const di = isWeatherMissing(daySlot?.weather?.info) ? '' : String(daySlot.weather.info).trim()
+  const ni = isWeatherMissing(nightSlot?.weather?.info) ? '' : String(nightSlot.weather.info).trim()
+  if (di && ni && di !== ni) return `${di}转${ni}`
+  return di || ni || '—'
+}
+
+/** 与 predict.detail[].date 对齐的 tempchart 行（time 形如 2026/05/10） */
+const findTempchartRow = (tempchart: Record<string, any>[] | undefined, ymd: string) => {
+  if (!tempchart?.length) return undefined
+  const target = dayjs(ymd)
+  return tempchart.find((row) => {
+    const rowDay = row?.time ? dayjs(String(row.time).replace(/\//g, '-')) : null
+    return rowDay?.isValid() && rowDay.isSame(target, 'day')
+  })
 }
 
 const weekTextMap: Record<number, string> = {
@@ -79,14 +157,19 @@ const todayWeather = ref<Record<string, any>>({
   currentTemp: 0,
   humidity: 0
 })
-const weatherList = ref<Record<string, any>>([])
+const weatherList = ref<Record<string, any>[]>([])
 
 const echartOption = ref({
+  animation: false,
   tooltip: {
-    trigger: 'axis',
+    trigger: 'axis' as const,
     axisPointer: {
-      type: 'shadow'
-    }
+      type: 'line' as const,
+      lineStyle: { color: 'rgba(255, 255, 255, 0.35)', type: 'dashed' as const, width: LINE_WIDTH }
+    },
+    backgroundColor: 'rgba(20, 40, 60, 0.92)',
+    borderColor: 'rgba(120, 200, 255, 0.35)',
+    textStyle: { color: '#fff', fontSize: FONT_SIZE, fontFamily: CHART_FONT }
   },
   legend: {
     top: 0,
@@ -95,8 +178,8 @@ const echartOption = ref({
     itemHeight: 10,
     textStyle: {
       color: '#FFFFFF',
-      fontSize: 16,
-      fontFamily: 'PingFangSC, sans-serif',
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT,
       padding: [0, 0, 0, 8]
     },
     data: [
@@ -105,52 +188,55 @@ const echartOption = ref({
     ]
   },
   grid: {
-    top: 40,
-    left: '3%',
-    right: '3%',
-    bottom: '3%',
+    top: '22%',
+    left: '5%',
+    right: '6%',
+    bottom: '14%',
     containLabel: true
   },
   xAxis: {
-    type: 'category',
+    type: 'category' as const,
     axisTick: {
       show: false
     },
+    offset: 8,
     axisLine: {
       lineStyle: {
-        color: 'rgba(179,223,255, 0.5)'
+        color: 'rgba(179, 223, 255, 0.5)',
+        width: LINE_WIDTH
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 16,
-      fontFamily: 'DINAlternate, Arial, sans-serif',
-      margin: 14
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_X
     },
     data: ['4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '4.10', '4.11', '4.12']
   },
   yAxis: {
-    type: 'value',
+    type: 'value' as const,
     name: '周降雨量（mm）',
     min: 0,
     max: 90,
     interval: 23,
     nameTextStyle: {
       color: '#fff',
-      fontSize: 16,
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT,
       padding: [0, 0, 8, -8]
     },
     splitLine: {
       show: true,
       lineStyle: {
-        type: 'dashed',
-        color: 'rgba(217,231,255, 0.15)'
+        type: 'dashed' as const,
+        color: 'rgba(217, 231, 255, 0.2)',
+        width: LINE_WIDTH
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 16,
-      fontFamily: 'PingFangSC, sans-serif'
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_AXIS_VALUE
     },
     axisTick: {
       show: false
@@ -162,8 +248,8 @@ const echartOption = ref({
   series: [
     {
       name: '历史降雨量',
-      type: 'bar',
-      barWidth: 12,
+      type: 'bar' as const,
+      barWidth: 14,
       data: [62, 45, 57, 76, 70, 57, 0, 0, 0, 0, 0, 0],
       itemStyle: {
         color: {
@@ -181,8 +267,8 @@ const echartOption = ref({
     },
     {
       name: '未来7天降雨量',
-      type: 'bar',
-      barWidth: 12,
+      type: 'bar' as const,
+      barWidth: 14,
       data: [0, 0, 0, 0, 0, 0, 34, 50, 59, 49, 70, 34],
       itemStyle: {
         color: {
@@ -203,43 +289,70 @@ const echartOption = ref({
 
 usePolling(async () => {
   const result: any = await service.xfqs.queryStationWeather({})
-  // 18:00时间戳： 1767693600000
-  // 未来一周天气
-  const dayWeatherList = []
-  for (const dayItem of result.predict.detail) {
+  const detail = (result?.predict?.detail || []) as Record<string, any>[]
+  const tempchart = (result?.tempchart || []) as Record<string, any>[]
+
+  const dayWeatherList: Record<string, any>[] = []
+  for (const dayItem of detail) {
+    const night = dayItem.night || {}
+    const day = dayItem.day || {}
+    const tcRow = dayItem.date ? findTempchartRow(tempchart, dayItem.date) : undefined
+    const chartMin = tcRow && typeof tcRow.min_temp === 'number' ? tcRow.min_temp : parseForecastTemp(tcRow?.min_temp)
+    const chartMax = tcRow && typeof tcRow.max_temp === 'number' ? tcRow.max_temp : parseForecastTemp(tcRow?.max_temp)
+    const nightT = parseForecastTemp(night?.weather?.temperature) ?? chartMin
+    const dayT = parseForecastTemp(day?.weather?.temperature) ?? chartMax
+    const tMin = nightT ?? dayT ?? 0
+    const tMax = dayT ?? nightT ?? tMin
     dayWeatherList.push({
       ...dayItem,
       date: dayjs(dayItem.date).format('MM-DD'),
       week: formatWeekText(dayItem.date),
-      weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(dayItem.night.weather.info) : getPhotoUrl(dayItem.day.weather.info),
-      weatherText: dayItem.textDay,
-      tempMin: dayItem.night.weather.temperature,
-      tempMax: dayItem.day.weather.temperature,
-      humidity: dayItem.humidity
+      weather: getPhotoUrlByInfo(pickForecastWeatherInfoForIcon(day, night)),
+      weatherText: formatForecastWeatherText(day, night),
+      tempMin: Math.min(tMin, tMax),
+      tempMax: Math.max(tMin, tMax)
     })
   }
   weatherList.value = dayWeatherList.slice(1, 7)
 
-  // 今日天气
+  const first = detail[0]
+  const tc0 = first?.date ? findTempchartRow(tempchart, first.date) : undefined
+  let todayMin = parseForecastTemp(first?.night?.weather?.temperature)
+  let todayMax = parseForecastTemp(first?.day?.weather?.temperature)
+  if (tc0) {
+    const cmin = typeof tc0.min_temp === 'number' ? tc0.min_temp : parseForecastTemp(tc0.min_temp)
+    const cmax = typeof tc0.max_temp === 'number' ? tc0.max_temp : parseForecastTemp(tc0.max_temp)
+    if (todayMin === undefined && cmin !== undefined) todayMin = cmin
+    if (todayMax === undefined && cmax !== undefined) todayMax = cmax
+  }
+  if (todayMin === undefined) todayMin = parseForecastTemp(first?.day?.weather?.temperature)
+  if (todayMax === undefined) todayMax = parseForecastTemp(first?.night?.weather?.temperature)
+  if (todayMin !== undefined && todayMax !== undefined && todayMax < todayMin) {
+    const t = todayMin
+    todayMin = todayMax
+    todayMax = t
+  }
   todayWeather.value = {
     date: '今日',
-    direction: result.real.wind.direct,
-    weather: dayjs().valueOf() >= 1767693600000 ? getPhotoUrl(result.real.weather.info) : getPhotoUrl(result.real.weather.info),
-    weatherText: result.real.weather.info,
-    tempMin: result.predict.detail[0].night.weather.temperature,
-    tempMax: result.predict.detail[0].day.weather.temperature,
-    currentTemp: Math.round(result.real.weather.temperature),
-    humidity: result.real.weather.humidity
+    direction: result.real?.wind?.direct ?? '—',
+    weather: getPhotoUrlByInfo(result.real?.weather?.info),
+    weatherText: isWeatherMissing(result.real?.weather?.info) ? '—' : String(result.real.weather.info),
+    tempMin: todayMin ?? 0,
+    tempMax: todayMax ?? todayMin ?? 0,
+    currentTemp: Math.round(Number(result.real?.weather?.temperature) || 0),
+    humidity: Number(result.real?.weather?.humidity) || 0
+  }
+
+  const chartSlice = detail.slice(0, 12)
+  if (chartSlice.length > 0) {
+    echartOption.value.xAxis.data = chartSlice.map((d: Record<string, any>) => dayjs(d.date).format('M.D'))
   }
 })
-
 </script>
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 45px 40px;
-
-  /* height: 465px; */
+  padding: 45px 40px 40px;
   box-sizing: border-box;
 }
 
@@ -254,8 +367,6 @@ usePolling(async () => {
   font-family: PingFangSC, sans-serif;
   background: url('@/assets/global/images/situation/today-weather-bg.png') no-repeat center top;
   background-size: 100% 100%;
-
-  // background: linear-gradient(180deg, rgb(38 82 117 / 31), rgb(9 39 54 / 48));
 
   .today-weather__temp {
     font-size: 64px;
@@ -273,18 +384,29 @@ usePolling(async () => {
   font-family: PingFangSC, sans-serif;
   padding: 20px 0;
   box-sizing: border-box;
+  cursor: pointer;
   background: url('@/assets/global/images/situation/weather-bg.png') no-repeat center top;
   background-size: 100% 100%;
 
-  // background: linear-gradient(180deg, rgb(38 82 117 / 31), rgb(9 39 54 / 48));
-  // border: 1px solid transparent;
-  // border-bottom: none;
-  // border-image: linear-gradient(180deg, #98BCE5, rgb(102 102 102 / 0)) 1;
-  // border-radius: 4px;
+  .week-weather__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 49px;
+    padding: 4px;
+    border-radius: 8px;
+    border: 2px solid transparent;
+    box-sizing: border-box;
+  }
+
+  &--active .week-weather__icon-wrap {
+    border-color: #56EBFF;
+    box-shadow: 0 0 8px rgb(86 235 255 / 0.45);
+  }
 }
 
-.chart {
+.rain-chart {
   margin-top: 28px;
-  height: 460px;
+  height: 320px;
 }
 </style>
