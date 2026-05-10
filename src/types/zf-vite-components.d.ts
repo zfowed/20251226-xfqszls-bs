@@ -21,6 +21,7 @@ declare module 'vue' {
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
+    ElTooltip: typeof import('element-plus/es')['ElTooltip']
     FloodAdvancePageLeftCard1: typeof import('./../components/FloodAdvancePageLeftCard1.vue')['default']
     FloodAdvancePageLeftCard2: typeof import('./../components/FloodAdvancePageLeftCard2.vue')['default']
     FloodAdvancePageLeftCard3: typeof import('./../components/FloodAdvancePageLeftCard3.vue')['default']

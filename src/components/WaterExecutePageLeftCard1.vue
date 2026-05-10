@@ -312,6 +312,28 @@ onMounted(() => {
   white-space: nowrap;
 }
 
+.action-view {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: none;
+  padding: 0;
+  color: rgb(184 199 212 / 0.72);
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  background: transparent;
+
+  &::before {
+    content: '';
+    width: 16px;
+    height: 11px;
+    border: 1px solid rgb(184 199 212 / 0.72);
+    border-radius: 12px / 9px;
+    box-sizing: border-box;
+  }
+}
+
 .files-table.water-warn-table {
   :deep(.el-table__inner-wrapper) {
     &::before {
@@ -341,7 +363,7 @@ onMounted(() => {
 
       td.el-table__cell {
         background: rgb(19 79 135 / 0.2);
-        color: #81e6ff;
+        color: rgb(184 199 212 / 0.72);
         font-family: PIngFangSC, sans-serif;
         font-size: 26px;
         border: 1px solid #527191;
@@ -356,37 +378,25 @@ onMounted(() => {
       }
     }
 
+    .el-table__row.current-row > td.el-table__cell,
     .el-table__row:hover > td.el-table__cell {
       background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
       color: #fff;
+    }
+
+    .el-table__row.current-row .action-view,
+    .el-table__row:hover .action-view {
+      color: #fff;
+
+      &::before {
+        border-color: #fff;
+      }
     }
   }
 
   :deep(.cell) {
     height: 80px;
     line-height: 80px;
-  }
-}
-
-.action-view {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  border: none;
-  padding: 0;
-  color: #8ce8ff;
-  font-size: 26px;
-  line-height: 1;
-  cursor: pointer;
-  background: transparent;
-
-  &::before {
-    content: '';
-    width: 16px;
-    height: 11px;
-    border: 1px solid #8ce8ff;
-    border-radius: 12px / 9px;
-    box-sizing: border-box;
   }
 }
 
