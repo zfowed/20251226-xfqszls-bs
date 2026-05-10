@@ -17,7 +17,13 @@
       </div>
 
       <div class="water-rank">
-        <PageTable :thead-col="theadCol" :data-list="rankList" :index="true" :limit-scroll="3">
+        <PageTable
+          class="rehearsal-table"
+          :thead-col="theadCol"
+          :data-list="rankList"
+          :index="true"
+          :limit-scroll="3"
+        >
           <template #index="scope">
             <div class="table-index">
               {{ scope.index }}
@@ -191,25 +197,57 @@ usePolling(async () => {
   justify-content: center;
   width: 49.68px;
   height: 59.61px;
-  line-height: 59.61px;
   color: #fff;
-  font-size: 40px;
-  font-weight: bold;
+  font-family: JiangChengHeiTi, 'Alibaba PuHuiTi 2.0', sans-serif;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 59.61px;
   background: url('@/components/PageTable/assets/index-bg.png') no-repeat;
   background-size: 100% 100%;
 }
 
 .water-rank__value {
-  color: #50fffc;
-  font-size: 22px;
-  font-weight: bold;
-  font-family: Quantico, sans-serif;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
 }
 
 .water-rank__unit {
-  margin-left: 10px;
-  color: #d8edff;
-  font-size: 18px;
-  font-family: PingFangSC, sans-serif;
+  margin-left: 6px;
+  color: #beeeff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 24px;
+}
+
+.rehearsal-table {
+  height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3) .water-rank__unit) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
 }
 </style>

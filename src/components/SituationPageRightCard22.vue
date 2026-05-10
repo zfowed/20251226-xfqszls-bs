@@ -2,7 +2,12 @@
   <PageCard title="重点流量站" bg-class="right">
     <div class="page-container">
       <div class="flow-table">
-        <PageTable :thead-col="theadCol" :data-list="dataList" :limit-scroll="5">
+        <PageTable
+          class="rehearsal-table"
+          :thead-col="theadCol"
+          :data-list="dataList"
+          :limit-scroll="5"
+        >
           <template #siteName="scope">
             <div class="flow-table__site">
               <img
@@ -76,13 +81,15 @@ usePolling(async () => {
 }
 
 .flow-table {
-  height: 455px;
+  height: 515px;
 }
 
 .flow-table__site {
   display: flex;
   align-items: center;
   color: #81e6ff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
 }
 
 .flow-table__site-icon {
@@ -92,14 +99,45 @@ usePolling(async () => {
 }
 
 .flow-table__value {
-  color: #50fffc;
-  font-size: 22px;
-  font-family: Quantico, sans-serif;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
 }
 
 .flow-table__unit {
   margin-left: 6px;
-  color: #d8edff;
-  font-size: 18px;
+  color: #beeeff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 24px;
+}
+
+.rehearsal-table {
+  height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th),
+  :deep(.table-body__tr:nth-child(3) .flow-table__site),
+  :deep(.table-body__tr:nth-child(3) .flow-table__unit) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
 }
 </style>

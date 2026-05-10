@@ -23,8 +23,8 @@
 const theadCol = ref([
   { key: 'name', name: '渠道名称', width: 230 },
   { key: 'type', name: '渠道类型', width: 140, align: 'center' },
-  { key: 'flow', name: '渠首流量', width: 150, align: 'center' },
-  { key: 'status', name: '渠道过流状态', width: 180, align: 'center' }
+  { key: 'flow', name: '渠首流量', align: 'center' },
+  { key: 'status', name: '渠道过流状态', align: 'center' }
 ])
 
 const channelTypeMap: Record<string, string> = {
@@ -114,25 +114,49 @@ usePolling(async () => {
 
 .channel-table-card__table {
   height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th),
+  :deep(.table-body__tr:nth-child(3) .channel-table-card__flow-unit) {
+    color: #fff;
+  }
+
+  :deep(.table-body__tr:nth-child(3):hover) {
+    color: #fff;
+    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+  }
 }
 
 .channel-table-card__flow-value {
-  color: #4df3ff;
-  font-family: DINAlternate, Arial, sans-serif;
-  font-size: 20px;
-  font-weight: 700;
-  text-shadow: 0 0 10px rgb(77 243 255 / 0.22);
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 30px;
 }
 
 .channel-table-card__flow-unit {
-  color: rgb(217 241 255 / 0.7);
-  font-size: 14px;
+  color: #beeeff;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  font-size: 24px;
 }
 
 .channel-table-card__flow-cell {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
 }
 </style>
