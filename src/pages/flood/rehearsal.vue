@@ -1,8 +1,12 @@
 <template>
   <PageScreen>
-    <template #middle>
+    <template #left>
       <div class="middle-container">
         <NavSide v-model="navList" class="middle-nav absolute -left-[100px] top-[30px]" />
+      </div>
+    </template>
+    <template #middle>
+      <div class="middle-container">
         <FloodRehearsalPageMiddleCard1 class="middle-card absolute bottom-[220px] left-1/2 -translate-x-1/2" />
       </div>
     </template>

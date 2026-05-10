@@ -17,6 +17,7 @@ declare module 'vue' {
     AgriculturePageRightCard2: typeof import('./../components/AgriculturePageRightCard2.vue')['default']
     AgriculturePageRightCard3: typeof import('./../components/AgriculturePageRightCard3.vue')['default']
     AppLayout: typeof import('./../components/AppLayout/AppLayout.vue')['default']
+    ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
     ElOption: typeof import('element-plus/es')['ElOption']
     ElSelect: typeof import('element-plus/es')['ElSelect']
     ElTable: typeof import('element-plus/es')['ElTable']

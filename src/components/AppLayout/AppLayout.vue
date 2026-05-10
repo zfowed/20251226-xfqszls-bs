@@ -50,6 +50,49 @@ const getPhotoUrl = (icon: string) => {
   return new URL(`../../assets/global/images/weather/${icon}.png`, import.meta.url).href
 }
 
+const isWeatherMissing = (v: unknown) => {
+  if (v === null || v === undefined) return true
+  const s = String(v).trim()
+  return s === '' || s === '9999' || Number(s) === 9999
+}
+
+const parseForecastTemp = (v: unknown): number | undefined => {
+  if (isWeatherMissing(v)) return undefined
+  const n = Number(v)
+  return Number.isFinite(n) && n < 9990 ? n : undefined
+}
+
+/** 与 FloodIndexPageLeftCard1 一致：实况文案 → 现有 png 名 */
+const resolveWeatherIconName = (info: unknown): string => {
+  if (isWeatherMissing(info)) return '多云'
+  const t = String(info).trim()
+  const alias: Record<string, string> = {
+    阴: '阴天',
+    阴天: '阴天',
+    雾: '阴天',
+    霾: '阴天',
+    小雨: '阴天',
+    中雨: '雷阵雨',
+    大雨: '雷阵雨',
+    暴雨: '雷阵雨',
+    雷阵雨: '雷阵雨',
+    雨: '阴天',
+    雪: '阴天'
+  }
+  return alias[t] ?? t
+}
+
+const getPhotoUrlByInfo = (info: unknown) => getPhotoUrl(resolveWeatherIconName(info))
+
+const findTempchartRow = (tempchart: Record<string, any>[] | undefined, ymd: string) => {
+  if (!tempchart?.length) return undefined
+  const target = dayjs(ymd)
+  return tempchart.find((row) => {
+    const rowDay = row?.time ? dayjs(String(row.time).replace(/\//g, '-')) : null
+    return rowDay?.isValid() && rowDay.isSame(target, 'day')
+  })
+}
+
 const menuList = reactive([
   { name: '灌区概览', path: '/preview', ueEvent: 'menu_kuangshan', active: false },
   { name: '态势感知', path: '/situation', ueEvent: 'menu_anquan', active: false },
@@ -78,10 +121,29 @@ const weatherInfo = reactive({
 })
 usePolling(async () => {
   const result: any = await service.xfqs.queryStationWeather({})
-  weatherInfo.min = result.predict.detail[0].night.weather.temperature
-  weatherInfo.max = result.predict.detail[0].day.weather.temperature
-  weatherInfo.text = result.real.weather.info
-  weatherInfo.icon = getPhotoUrl('晴')
+  const detail = (result?.predict?.detail || []) as Record<string, any>[]
+  const tempchart = (result?.tempchart || []) as Record<string, any>[]
+  const first = detail[0]
+  const tc0 = first?.date ? findTempchartRow(tempchart, first.date) : undefined
+  let todayMin = parseForecastTemp(first?.night?.weather?.temperature)
+  let todayMax = parseForecastTemp(first?.day?.weather?.temperature)
+  if (tc0) {
+    const cmin = typeof tc0.min_temp === 'number' ? tc0.min_temp : parseForecastTemp(tc0.min_temp)
+    const cmax = typeof tc0.max_temp === 'number' ? tc0.max_temp : parseForecastTemp(tc0.max_temp)
+    if (todayMin === undefined && cmin !== undefined) todayMin = cmin
+    if (todayMax === undefined && cmax !== undefined) todayMax = cmax
+  }
+  if (todayMin === undefined) todayMin = parseForecastTemp(first?.day?.weather?.temperature)
+  if (todayMax === undefined) todayMax = parseForecastTemp(first?.night?.weather?.temperature)
+  if (todayMin !== undefined && todayMax !== undefined && todayMax < todayMin) {
+    const t = todayMin
+    todayMin = todayMax
+    todayMax = t
+  }
+  weatherInfo.min = todayMin ?? 0
+  weatherInfo.max = todayMax ?? todayMin ?? 0
+  weatherInfo.text = isWeatherMissing(result?.real?.weather?.info) ? '—' : String(result.real.weather.info)
+  weatherInfo.icon = getPhotoUrlByInfo(result?.real?.weather?.info)
 })
 
 const weekMap = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
