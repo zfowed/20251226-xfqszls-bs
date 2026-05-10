@@ -309,9 +309,9 @@ usePolling(async () => {
 }
 
 .rain-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 30px;
   padding: 0 24px;
 }
@@ -319,13 +319,16 @@ usePolling(async () => {
 .rain-summary__item {
   display: flex;
   align-items: center;
+  min-width: 0;
 }
 
 .rain-summary__icon {
-  width: 74px;
-  height: 82px;
+  width: 100px;
+  height: 100px;
   margin-right: 14px;
   flex-shrink: 0;
+  object-fit: contain;
+  object-position: left center;
 }
 
 .rain-summary__content {
@@ -334,33 +337,37 @@ usePolling(async () => {
 }
 
 .rain-summary__label {
-  margin-bottom: 8px;
+  margin-bottom: 21px;
   color: #fff;
-  font-size: 24px;
-  line-height: 1;
-  font-family: PingFangSC, sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: normal;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
   white-space: nowrap;
 }
 
 .rain-summary__value-row {
   display: flex;
-  align-items: baseline;
+  align-items: flex-end;
 }
 
 .rain-summary__value {
   color: #50fffc;
-  font-size: 38px;
-  line-height: 1;
+  font-size: 32px;
   font-weight: bold;
+  line-height: 28px;
+  letter-spacing: -2.56px;
   font-family: Quantico, sans-serif;
-  text-shadow: 0 0 12px rgb(80 255 252 / 0.35);
 }
 
 .rain-summary__unit {
-  margin-left: 8px;
-  color: #d8edff;
-  font-size: 20px;
-  font-family: PingFangSC, sans-serif;
+  margin-left: 4px;
+  padding-bottom: 1px;
+  color: #beeeff;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 22px;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
 }
 
 .rain-rank {
