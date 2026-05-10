@@ -76,11 +76,7 @@ const theadCol = ref([
   }
 ])
 
-const rankList = ref<RankItem[]>([
-  { id: 'rank-1', name: 'XXX行政村', value: 1.97, unit: '万m3' },
-  { id: 'rank-2', name: 'XXX行政村', value: 2.36, unit: '万m3' },
-  { id: 'rank-3', name: 'XXX行政村', value: 4.18, unit: '万m3' }
-])
+const rankList = ref<RankItem[]>([])
 
 const getNumberByKeys = (source: Record<string, any>, keys: string[]) => {
   for (const key of keys) {
@@ -98,31 +94,39 @@ usePolling(async () => {
     service.xfqs.getFactoryRealData({})
   ])
 
-  const waterUserList = (waterUserResult?.list || []).map((item: Record<string, any>, index: number) => ({
-    id: item.id || item.stcd || `water-user-${index}`,
-    name: item.name || item.villagename || item.xzqmc || item.adnm || 'XXX行政村',
-    value: getNumberByKeys(item, ['stw', 'water', 'supplyWater', 'maxWater', 'area']) / 100,
-    unit: '万m3'
-  }))
+  /** findWaterUserList 解包后为 { list }；项含 name、area（亩）、positionId（1 为灌区汇总）等 */
+  const rawWaterUsers = (waterUserResult?.list || []) as Record<string, any>[]
+  const guanquRow = rawWaterUsers.find((item) => item.positionId === 1)
+  const guanquArea = guanquRow ? getNumberByKeys(guanquRow, ['area']) : 0
+  const sumVillageArea = rawWaterUsers
+    .filter((item) => item.positionId !== 1 && String(item.name || '').trim() !== '测试')
+    .reduce((sum: number, item: Record<string, any>) => sum + getNumberByKeys(item, ['area']), 0)
+  const irrigationAreaMu = guanquArea > 0 ? guanquArea : sumVillageArea
 
-  const ecologyList = ecologyResult?.list || ecologyResult?.data || []
+  const waterUserList: RankItem[] = rawWaterUsers
+    .filter((item) => item.positionId !== 1 && String(item.name || '').trim() !== '测试')
+    .map((item, index) => ({
+      id: String(item.id ?? item.stcd ?? `water-user-${index}`),
+      name: String(item.name || item.positionName || item.villagename || item.xzqmc || item.adnm || '行政村'),
+      value: Number((getNumberByKeys(item, ['area']) / 100).toFixed(2)),
+      unit: '万m3'
+    }))
 
-  const irrigationTotal = waterUserList.reduce((sum: number, item: RankItem) => sum + item.value, 0)
-  const ecologyTotal = ecologyList.reduce((sum: number, item: Record<string, any>) => {
-    return sum + getNumberByKeys(item, ['stw', 'water', 'supplyWater', 'flow'])
-  }, 0) / 100
+  /** getFactoryRealData 解包后为 { stmap, list }；stmap 为汇总，list 为按小时明细 */
+  const stmap = ecologyResult?.stmap as Record<string, any> | undefined
+  const ecologyWaterWanm3 = getNumberByKeys(stmap || {}, ['water', 'stw', 'sum'])
 
-  summaryList.value[0].value = Number(irrigationTotal.toFixed(2))
-  summaryList.value[1].value = Number(ecologyTotal.toFixed(2))
+  summaryList.value[0].value = Number((irrigationAreaMu / 100).toFixed(2))
+  summaryList.value[1].value = Number(ecologyWaterWanm3.toFixed(2))
 
   if (waterUserList.length > 0) {
     rankList.value = waterUserList
-      .sort((prev, next) => next.value - prev.value)
+      .sort((prev: RankItem, next: RankItem) => next.value - prev.value)
       .slice(0, 3)
-      .map((item, index) => ({
+      .map((item: RankItem, index: number) => ({
         ...item,
         id: item.id || `rank-${index + 1}`,
-        name: item.name || 'XXX行政村'
+        name: item.name || '行政村'
       }))
   }
 })
