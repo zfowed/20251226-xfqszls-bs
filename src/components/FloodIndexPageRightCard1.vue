@@ -9,15 +9,27 @@
 </template>
 
 <script setup lang="ts">
-/** 正常蓄水位、讯限蓄水位（m），与设计稿刻度一致 */
+/** 设计稿节点 4005:44 — 与稿中刻度、图例一致 */
 const NORMAL_STORAGE_M = 400
 const FLOOD_LIMIT_STORAGE_M = 125
+const CHART_FONT = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_AXIS_VALUE = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
+const CHART_FONT_X = '"PingFang SC", "Microsoft YaHei", sans-serif'
+const FONT_SIZE = 20
+const LINE_WIDTH = 1
+const SYMBOL_SIZE = 6
 
 const X_LABELS = ['12.20', '12.21', '12.22', '12.23', '12.24', '12.25', '12.25']
 
-/** 入库 / 出库流量演示数据（m³/s），与设计稿走势相近 */
+/** 坝上水位（m，左轴） */
+const DAM_LEVEL_DEMO = [220, 235, 410, 380, 290, 260, 240]
+/** 入库 / 出库流量（m³/s，右轴） */
 const INFLOW_DEMO = [18, 32, 48, 42, 28, 22, 26]
 const OUTFLOW_DEMO = [12, 22, 52, 46, 32, 24, 30]
+
+const COLOR_INFLOW = '#32d74b'
+const COLOR_OUTFLOW = '#f39800'
+const COLOR_DAM = '#3c80c0'
 
 const greenArea = {
   type: 'linear' as const,
@@ -26,8 +38,8 @@ const greenArea = {
   x2: 0,
   y2: 1,
   colorStops: [
-    { offset: 0, color: 'rgba(140, 230, 90, 0.55)' },
-    { offset: 1, color: 'rgba(140, 230, 90, 0)' }
+    { offset: 0, color: 'rgba(50, 215, 75, 0.5)' },
+    { offset: 1, color: 'rgba(50, 215, 75, 0)' }
   ]
 }
 
@@ -38,113 +50,127 @@ const orangeArea = {
   x2: 0,
   y2: 1,
   colorStops: [
-    { offset: 0, color: 'rgba(255, 150, 60, 0.55)' },
-    { offset: 1, color: 'rgba(255, 150, 60, 0)' }
+    { offset: 0, color: 'rgba(243, 152, 0, 0.5)' },
+    { offset: 1, color: 'rgba(243, 152, 0, 0)' }
   ]
 }
 
-/** 水位参考线：用 markLine 画线并带文字（数据点 label 在 symbol:none 时往往不渲染） */
+const markLabelCommon = {
+  show: true,
+  color: 'rgba(255,255,255,0.95)',
+  fontSize: FONT_SIZE,
+  fontFamily: CHART_FONT
+}
+
+/** 水平标线（设计稿） */
 const levelMarkLine = {
   silent: true,
   symbol: 'none' as const,
   animation: false,
-  lineStyle: {
-    type: 'dashed' as const,
-    color: 'rgba(255, 236, 160, 0.95)',
-    width: 1
-  },
-  label: {
-    show: true,
-    color: 'rgba(255,255,255,0.95)',
-    fontSize: 14,
-    fontFamily: 'PingFangSC, sans-serif'
-  },
+  z: 10,
   data: [
     {
       yAxis: NORMAL_STORAGE_M,
+      lineStyle: {
+        type: 'dashed' as const,
+        color: 'rgba(255, 236, 160, 0.95)',
+        width: LINE_WIDTH
+      },
       label: {
-        formatter: `正常蓄水位${NORMAL_STORAGE_M}m`,
+        ...markLabelCommon,
+        formatter: `正常蓄水位${NORMAL_STORAGE_M}mm`,
         position: 'start' as const,
         align: 'left' as const,
         verticalAlign: 'bottom' as const,
-        offset: [10, -18]
+        offset: [8, -6]
       }
     },
     {
       yAxis: FLOOD_LIMIT_STORAGE_M,
+      lineStyle: {
+        type: 'dashed' as const,
+        color: 'rgba(50, 215, 75, 0.9)',
+        width: LINE_WIDTH
+      },
       label: {
-        formatter: `讯限蓄水位${FLOOD_LIMIT_STORAGE_M}m`,
+        ...markLabelCommon,
+        formatter: `讯限蓄水位${FLOOD_LIMIT_STORAGE_M}mm`,
         position: 'start' as const,
         align: 'left' as const,
         verticalAlign: 'bottom' as const,
-        offset: [10, -18]
+        offset: [8, -6]
       }
     }
   ]
 }
 
 const echartOption = ref({
+  animation: false,
   tooltip: {
     trigger: 'axis' as const,
-    axisPointer: { type: 'line' as const, lineStyle: { color: 'rgba(255,255,255,0.35)', type: 'dashed' as const } },
+    axisPointer: { type: 'line' as const, lineStyle: { color: 'rgba(255, 255, 255, 0.35)', type: 'dashed' as const, width: LINE_WIDTH } },
     backgroundColor: 'rgba(20, 40, 60, 0.92)',
     borderColor: 'rgba(120, 200, 255, 0.35)',
-    textStyle: { color: '#fff', fontSize: 16 },
+    textStyle: { color: '#fff', fontSize: FONT_SIZE, fontFamily: CHART_FONT },
     formatter (items: Record<string, any>[]) {
       if (!items?.length) return ''
       const axis = items[0].axisValueLabel ?? items[0].name
       const lines: string[] = [String(axis)]
       for (const it of items) {
         const name = it.seriesName as string
-        if (name.includes('蓄水位') || name === '__水位标线') continue
+        if (name.includes('蓄水位') || name === '__标线层') continue
         const v = it.value
         const n = typeof v === 'object' && v !== null && 'value' in v ? Number((v as { value: number }).value) : Number(v)
         if (Number.isNaN(n)) continue
         if (name === '入库流量' || name === '出库流量') {
           lines.push(`${name}：${n} m³/s`)
+        } else if (name === '坝上水位') {
+          lines.push(`${name}：${n} m`)
         }
       }
       return lines.join('<br/>')
     }
   },
   legend: {
-    top: 8,
+    top: 10,
     left: 'center',
-    itemWidth: 28,
-    itemHeight: 3,
-    itemGap: 36,
+    itemWidth: 32,
+    itemHeight: 10,
+    itemGap: 40,
     textStyle: {
       color: '#FFFFFF',
-      fontSize: 18,
-      fontFamily: 'PingFangSC, sans-serif',
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT,
       padding: [0, 0, 0, 10]
     },
     data: [
-      { name: '入库流量', icon: 'roundRect', itemStyle: { color: '#9AE66E' } },
-      { name: '出库流量', icon: 'roundRect', itemStyle: { color: '#FF9A3C' } }
+      { name: '坝上水位', icon: 'roundRect', itemStyle: { color: COLOR_DAM, borderWidth: 0 } },
+      { name: '入库流量', icon: 'roundRect', itemStyle: { color: COLOR_INFLOW } },
+      { name: '出库流量', icon: 'roundRect', itemStyle: { color: COLOR_OUTFLOW } }
     ]
   },
   grid: {
-    top: '24%',
-    left: '4%',
-    right: '5%',
-    bottom: '12%',
+    top: '26%',
+    left: '5%',
+    right: '6%',
+    bottom: '14%',
     containLabel: true
   },
   xAxis: {
     type: 'category' as const,
     boundaryGap: false,
     axisTick: { show: false },
-    offset: 10,
+    offset: 8,
     axisLine: {
       lineStyle: {
-        color: 'rgba(179, 223, 255, 0.5)'
+        color: 'rgba(179, 223, 255, 0.5)',
+        width: LINE_WIDTH
       }
     },
     axisLabel: {
       color: '#fff',
-      fontSize: 17,
-      fontFamily: 'PingFangSC, sans-serif'
+      fontSize: FONT_SIZE,
+      fontFamily: CHART_FONT_X
     },
     data: [...X_LABELS]
   },
@@ -152,16 +178,16 @@ const echartOption = ref({
     {
       type: 'value' as const,
       position: 'left' as const,
-      name: '水位 (m)',
+      name: '水位（m)',
       min: 0,
       max: 600,
       interval: 150,
       nameLocation: 'end' as const,
-      nameGap: 24,
+      nameGap: 28,
       nameTextStyle: {
         color: '#fff',
-        fontSize: 17,
-        fontFamily: 'PingFangSC, sans-serif'
+        fontSize: FONT_SIZE,
+        fontFamily: CHART_FONT
       },
       axisLine: { show: false },
       axisTick: { show: false },
@@ -169,42 +195,43 @@ const echartOption = ref({
         show: true,
         lineStyle: {
           type: 'dashed' as const,
-          color: 'rgba(217, 231, 255, 0.2)'
+          color: 'rgba(217, 231, 255, 0.2)',
+          width: LINE_WIDTH
         }
       },
       axisLabel: {
         color: '#fff',
-        fontSize: 17,
-        fontFamily: 'Quantico, PingFangSC, sans-serif'
+        fontSize: FONT_SIZE,
+        fontFamily: CHART_FONT_AXIS_VALUE
       }
     },
     {
       type: 'value' as const,
       position: 'right' as const,
-      name: '流量 (m³/s)',
+      name: '流量（m³/s)',
       min: 0,
       max: 60,
       interval: 15,
       nameLocation: 'end' as const,
-      nameGap: 24,
+      nameGap: 28,
       nameTextStyle: {
         color: '#fff',
-        fontSize: 17,
-        fontFamily: 'PingFangSC, sans-serif'
+        fontSize: FONT_SIZE,
+        fontFamily: CHART_FONT
       },
       axisLine: { show: false },
       axisTick: { show: false },
       splitLine: { show: false },
       axisLabel: {
         color: '#fff',
-        fontSize: 17,
-        fontFamily: 'Quantico, PingFangSC, sans-serif'
+        fontSize: FONT_SIZE,
+        fontFamily: CHART_FONT_AXIS_VALUE
       }
     }
   ],
   series: [
     {
-      name: '__水位标线',
+      name: '__标线层',
       type: 'line' as const,
       yAxisIndex: 0,
       xAxisIndex: 0,
@@ -219,16 +246,29 @@ const echartOption = ref({
       z: 8
     },
     {
+      name: '坝上水位',
+      type: 'line' as const,
+      yAxisIndex: 0,
+      smooth: true,
+      showSymbol: true,
+      symbol: 'circle',
+      symbolSize: SYMBOL_SIZE,
+      data: [...DAM_LEVEL_DEMO],
+      lineStyle: { color: COLOR_DAM, width: LINE_WIDTH },
+      itemStyle: { color: COLOR_DAM },
+      z: 4
+    },
+    {
       name: '入库流量',
       type: 'line' as const,
       yAxisIndex: 1,
       smooth: true,
       showSymbol: true,
       symbol: 'circle',
-      symbolSize: 8,
+      symbolSize: SYMBOL_SIZE,
       data: [...INFLOW_DEMO],
-      lineStyle: { color: '#9AE66E', width: 2 },
-      itemStyle: { color: '#9AE66E' },
+      lineStyle: { color: COLOR_INFLOW, width: LINE_WIDTH },
+      itemStyle: { color: COLOR_INFLOW },
       areaStyle: { color: greenArea },
       z: 3
     },
@@ -239,10 +279,10 @@ const echartOption = ref({
       smooth: true,
       showSymbol: true,
       symbol: 'circle',
-      symbolSize: 8,
+      symbolSize: SYMBOL_SIZE,
       data: [...OUTFLOW_DEMO],
-      lineStyle: { color: '#FF9A3C', width: 2 },
-      itemStyle: { color: '#FF9A3C' },
+      lineStyle: { color: COLOR_OUTFLOW, width: LINE_WIDTH },
+      itemStyle: { color: COLOR_OUTFLOW },
       areaStyle: { color: orangeArea },
       z: 2
     }
@@ -252,7 +292,7 @@ const echartOption = ref({
 
 <style lang="scss" scoped>
 .page-container {
-  padding: 28px 36px 32px;
+  padding: 20px 32px 28px;
   box-sizing: border-box;
 }
 
