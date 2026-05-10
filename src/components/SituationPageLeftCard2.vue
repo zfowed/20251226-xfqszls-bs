@@ -311,7 +311,7 @@ usePolling(async () => {
 .rain-summary {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-bottom: 30px;
   padding: 0 24px;
 }

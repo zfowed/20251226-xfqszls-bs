@@ -7,15 +7,15 @@
       </div>
 
       <div class="reservoir-summary">
-        <div v-for="item in reservoirInfo" :key="item.name" class="reservoir-item">
-          <img :src="item.icon" :alt="item.name" class="reservoir-item__icon">
-          <div>
-            <div class="reservoir-item__label">
+        <div v-for="item in reservoirInfo" :key="item.name" class="reservoir-summary__item">
+          <img :src="item.icon" :alt="item.name" class="reservoir-summary__icon">
+          <div class="reservoir-summary__content">
+            <div class="reservoir-summary__label">
               {{ item.name }}
             </div>
-            <div class="reservoir-item__value-row">
-              <ZfTweenNumber :value="item.value" class="reservoir-item__value" />
-              <span class="reservoir-item__unit">{{ item.unit }}</span>
+            <div class="reservoir-summary__value-row">
+              <ZfTweenNumber :value="item.value" class="reservoir-summary__value" />
+              <span class="reservoir-summary__unit">{{ item.unit }}</span>
             </div>
           </div>
         </div>
@@ -288,48 +288,65 @@ usePolling(async () => {
 }
 
 .reservoir-summary {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  column-gap: 29px;
-}
-
-.reservoir-item {
   display: flex;
   align-items: center;
-  font-family: PingFangSC, sans-serif;
+  justify-content: space-around;
+  margin-bottom: 0;
+  padding: 0 24px;
+}
 
-  .reservoir-item__icon {
-    width: 76px;
-    height: 84px;
-    margin-right: 14px;
-    flex-shrink: 0;
-  }
+.reservoir-summary__item {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
 
-  .reservoir-item__label {
-    margin-bottom: 6px;
-    font-size: 30px;
-    color: #fff;
-    white-space: nowrap;
-  }
+.reservoir-summary__icon {
+  width: 100px;
+  height: 100px;
+  margin-right: 14px;
+  flex-shrink: 0;
+  object-fit: contain;
+  object-position: left center;
+}
 
-  .reservoir-item__value-row {
-    display: flex;
-    align-items: baseline;
-  }
+.reservoir-summary__content {
+  display: flex;
+  flex-direction: column;
+}
 
-  .reservoir-item__value {
-    font-family: Quantico, sans-serif;
-    font-size: 32px;
-    font-weight: bold;
-    color: #50fffc;
-    text-shadow: 0 0 10px rgb(80 255 252 / 0.3);
-  }
+.reservoir-summary__label {
+  margin-bottom: 21px;
+  color: #fff;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: normal;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+  white-space: nowrap;
+}
 
-  .reservoir-item__unit {
-    margin-left: 8px;
-    font-size: 24px;
-    color: #beeeff;
-  }
+.reservoir-summary__value-row {
+  display: flex;
+  align-items: flex-end;
+}
+
+.reservoir-summary__value {
+  color: #50fffc;
+  font-size: 32px;
+  font-weight: bold;
+  line-height: 28px;
+  letter-spacing: -2.56px;
+  font-family: Quantico, sans-serif;
+}
+
+.reservoir-summary__unit {
+  margin-left: 4px;
+  padding-bottom: 1px;
+  color: #beeeff;
+  font-size: 24px;
+  font-weight: 300;
+  line-height: 22px;
+  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
 }
 
 .reservoir-chart {
