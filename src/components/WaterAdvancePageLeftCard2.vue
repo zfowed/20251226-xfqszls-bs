@@ -62,6 +62,12 @@ const metrics = ref<MetricItem[]>([
     percent: 59
   }
 ])
+
+usePolling(async () => {
+  // const result: any = await service.xfqs.getRsvrWarnInfo({})
+  // console.log('可供水量预警数据：', result)
+  // const { msg, currntZ, tm } = result
+})
 </script>
 
 <style lang="scss" scoped>

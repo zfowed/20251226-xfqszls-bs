@@ -212,7 +212,7 @@ usePolling(async () => {
   totalInfo.totalDitchCount = ditchResult.size
   totalInfo.totalDitchLength = ditchResult.allLen
   if (ditchResult.channelList.length > 0) {
-    ditchList.value = ditchResult.channelList.slice(0, 7).map((it: any, index: number) => {
+    ditchList.value = ditchResult.channelList.map((it: any, index: number) => {
       return {
         ...it,
         icon: index === 3 ? getPhotoUrl('ditch-icon-2') : getPhotoUrl('ditch-icon-1')

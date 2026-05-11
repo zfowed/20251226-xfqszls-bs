@@ -235,8 +235,8 @@ usePolling(async () => {
       echartsResult?.hsybForecastccDdfafExtList?.[0]?.hsybForecastcExtList?.[0]?.hsybForecastList || []
 
     if (hsybForecastList.length > 0) {
-      xAxisData = hsybForecastList.slice(0, 12).map((item: Record<string, any>) => dayjs(item.tm).format('M.D'))
-      const sourceData = hsybForecastList.slice(0, 12).map((item: Record<string, any>) => Number(item.z) || 0)
+      xAxisData = hsybForecastList.map((item: Record<string, any>) => dayjs(item.tm).format('M.D'))
+      const sourceData = hsybForecastList.map((item: Record<string, any>) => Number(item.z) || 0)
       if (sourceData.length > 0) {
         rapeseedData = sourceData.map((item: number, index: number) => Number((item + (index % 3 === 0 ? 4 : -2)).toFixed(1)))
         wheatData = sourceData.map((item: number, index: number) => Number((item + (index % 2 === 0 ? -2 : 3)).toFixed(1)))
@@ -270,7 +270,7 @@ usePolling(async () => {
   })
 
   if (gateResult?.list?.length > 0) {
-    tableDataList.value = gateResult.list.slice(0, 5).map((item: Record<string, any>) => ({
+    tableDataList.value = gateResult.list.map((item: Record<string, any>) => ({
       siteName: item.stnm || 'XXX站点',
       waterLevel: Number(item.inz || 0),
       waterDepth: Number(item.otz || 0),

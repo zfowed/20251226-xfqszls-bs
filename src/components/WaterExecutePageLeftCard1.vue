@@ -141,6 +141,7 @@ type InstructionRow = {
   totalSupply?: string
   gateOpenTime: string
   gateFlow: string
+  fileUrl?: string
 }
 
 const tableRef = ref<any>()
@@ -230,6 +231,33 @@ function onInstructionChange (row: InstructionRow | undefined) {
 onMounted(() => {
   nextTick(() => {
     const defaultRow = instructionList.value.find((r) => r.id === 3)
+    if (defaultRow) {
+      currentInstruction.value = defaultRow
+      tableRef.value?.setCurrentRow(defaultRow)
+    }
+  })
+})
+
+usePolling(async () => {
+  const result: any = await service.xfqs.findWaterCommandList({})
+  console.log('调度指令列表数据：', result)
+
+  if (!Array.isArray(result) || !result.length) {
+    return
+  }
+
+  instructionList.value = result.map((item: Record<string, any>) => ({
+    id: Number(item.id),
+    code: item.commandName || item.billName || '—',
+    releaseTime: item.createTime || item.openTime || '—',
+    totalSupply: item.processMap?.totalWater ? `${item.processMap.totalWater} m³` : '—',
+    gateOpenTime: item.openTime || '—',
+    gateFlow: item.openFlow !== null && item.openFlow !== undefined ? `${item.openFlow} m³/s` : '—',
+    fileUrl: item.fileMsg?.path || item.fileUrl || ''
+  }))
+
+  nextTick(() => {
+    const defaultRow = instructionList.value[0]
     if (defaultRow) {
       currentInstruction.value = defaultRow
       tableRef.value?.setCurrentRow(defaultRow)

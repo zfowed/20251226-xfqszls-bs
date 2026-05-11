@@ -7,6 +7,8 @@
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs'
+
 const echartOption = ref({
   animation: false,
   tooltip: {
@@ -194,6 +196,18 @@ const echartOption = ref({
       }
     }
   ]
+})
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getIwfShortAchievementList({
+    start: 1,
+    limit: 1000,
+    currentDate: dayjs().format('YYYY-MM-DD')
+  })
+  // console.log('来水预报数据：', result)
+  const modelDetail = JSON.parse(result.list[0].modelDetail)
+  // console.log(modelDetail)
+  console.log('modelDetail', modelDetail)
 })
 </script>
 

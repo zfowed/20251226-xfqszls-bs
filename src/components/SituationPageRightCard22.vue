@@ -59,16 +59,15 @@ const dataList = ref<Record<string, any>[]>([
 ])
 
 usePolling(async () => {
-  const result: any = await service.xfqs.getGatePageList({
+  const result: any = await service.xfqs.getChannelPage({
     start: 1,
-    limit: 5,
-    sttp: 'DD'
+    limit: 1000,
+    sttp: 'ZZ'
   })
-
   if (result?.list?.length > 0) {
-    dataList.value = result.list.slice(0, 5).map((item: Record<string, any>) => ({
+    dataList.value = result.list.map((item: Record<string, any>) => ({
       siteName: item.stnm || 'XXX站点',
-      flow: Number(item.sq || item.q || 0),
+      flow: item.z ?? '--',
       time: item.tm ? dayjs(item.tm).format('YY/M/DD H:mm') : '--'
     }))
   }

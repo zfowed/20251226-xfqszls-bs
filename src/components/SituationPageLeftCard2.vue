@@ -74,7 +74,7 @@
 </template>
 
 <script setup lang="ts">
-import dayjs from 'dayjs'
+// import dayjs from 'dayjs'
 
 interface SummaryItem {
   key: string
@@ -184,86 +184,36 @@ const switchMonitorType = (type: 'rainfall' | 'weather') => {
   currentMonitorType.value = type
 }
 
-const getNumberByKeys = (source: Record<string, any>, keys: string[]) => {
-  for (const key of keys) {
-    const value = Number(source?.[key])
-    if (!Number.isNaN(value) && Number.isFinite(value)) {
-      return value
-    }
-  }
-  return 0
+const toNumber = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : 0
 }
 
 usePolling(async () => {
-  const result: any = await service.xfqs.queryStationWeather({})
+  const result: any = await service.xfqs.getPptnPage({
+    start: 1,
+    limit: 1000,
+    sttp: 'MM'
+  })
 
-  const currentRainfall = getNumberByKeys(result?.real || {}, [
-    'rain',
-    'rainfall',
-    'precipitation',
-    'pcpn'
-  ])
-  const currentMaxRainfall = getNumberByKeys(result?.real || {}, [
-    'maxHourRainfall',
-    'hourRainfall',
-    'maxRain',
-    'rain'
-  ])
-  const totalRainfall = getNumberByKeys(result?.real || {}, [
-    'totalRainfall',
-    'accRainfall',
-    'accumulatedRainfall',
-    'rainfall'
-  ])
+  const rainfallList = Array.isArray(result?.list) ? result.list : []
+  if (!rainfallList.length) return
 
-  rainfallSummaryList.value[0].value = Number((currentMaxRainfall || 56).toFixed(2))
-  rainfallSummaryList.value[1].value = Number((currentRainfall || 0.12).toFixed(2))
-  rainfallSummaryList.value[2].value = Number((totalRainfall || 0.19).toFixed(2))
+  const periodRainfallList = rainfallList.map((item: Record<string, any>) => toNumber(item.drp))
+  const currentRainfallList = rainfallList.map((item: Record<string, any>) => toNumber(item.dyp))
+  const totalRainfallList = rainfallList.map((item: Record<string, any>) => toNumber(item.accp))
 
-  const currentTemp = getNumberByKeys(result?.real?.weather || {}, ['temperature'])
-  const humidity = getNumberByKeys(result?.real?.weather || {}, ['humidity'])
-  const maxTemp = getNumberByKeys(result?.predict?.detail?.[0]?.day?.weather || {}, ['temperature'])
+  rainfallSummaryList.value[0].value = Number(Math.max(...periodRainfallList).toFixed(2))
+  rainfallSummaryList.value[1].value = Number(Math.max(...currentRainfallList).toFixed(2))
+  rainfallSummaryList.value[2].value = Number(totalRainfallList.reduce((sum, value) => sum + value, 0).toFixed(2))
 
-  weatherSummaryList.value[0].value = Number((maxTemp || 32).toFixed(2))
-  weatherSummaryList.value[1].value = Number((currentTemp || 26).toFixed(2))
-  weatherSummaryList.value[2].value = Number((humidity || 65).toFixed(2))
-
-  const detailList = result?.predict?.detail || []
-  if (detailList.length > 0) {
-    rainfallRankList.value = detailList
-      .slice(0, 5)
-      .map((item: Record<string, any>, index: number) => {
-        const rainfall = getNumberByKeys(item, [
-          'rain',
-          'rainfall',
-          'precipitation',
-          'pcpn'
-        ]) || [9.97, 3.36, 3.18, 3.46, 3.46][index] || 0
-
-        return {
-          id: item.id || `rain-${index + 1}`,
-          name: item.name || item.stationName || item.stnm || 'XXX站点',
-          metricValue1: Number(rainfall.toFixed(2)),
-          metricValue2: Number(rainfall.toFixed(2)),
-          unit: 'mm'
-        }
-      })
-
-    weatherRankList.value = detailList
-      .slice(0, 5)
-      .map((item: Record<string, any>, index: number) => {
-        const minTemp = getNumberByKeys(item?.night?.weather || {}, ['temperature']) || [18, 19, 20, 18, 17][index] || 0
-        const maxTempItem = getNumberByKeys(item?.day?.weather || {}, ['temperature']) || [27, 28, 29, 26, 25][index] || 0
-
-        return {
-          id: item.id || `weather-${index + 1}`,
-          name: item.date ? dayjs(item.date).format('MM-DD') : `05-0${index + 8}`,
-          metricValue1: Number(minTemp.toFixed(2)),
-          metricValue2: Number(maxTempItem.toFixed(2)),
-          unit: '℃'
-        }
-      })
-  }
+  rainfallRankList.value = rainfallList.map((item: Record<string, any>, index: number) => ({
+    id: String(item.id || item.stcd || `rain-${index + 1}`),
+    name: item.stnm || `雨量站${index + 1}`,
+    metricValue1: Number(toNumber(item.drp).toFixed(2)),
+    metricValue2: Number(toNumber(item.dyp).toFixed(2)),
+    unit: 'mm'
+  }))
 })
 </script>
 

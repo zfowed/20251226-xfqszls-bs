@@ -29,6 +29,8 @@
 </template>
 
 <script setup lang="ts">
+import dayjs from 'dayjs'
+
 type CropItem = {
   icon: string
   name: string
@@ -61,17 +63,11 @@ const theadCol = ref([
 ])
 
 const cropList = ref<CropItem[]>([
-  { icon: getPhotoUrl('rice'), name: '水稻', sowingDate: '26/5/12', growthStage: '黄熟期', dailyWater: '10.21', waterUnit: '万m³' },
-  { icon: getPhotoUrl('rice'), name: '中稻', sowingDate: '26/5/12', growthStage: '黄熟期', dailyWater: '10.21', waterUnit: '万m³' },
-  { icon: getPhotoUrl('rice'), name: '晚稻', sowingDate: '26/5/12', growthStage: '黄熟期', dailyWater: '10.21', waterUnit: '万m³' },
-  { icon: getPhotoUrl('corn'), name: '玉米', sowingDate: '26/5/12', growthStage: '黄熟期', dailyWater: '10.21', waterUnit: '万m³' },
-  { icon: getPhotoUrl('rapeseed'), name: '油菜', sowingDate: '26/5/12', growthStage: '生苗期', dailyWater: '10.21', waterUnit: '万m³' },
-  { icon: getPhotoUrl('wheat'), name: '小麦', sowingDate: '26/5/12', growthStage: '生苗期', dailyWater: '10.21', waterUnit: '万m³' }
 ])
 
 usePolling(async () => {
   const result: any = await service.xfqs.getShortPosition({
-    time: '2026-04-29'
+    time: dayjs().format('YYYY-MM-DD')
   })
 
   const firstPosition = Array.isArray(result) ? result[0] : result

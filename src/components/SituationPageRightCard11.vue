@@ -1,5 +1,5 @@
 <template>
-  <PageCard title="未来24h水库水情" bg-class="right">
+  <PageCard title="重点水位站" bg-class="right">
     <div class="page-container">
       <div class="header-title flex items-center mb-[30px]">
         <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
@@ -47,11 +47,15 @@
             </div>
           </template>
           <template #waterLevel="scope">
-            <span class="reservoir-table__value">{{ scope.row.waterLevel }}</span>
+            <span class="reservoir-table__value">{{
+              scope.row.waterLevel
+            }}</span>
             <span class="reservoir-table__unit">m</span>
           </template>
           <template #waterDepth="scope">
-            <span class="reservoir-table__value">{{ scope.row.waterDepth }}</span>
+            <span class="reservoir-table__value">{{
+              scope.row.waterDepth
+            }}</span>
             <span class="reservoir-table__unit">m</span>
           </template>
         </PageTable>
@@ -64,17 +68,36 @@
 import dayjs from 'dayjs'
 
 const getSituationPhotoUrl = (icon: string) => {
-  return new URL(`../assets/global/images/situation/SituationPageLeftCard3/${icon}.png`, import.meta.url).href
+  return new URL(
+    `../assets/global/images/situation/SituationPageLeftCard3/${icon}.png`,
+    import.meta.url
+  ).href
 }
 
 const getWaterPhotoUrl = (icon: string) => {
-  return new URL(`../assets/global/images/water/${icon}.png`, import.meta.url).href
+  return new URL(`../assets/global/images/water/${icon}.png`, import.meta.url)
+    .href
 }
 
 const reservoirInfo = ref<Record<string, any>>([
-  { icon: getSituationPhotoUrl('q1'), name: '总库容', value: 12.3, unit: '万m3' },
-  { icon: getWaterPhotoUrl('home-icon'), name: '较上年度', value: 0.8, unit: '万m3' },
-  { icon: getSituationPhotoUrl('q2'), name: '较多年同期', value: -2.3, unit: '万m3' }
+  {
+    icon: getSituationPhotoUrl('q1'),
+    name: '总库容',
+    value: 12.3,
+    unit: '万m3'
+  },
+  {
+    icon: getWaterPhotoUrl('home-icon'),
+    name: '较上年度',
+    value: 0.8,
+    unit: '万m3'
+  },
+  {
+    icon: getSituationPhotoUrl('q2'),
+    name: '较多年同期',
+    value: -2.3,
+    unit: '万m3'
+  }
 ])
 const theadCol = ref([
   {
@@ -102,11 +125,6 @@ const theadCol = ref([
   }
 ])
 const tableDataList = ref<Record<string, any>[]>([
-  { siteName: 'XXX站点', waterLevel: 2, waterDepth: 2, time: '26/4/23 10:00' },
-  { siteName: 'XXX站点', waterLevel: 1, waterDepth: 1, time: '26/4/22 13:00' },
-  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/21 12:00' },
-  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/20 9:00' },
-  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/20 16:00' }
 ])
 
 const echartOption = ref({
@@ -218,6 +236,14 @@ const echartOption = ref({
 })
 
 usePolling(async () => {
+  // const zzWarnInfoResult: any = await service.xfqs.getZZWarnInfo({})
+  // console.log('重点水位站数据：', zzWarnInfoResult)
+
+  const channelPageResult: any = await service.xfqs.getChannelPage({
+    start: 1,
+    limit: 1000
+  })
+
   const warnInfoResult: any = await service.xfqs.getRsvrWarnInfo({})
   const pageResult: any = await service.xfqs.hsybForecastccFindPage({
     start: 1,
@@ -233,19 +259,31 @@ usePolling(async () => {
       id: pageResult.list[0].id
     })
     const hsybForecastList =
-      echartsResult?.hsybForecastccDdfafExtList?.[0]?.hsybForecastcExtList?.[0]?.hsybForecastList || []
+      echartsResult?.hsybForecastccDdfafExtList?.[0]?.hsybForecastcExtList?.[0]
+        ?.hsybForecastList || []
 
     if (hsybForecastList.length > 0) {
-      xAxisData = hsybForecastList.map((item: Record<string, any>) => dayjs(item.tm).format('MM.DD'))
-      seriesData = hsybForecastList.map((item: Record<string, any>) => Number(item.z) || 0)
+      xAxisData = hsybForecastList.map((item: Record<string, any>) =>
+        dayjs(item.tm).format('MM.DD')
+      )
+      seriesData = hsybForecastList.map(
+        (item: Record<string, any>) => Number(item.z) || 0
+      )
     }
   }
 
-  const currentValue = Number(warnInfoResult?.currntZ) || seriesData[seriesData.length - 1] || 12.3
-  const previousYearValue = seriesData.length > 1 ? currentValue - Number(seriesData[seriesData.length - 2] || 0) : 0.8
-  const multiYearValue = seriesData.length > 0
-    ? currentValue - seriesData.reduce((sum: number, item: number) => sum + item, 0) / seriesData.length
-    : -2.3
+  const currentValue =
+    Number(warnInfoResult?.currntZ) || seriesData[seriesData.length - 1] || 12.3
+  const previousYearValue =
+    seriesData.length > 1
+      ? currentValue - Number(seriesData[seriesData.length - 2] || 0)
+      : 0.8
+  const multiYearValue =
+    seriesData.length > 0
+      ? currentValue -
+        seriesData.reduce((sum: number, item: number) => sum + item, 0) /
+          seriesData.length
+      : -2.3
 
   reservoirInfo.value[0].value = Number((currentValue || 12.3).toFixed(1))
   reservoirInfo.value[1].value = Number((previousYearValue || 0.8).toFixed(1))
@@ -259,20 +297,14 @@ usePolling(async () => {
   echartOption.value.yAxis.min = Number((dataMin - 3).toFixed(1))
   echartOption.value.yAxis.max = Number((dataMax + 3).toFixed(1))
 
-  const gateResult: any = await service.xfqs.getGatePageList({
-    start: 1,
-    limit: 5,
-    sttp: 'DD'
-  })
-
-  if (gateResult?.list?.length > 0) {
-    tableDataList.value = gateResult.list.slice(0, 5).map((item: Record<string, any>) => ({
-      siteName: item.stnm || 'XXX站点',
-      waterLevel: Number(item.inz || 0),
-      waterDepth: Number(item.otz || 0),
+  tableDataList.value = channelPageResult.list.map(
+    (item: Record<string, any>, index: number) => ({
+      siteName: item.stnm || `站点${index + 1}`,
+      waterLevel: item.z ?? '--',
+      waterDepth: item.zs ?? '--',
       time: item.tm ? dayjs(item.tm).format('YY/M/DD H:mm') : '--'
-    }))
-  }
+    })
+  )
 })
 </script>
 
@@ -400,7 +432,11 @@ usePolling(async () => {
 
   :deep(.table-body__tr:nth-child(3)) {
     color: #fff;
-    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+    background: linear-gradient(
+      0deg,
+      rgb(0 132 255 / 0.52),
+      rgb(30 83 132 / 0.52)
+    );
   }
 
   :deep(.table-body__tr:nth-child(3) .table-body__th),
@@ -411,7 +447,11 @@ usePolling(async () => {
 
   :deep(.table-body__tr:nth-child(3):hover) {
     color: #fff;
-    background: linear-gradient(0deg, rgb(0 132 255 / 0.52), rgb(30 83 132 / 0.52));
+    background: linear-gradient(
+      0deg,
+      rgb(0 132 255 / 0.52),
+      rgb(30 83 132 / 0.52)
+    );
   }
 }
 </style>

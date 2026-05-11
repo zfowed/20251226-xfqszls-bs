@@ -47,6 +47,16 @@ const monitorPointList = ref([
 usePolling(async () => {
   const result: any = await service.xfqs.getSoilWarnInfo({})
   console.log('墒情预警数据：', result)
+
+  monitorPointList.value = Array.isArray(result?.list)
+    ? result.list.map((item: Record<string, any>, index: number) => ({
+      id: `${item.stnm || 'monitor'}-${index + 1}`,
+      name: item.stnm || `墒情监测点#${index + 1}`,
+      status: item.msg || '--',
+      value: `${item.avgValue ?? '--'}%`,
+      icon: soilIcon
+    }))
+    : []
 })
 </script>
 

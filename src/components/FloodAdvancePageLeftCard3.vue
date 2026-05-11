@@ -65,7 +65,7 @@ usePolling(async () => {
     return
   }
   totalWarnCount.value = Number(result?.total || list.length) || list.length
-  displayList.value = list.slice(0, 3).map((item: Record<string, any>) => ({
+  displayList.value = list.map((item: Record<string, any>) => ({
     stnm: item?.stnm || item?.stationName || 'XXX站点',
     warnText: formatWarnText(item),
     publishTime: formatPublishTime(item)

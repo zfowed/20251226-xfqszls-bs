@@ -49,6 +49,14 @@ export const queryStationWeather = defineService<
   return request.get('/api/gq/weather/queryStationWeather', { params, ...config })
 })
 
+// 降雨监测
+export const getPptnPage = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params) {
+  return request.post('/api/gq/st/pptn/page', params)
+})
+
 // 可供水量
 export const getAllstep = defineService<
   Record<string, any>,
@@ -79,6 +87,14 @@ export const getGatePageList = defineService<
   Record<string, any>
 >(async function (params) {
   return request.post('/api/gq/st/gate/page', params)
+})
+
+// 渠道水位
+export const getChannelPage = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params) {
+  return request.post('/api/gq/st/channel/page', params)
 })
 // 查询视频点位列表
 export const getVideoStationList = defineService<
@@ -149,6 +165,14 @@ export const getRsvrWarnInfo = defineService<
   Record<string, any>
 >(async function (params, config) {
   return request.get('/api/gq/baseinfo/oneMap/getRsvrWarnInfo', { params, ...config })
+})
+
+// 来水预报
+export const getIwfShortAchievementList = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/iwfShortAchievement/find/list', { params, ...config })
 })
 
 // 未来24h水库水情曲线数据
@@ -237,4 +261,12 @@ export const delFloodPlanFile = defineService<
   Record<string, any>
 >(async function (params) {
   return request.post(`/api/gq/flood/control/delFloodPlanFile/${params.id}`, params)
+})
+
+// 查询调度令列表
+export const findWaterCommandList = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/scheduleWaterCommand/findWaterCommandList', { params, ...config })
 })

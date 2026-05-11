@@ -8,17 +8,17 @@
               <img src="@/assets/flood-advance-water-temperature-icon.svg" class="warning-status__thermometer-image" alt="">
             </span>
             <div class="warning-status__text">
-              正常
+              {{ warningStatusText }}
             </div>
           </div>
         </div>
         <div class="warning-content">
           <p class="warning-content__title flex items-center">
             <img src="@/assets/global/images/water/advance/Vector.png" alt="">
-            <span>高温红色预警</span>
+            <span>{{ warningTitle }}</span>
           </p>
           <p class="warning-content__temperature">
-            当前温度：<span>6℃-15℃</span>
+            当前温度：<span>{{ warningTemperatureText }}</span>
           </p>
         </div>
       </div>
@@ -50,26 +50,65 @@ type MetricItem = {
   percent: number
 }
 
+const warningStatusText = ref('正常')
+const warningTitle = ref('高温红色预警')
+const warningTemperatureText = ref('6℃-15℃')
+
 const metrics = ref<MetricItem[]>([
   {
     label: '过去累计连续无雨日',
-    value: 4,
+    value: 0,
     unit: '天',
-    percent: 23
+    percent: 0
   },
   {
     label: '过去持续累计降雨',
-    value: 12,
+    value: 0,
     unit: 'mm',
-    percent: 40
+    percent: 0
   },
   {
     label: '未来12小时累积降雨',
-    value: 42,
+    value: 0,
     unit: 'mm',
-    percent: 59
+    percent: 0
   }
 ])
+
+const clampPercent = (value: number, max: number) => {
+  if (!Number.isFinite(value) || value <= 0 || max <= 0) {
+    return 0
+  }
+  return Math.min(100, Math.round((value / max) * 100))
+}
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getTemperatureAndPptnWarnInfoForBus({})
+
+  const airTemperature = result?.airTemperature || {}
+  const pptnData = result?.pptnData || {}
+  const maxTemperature = Number(airTemperature?.maxTemperature)
+  const maxTime = airTemperature?.maxTime
+  const PPTNSum1 = Number(pptnData?.PPTNSum1)
+  const accp = Number(pptnData?.beforePptn?.accp)
+
+  warningStatusText.value = '正常'
+
+  if (Number.isFinite(maxTemperature)) {
+    warningTitle.value = `最高气温预警 ${maxTime || ''}`.trim()
+    warningTemperatureText.value = `${maxTemperature}℃`
+  }
+
+  if (Number.isFinite(PPTNSum1)) {
+    metrics.value[0].value = PPTNSum1
+    metrics.value[0].percent = clampPercent(PPTNSum1, 30)
+  }
+
+  if (Number.isFinite(accp)) {
+    metrics.value[1].value = accp
+    metrics.value[1].percent = clampPercent(accp, 100)
+  }
+})
 </script>
 
 <style lang="scss" scoped>
