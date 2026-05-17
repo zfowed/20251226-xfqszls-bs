@@ -16,18 +16,19 @@
         </div>
       </div>
 
-      <ElTable :data="displayList" class="files-table water-warn-table" :max-height="410">
-        <ElTableColumn label="" width="90" align="center">
-          <template #default="scope">
-            <div class="table-index mt-[10px]">
-              {{ scope.$index + 1 }}
-            </div>
-          </template>
-        </ElTableColumn>
-        <ElTableColumn prop="stnm" label="站点" />
-        <ElTableColumn prop="warnText" label="告警信息" />
-        <ElTableColumn prop="publishTime" label="发布时间" />
-      </ElTable>
+      <PageTable
+        class="water-warn-table"
+        :thead-col="theadCol"
+        :data-list="displayList"
+        :index="true"
+        :limit-scroll="4"
+      >
+        <template #index="scope">
+          <div class="table-index mt-[10px]">
+            {{ scope.index }}
+          </div>
+        </template>
+      </PageTable>
     </div>
   </PageCard>
 </template>
@@ -41,16 +42,25 @@ type WarnRow = {
   publishTime: string
 }
 
-const displayList = ref<WarnRow[]>([
-  { stnm: 'XXX站点', warnText: '高温预警', publishTime: '2026-04-21' },
-  { stnm: 'XXX站点', warnText: '高温预警', publishTime: '2026-04-21' },
-  { stnm: 'XXX站点', warnText: '高温预警', publishTime: '2026-04-21' },
-  { stnm: 'XXX站点', warnText: '高温预警', publishTime: '2026-04-21' }
+const displayList = ref<WarnRow[]>([])
+const totalWarnCount = ref(0)
+const theadCol = ref([
+  {
+    key: 'stnm',
+    name: '站点'
+  },
+  {
+    key: 'warnText',
+    name: '告警信息'
+  },
+  {
+    key: 'publishTime',
+    name: '发布时间'
+  }
 ])
-const totalWarnCount = ref(14)
 
 const formatWarnText = (item: Record<string, any>) => {
-  return item?.warnName || item?.warnInfo || item?.warnTypeName || item?.warnType || '高温预警'
+  return item?.warnName || item?.warnInfo || item?.warnTypeName || item?.warnType || '水位预警'
 }
 
 const formatPublishTime = (item: Record<string, any>) => {
@@ -59,13 +69,14 @@ const formatPublishTime = (item: Record<string, any>) => {
 }
 
 usePolling(async () => {
-  const result: any = await service.xfqs.getTemperatureAndPptnWarnInfoForBus({})
-  const list = Array.isArray(result?.dataList) ? result.dataList : []
-  if (!list.length) {
-    return
-  }
-  totalWarnCount.value = Number(result?.total || list.length) || list.length
-  displayList.value = list.map((item: Record<string, any>) => ({
+  const result: any = await service.xfqs.getZZWarnInfo({})
+  console.log('水位预警:', result)
+
+  const detail = result?.detail || result || {}
+  const list = Array.isArray(detail?.dataList) ? detail.dataList : []
+  const warnList = list.filter((item: Record<string, any>) => Number(item?.warnStatus) === 1)
+  totalWarnCount.value = Number(detail?.warnSize) || warnList.length
+  displayList.value = warnList.map((item: Record<string, any>) => ({
     stnm: item?.stnm || item?.stationName || 'XXX站点',
     warnText: formatWarnText(item),
     publishTime: formatPublishTime(item)
@@ -160,63 +171,39 @@ usePolling(async () => {
   background-size: 100% 100%;
 }
 
-:deep(.el-table) {
-  background-color: transparent;
-}
+.water-warn-table {
+  height: 410px;
 
-.files-table.water-warn-table {
-  :deep(.el-table__inner-wrapper) {
-    &::before {
-      display: none;
-    }
-
-    tr {
-      background: transparent;
-    }
-
-    .el-table__header-wrapper {
-      th.el-table__cell {
-        background: rgb(19 96 160 / 0.46);
-        border-bottom: none;
-        color: #fff;
-        font-family: PIngFangSC, sans-serif;
-        font-size: 30px;
-      }
-    }
-
-    .el-table__body {
-      border-spacing: 0 4px;
-    }
-
-    .el-table__body-wrapper {
-      margin-top: 4px;
-
-      td.el-table__cell {
-        background: rgb(19 79 135 / 0.2);
-        color: #81e6ff;
-        font-family: PIngFangSC, sans-serif;
-        font-size: 26px;
-        border: 1px solid #527191;
-
-        &:not(:last-child) {
-          border-right: none;
-        }
-
-        &:not(:first-child) {
-          border-left: none;
-        }
-      }
-    }
-
-    .el-table__row:hover > td.el-table__cell {
-      background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
-      color: #fff;
-    }
+  :deep(.table-header__tr) {
+    background: rgb(19 96 160 / 0.46);
   }
 
-  :deep(.cell) {
+  :deep(.table-header__th) {
+    color: #fff;
+    font-family: PingFangSC, sans-serif;
+    font-size: 30px;
+  }
+
+  :deep(.table-body__tr) {
+    margin-top: 4px;
+    background: rgb(19 79 135 / 0.2);
+    border: 1px solid #527191;
+  }
+
+  :deep(.table-body__tr:hover) {
+    background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
+  }
+
+  :deep(.table-body__th) {
     height: 80px;
+    color: #81e6ff;
+    font-family: PingFangSC, sans-serif;
+    font-size: 26px;
     line-height: 80px;
+  }
+
+  :deep(.table-body__tr:hover .table-body__th) {
+    color: #fff;
   }
 }
 </style>

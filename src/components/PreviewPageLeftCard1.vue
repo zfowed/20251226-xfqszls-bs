@@ -74,21 +74,32 @@ const swiperDataList = ref([
 ])
 
 const completeRate = ref(0)
-const dataList = reactive([
-  { title: '聂家河镇', value: 0, unit: '万m3' },
-  { title: '姚家店乡', value: 0, unit: '万m3' },
-  { title: '枝城镇', value: 0, unit: '万m3' },
-  { title: '陆城街道', value: 0, unit: '万m3' }
-])
+const dataList = ref<Record<string, any>[]>([])
+
+const getSupplyDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
+}
+
+const toWanM3 = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? Number((numberValue / 10000).toFixed(2)) : 0
+}
 
 usePolling(async () => {
-  dataList[0].value = 113.9
-  dataList[1].value = 785.2
-  dataList[2].value = 749.6
-  dataList[3].value = 633
-  completeRate.value = 3282.5
+  const result: any = await service.xfqs.getGongshuiInfo({})
+  const detail = getSupplyDetail(result)
+  const tableData = Array.isArray(detail.tableData)
+    ? detail.tableData
+    : Array.isArray(detail.list)
+      ? detail.list
+      : []
 
-  // completeRate.value = dataList.reduce((sum, item) => sum + item.value, 0)
+  dataList.value = tableData.slice(0, 4).map((item: Record<string, any>) => ({
+    title: item.waterUserName || item.name || '',
+    value: toWanM3(item.yrW ?? item.yrSupplyW),
+    unit: '万m3'
+  }))
+  completeRate.value = Number(detail.yrTotalW) || 0
 })
 </script>
 

@@ -11,14 +11,17 @@
                 alt=""
               >
             </span>
+            <div class="warning-status__text">
+              {{ warningStatusText }}
+            </div>
           </div>
         </div>
         <div class="warning-content">
           <p class="warning-content__title">
-            熊渡水库当前水位：<span>50.66</span>m
+            熊渡水库当前水位：<span>{{ currentWaterLevel }}</span>m
           </p>
           <p class="warning-content__temperature">
-            监测时间：<span>202604.16 12:00</span>
+            监测时间：<span>{{ monitorTime }}</span>
           </p>
         </div>
       </div>
@@ -39,7 +42,7 @@
           :style="tallPaneHeightStyle"
         >
           <div class="visualization-canvas__pane-tall-value">
-            <span class="visualization-canvas__pane-tall-value-num">{{ guaranteedLevelDisplay }}</span><span class="visualization-canvas__pane-tall-value-unit">m</span>
+            <span class="visualization-canvas__pane-tall-value-num">{{ ruleWaterLevel }}</span><span class="visualization-canvas__pane-tall-value-unit">m</span>
           </div>
           <div class="visualization-canvas__pane-tall-overlay">
             <div class="pane-waterline pane-waterline--overflow-right">
@@ -136,6 +139,13 @@ const damPolygonPoints = '34,14 86,14 114,295 6,295'
 const damPatternFillUrl = `url(#${damPatternId})`
 const damClipUrl = `url(#${damClipId})`
 
+const warningStatusText = ref('正常')
+const currentWaterLevel = ref('0')
+const ruleWaterLevel = ref('56.01')
+const monitorTime = ref('')
+const currentWaterLevelPercent = ref(30)
+const ruleWaterLevelPercent = ref(50)
+
 const props = withDefaults(
   defineProps<{
     /** 右侧水面右上角数值（不含单位 m） */
@@ -166,12 +176,19 @@ function clampPaneHeightPercent (value: number): number {
 }
 
 const shortPaneHeightStyle = computed(() => ({
-  height: `${clampPaneHeightPercent(props.shortPaneHeightPercent)}%`
+  height: `${clampPaneHeightPercent(currentWaterLevelPercent.value)}%`
 }))
 
 const tallPaneHeightStyle = computed(() => ({
-  height: `${clampPaneHeightPercent(props.tallPaneHeightPercent)}%`
+  height: `${clampPaneHeightPercent(ruleWaterLevelPercent.value)}%`
 }))
+
+function calcCurrentWaterLevelPercent (currentLevel: number, ruleLevel: number): number {
+  if (!Number.isFinite(currentLevel) || !Number.isFinite(ruleLevel) || ruleLevel <= 0) {
+    return props.shortPaneHeightPercent
+  }
+  return clampPaneHeightPercent((currentLevel / ruleLevel) * ruleWaterLevelPercent.value)
+}
 
 /** 9 块之间的分界：1 … n-1（自下而上第 j/n 处） */
 const segmentDividerIndexes = computed(() =>
@@ -198,6 +215,20 @@ function midTickBottomPercent (k: number): string {
   }
   return `${((k + 0.5) / n) * 100}%`
 }
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getRsvrWarnInfo({})
+
+  warningStatusText.value = result?.msg || '正常'
+  currentWaterLevel.value = result?.currntZ || '0'
+  ruleWaterLevel.value = result?.ruleZ || props.guaranteedLevelDisplay
+  monitorTime.value = result?.tm || ''
+
+  const currentLevel = Number(result?.currntZ)
+  const ruleLevel = Number(result?.ruleZ)
+  ruleWaterLevelPercent.value = props.tallPaneHeightPercent
+  currentWaterLevelPercent.value = calcCurrentWaterLevelPercent(currentLevel, ruleLevel)
+})
 </script>
 
 <style lang="scss" scoped>

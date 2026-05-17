@@ -156,7 +156,7 @@ export const getGongshuiInfo = defineService<
   Record<string, any>,
   Record<string, any>
 >(async function (params, config) {
-  return request.get('/api/gq/onemap/getGongshuiInfo', { params, ...config })
+  return request.get('/api/gq/baseinfo/oneMap/getGongshuiInfo', { params, ...config })
 })
 
 // 未来24h水库水情统计数据
@@ -187,8 +187,8 @@ export const hsybForecastccFindPage = defineService<
 export const hsybForecastccFindById = defineService<
   Record<string, any>,
   Record<string, any>
->(async function (params) {
-  return request.post('/api/hsyb/business/hsybForecastcc/findById?id=' + params.id, params)
+>(async function (params, config) {
+  return request.get('/api/hsyb/business/hsybForecastcc/findById', { params, ...config })
 })
 
 // 安全管理责任人列表查询

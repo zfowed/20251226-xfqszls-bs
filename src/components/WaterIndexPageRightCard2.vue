@@ -60,13 +60,30 @@ const reservoirInfo = ref<Record<string, any>>([
   { name: '当年供水', value: 0, unit: 'm3' }
 ])
 
+const getSupplyDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
+}
+
 usePolling(async () => {
   const result: any = await service.xfqs.getGongshuiInfo({})
-  reservoirInfo.value[0].value = Number(result.data.dayTotalW)
-  reservoirInfo.value[1].value = Number(result.data.mthTotalW)
-  reservoirInfo.value[2].value = Number(result.data.yrTotalW)
+  const detail = getSupplyDetail(result)
+  reservoirInfo.value[0].value = Number(detail.dayTotalW) || 0
+  reservoirInfo.value[1].value = Number(detail.mthTotalW) || 0
+  reservoirInfo.value[2].value = Number(detail.yrTotalW) || 0
 
-  dataList.value = result.data.list
+  const tableData = Array.isArray(detail.tableData)
+    ? detail.tableData
+    : Array.isArray(detail.list)
+      ? detail.list
+      : []
+
+  dataList.value = tableData.map((item: Record<string, any>) => ({
+    ...item,
+    name: item.waterUserName || item.name,
+    daySupplyW: item.dayW ?? item.daySupplyW ?? 0,
+    mthSupplyW: item.mthW ?? item.mthSupplyW ?? 0,
+    yrSupplyW: item.yrW ?? item.yrSupplyW ?? 0
+  }))
 })
 
 </script>

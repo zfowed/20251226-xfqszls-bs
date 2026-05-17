@@ -359,7 +359,7 @@ function buildSoilStepParams (station: SoilStation | undefined) {
 
 async function loadSoilStep (station: SoilStation | undefined) {
   const soilStepParams = buildSoilStepParams(station)
-  console.log('墒情统计 soil/stat/step 请求参数：', soilStepParams)
+  // console.log('墒情统计 soil/stat/step 请求参数：', soilStepParams)
 
   if (!soilStepParams.stcd) {
     console.warn(
@@ -370,7 +370,7 @@ async function loadSoilStep (station: SoilStation | undefined) {
   }
 
   const soilStepResult: any = await service.xfqs.getSoilStatStep(soilStepParams)
-  console.log('墒情统计 soil/stat/step：', soilStepResult)
+  // console.log('墒情统计 soil/stat/step：', soilStepResult)
   updateChartOption(soilStepResult)
 }
 
@@ -387,7 +387,6 @@ onMounted(async () => {
     lx: 1,
     start: 1
   })
-  console.log('墒情点位信息 soil/page：', soilPageResult)
 
   const soilStationList = Array.isArray(soilPageResult?.list)
     ? soilPageResult.list
@@ -408,7 +407,6 @@ onMounted(async () => {
   )
 
   selectedReservoirId.value = reservoirList.value[0]?.id || ''
-  console.log('墒情下拉站点列表：', reservoirList.value)
   await loadSoilStep(reservoirList.value[0])
 })
 </script>
