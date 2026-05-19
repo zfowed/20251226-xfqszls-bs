@@ -43,9 +43,9 @@
 
 const currentType = ref<string>('agriculture')
 const btnsList = reactive([
-  { label: '农业灌溉供水', value: 'agriculture', active: true },
+  { label: '农业灌溉供水', value: 'agriculture', active: true }
   // { label: '城镇生活供水', value: 'town', active: false },
-  { label: '生态环境供水', value: 'ecology', active: false }
+  // { label: '生态环境供水', value: 'ecology', active: false }
 ])
 const clickOperationHandle = (item: Record<string, any>) => {
   btnsList.forEach(btnsItem => {
@@ -71,7 +71,7 @@ const theadCol = ref([
 const theadCol2 = ref([
   {
     key: 'stw',
-    name: '生态水量（万m³）'
+    name: '生态水量（m³）'
   },
   {
     key: 'time',

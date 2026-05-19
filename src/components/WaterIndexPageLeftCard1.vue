@@ -26,7 +26,7 @@
 
 const reservoirInfo = ref<Record<string, any>>([
   { name: '当前水位', value: 0, unit: 'm' },
-  { name: '当前水量', value: 0, unit: '万m³' },
+  { name: '当前水量', value: 0, unit: 'm³' },
   { name: '入库流量', value: 0, unit: 'm³/s' },
   { name: '出库流量', value: 0, unit: 'm³/s' }
 ])

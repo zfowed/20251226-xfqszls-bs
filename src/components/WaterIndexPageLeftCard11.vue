@@ -247,25 +247,25 @@ const echartOption = ref({
     }
   },
   series: [
-    {
-      name: '历史降雨量',
-      type: 'bar' as const,
-      barWidth: 14,
-      data: [62, 45, 57, 76, 70, 57, 0, 0, 0, 0, 0, 0],
-      itemStyle: {
-        color: {
-          type: 'linear',
-          x: 0,
-          y: 1,
-          x2: 0,
-          y2: 0,
-          colorStops: [
-            { offset: 0, color: 'rgba(68, 185, 255, 0.88)' },
-            { offset: 1, color: 'rgba(198, 227, 255, 0.92)' }
-          ]
-        }
-      }
-    },
+    // {
+    //   name: '历史降雨量',
+    //   type: 'bar' as const,
+    //   barWidth: 14,
+    //   data: [62, 45, 57, 76, 70, 57, 0, 0, 0, 0, 0, 0],
+    //   itemStyle: {
+    //     color: {
+    //       type: 'linear',
+    //       x: 0,
+    //       y: 1,
+    //       x2: 0,
+    //       y2: 0,
+    //       colorStops: [
+    //         { offset: 0, color: 'rgba(68, 185, 255, 0.88)' },
+    //         { offset: 1, color: 'rgba(198, 227, 255, 0.92)' }
+    //       ]
+    //     }
+    //   }
+    // },
     {
       name: '未来7天降雨量',
       type: 'bar' as const,

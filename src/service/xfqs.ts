@@ -1,4 +1,4 @@
-import { defineService } from 'zf-dbs'
+import { defineService, getAppConfig } from 'zf-dbs'
 import request from '@/utils/requestXfqs'
 
 // 农业灌溉统计
@@ -49,6 +49,22 @@ export const queryStationWeather = defineService<
   return request.get('/api/gq/weather/queryStationWeather', { params, ...config })
 })
 
+export const queryWeather = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params) {
+  const appConfig = getAppConfig()
+  const query = new URLSearchParams(params as Record<string, string>).toString()
+  const url = `${String(appConfig.xfqxRequestUrl).replace(/\/$/, '')}/api/gq/weather/queryWeather${query ? `?${query}` : ''}`
+  const response = await fetch(url, {
+    headers: {
+      authorization: appConfig.xfqxRequestToken
+    }
+  })
+
+  return response.json()
+})
+
 // 降雨监测
 export const getPptnPage = defineService<
   Record<string, any>,
@@ -63,6 +79,13 @@ export const getAllstep = defineService<
   Record<string, any>
 >(async function (params) {
   return request.post('/api/gq/st/rsvr/stat/allstep', params)
+})
+
+export const getRsvrStatDay = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params) {
+  return request.post('/api/gq/st/rsvr/stat/day', params)
 })
 
 // 工程巡检
@@ -144,6 +167,20 @@ export const getCurrentDateCropArea = defineService<
 })
 
 // 配水调度
+export const getCurrentHourShortWater = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/watercontrol/platform-bus-wdd/api/bus/xsShortData/getCurrentHourShortWater', { params, ...config })
+})
+
+export const getCurrentDateShortWater = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/watercontrol/platform-bus-wdd/api/bus/xsShortData/getCurrentDateShortWater', { params, ...config })
+})
+
 export const getOptionConfigList = defineService<
   Record<string, any>,
   Record<string, any>

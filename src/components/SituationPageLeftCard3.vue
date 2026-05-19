@@ -2,7 +2,7 @@
   <PageCard title="水量统计" bg-class="left">
     <div class="page-container">
       <div class="water-summary">
-        <div v-for="item in summaryList" :key="item.key" class="water-summary__item">
+        <!-- <div v-for="item in summaryList" :key="item.key" class="water-summary__item">
           <img :src="item.icon" :alt="item.name" class="water-summary__icon">
           <div class="water-summary__content">
             <div class="water-summary__label">
@@ -13,7 +13,7 @@
               <span class="water-summary__unit">{{ item.unit }}</span>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <div class="water-rank">
@@ -60,8 +60,8 @@ const getPhotoUrl = (icon: string) => {
 }
 
 const summaryList = ref<SummaryItem[]>([
-  { key: 'irrigation', name: '灌溉用水', value: 0, unit: '万m3', icon: getPhotoUrl('q1') },
-  { key: 'ecology', name: '生态用水', value: 0, unit: '万m3', icon: getPhotoUrl('q2') }
+  { key: 'irrigation', name: '灌溉用水', value: 0, unit: 'm³/s', icon: getPhotoUrl('q1') },
+  { key: 'ecology', name: '生态用水', value: 0, unit: 'm³/s', icon: getPhotoUrl('q2') }
 ])
 const theadCol = ref([
   {
@@ -70,7 +70,7 @@ const theadCol = ref([
   },
   {
     key: 'value',
-    name: '最大小时降雨量',
+    name: '用水量',
     width: 240,
     align: 'center'
   }
@@ -88,11 +88,17 @@ const getNumberByKeys = (source: Record<string, any>, keys: string[]) => {
   return 0
 }
 
+const getSupplyDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
+}
+
 usePolling(async () => {
   const [waterUserResult, ecologyResult] = await Promise.all([
     service.xfqs.findWaterUserList({}),
     service.xfqs.getFactoryRealData({})
   ])
+  const d = await service.xfqs.getGongshuiInfo()
+  const supplyDetail = getSupplyDetail(d)
 
   /** findWaterUserList 解包后为 { list }；项含 name、area（亩）、positionId（1 为灌区汇总）等 */
   const rawWaterUsers = (waterUserResult?.list || []) as Record<string, any>[]
@@ -103,15 +109,6 @@ usePolling(async () => {
     .reduce((sum: number, item: Record<string, any>) => sum + getNumberByKeys(item, ['area']), 0)
   const irrigationAreaMu = guanquArea > 0 ? guanquArea : sumVillageArea
 
-  const waterUserList: RankItem[] = rawWaterUsers
-    .filter((item) => item.positionId !== 1 && String(item.name || '').trim() !== '测试')
-    .map((item, index) => ({
-      id: String(item.id ?? item.stcd ?? `water-user-${index}`),
-      name: String(item.name || item.positionName || item.villagename || item.xzqmc || item.adnm || '行政村'),
-      value: Number((getNumberByKeys(item, ['area']) / 100).toFixed(2)),
-      unit: '万m3'
-    }))
-
   /** getFactoryRealData 解包后为 { stmap, list }；stmap 为汇总，list 为按小时明细 */
   const stmap = ecologyResult?.stmap as Record<string, any> | undefined
   const ecologyWaterWanm3 = getNumberByKeys(stmap || {}, ['water', 'stw', 'sum'])
@@ -119,16 +116,20 @@ usePolling(async () => {
   summaryList.value[0].value = Number((irrigationAreaMu / 100).toFixed(2))
   summaryList.value[1].value = Number(ecologyWaterWanm3.toFixed(2))
 
-  if (waterUserList.length > 0) {
-    rankList.value = waterUserList
-      .sort((prev: RankItem, next: RankItem) => next.value - prev.value)
-      .slice(0, 3)
-      .map((item: RankItem, index: number) => ({
-        ...item,
-        id: item.id || `rank-${index + 1}`,
-        name: item.name || '行政村'
-      }))
-  }
+  const supplyTableData = Array.isArray(supplyDetail.tableData)
+    ? supplyDetail.tableData
+    : Array.isArray(supplyDetail.list)
+      ? supplyDetail.list
+      : []
+
+  rankList.value = supplyTableData
+    .map((item: Record<string, any>, index: number) => ({
+      id: String(item.id ?? item.waterUserName ?? `rank-${index + 1}`),
+      name: String(item.waterUserName || item.name || '--'),
+      value: Number(getNumberByKeys(item, ['yrW', 'yrSupplyW']).toFixed(2)),
+      unit: 'm³/s'
+    }))
+    .sort((prev: RankItem, next: RankItem) => next.value - prev.value)
 })
 </script>
 

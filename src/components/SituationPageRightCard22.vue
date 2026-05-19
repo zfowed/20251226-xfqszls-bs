@@ -19,7 +19,7 @@
           </template>
           <template #flow="scope">
             <span class="flow-table__value">{{ scope.row.flow }}</span>
-            <span class="flow-table__unit">万m³</span>
+            <span class="flow-table__unit">m³/s</span>
           </template>
         </PageTable>
       </div>
@@ -51,23 +51,18 @@ const theadCol = ref([
 ])
 
 const dataList = ref<Record<string, any>[]>([
-  { siteName: 'XXX站点', flow: 2, time: '26/4/23 10:00' },
-  { siteName: 'XXX站点', flow: 1, time: '26/4/22 13:00' },
-  { siteName: 'XXX站点', flow: 0, time: '26/4/21 12:00' },
-  { siteName: 'XXX站点', flow: 0, time: '26/4/20 9:00' },
-  { siteName: 'XXX站点', flow: 0, time: '26/4/20 16:00' }
 ])
 
 usePolling(async () => {
   const result: any = await service.xfqs.getChannelPage({
     start: 1,
     limit: 1000,
-    sttp: 'ZZ'
+    sttp: 'QQ'
   })
   if (result?.list?.length > 0) {
     dataList.value = result.list.map((item: Record<string, any>) => ({
       siteName: item.stnm || 'XXX站点',
-      flow: item.z ?? '--',
+      flow: item.q ?? '--',
       time: item.tm ? dayjs(item.tm).format('YY/M/DD H:mm') : '--'
     }))
   }

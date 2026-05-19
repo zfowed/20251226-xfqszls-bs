@@ -166,33 +166,22 @@ const reservoirList = ref<Record<string, any>[]>([
     id: 'reservoir1',
     name: '熊渡水库',
     metrics: [
-      { id: 'reservoir1-m1', name: '水库库容', value: 0, unit: '万m³' },
+      { id: 'reservoir1-m1', name: '水库库容', value: 0, unit: 'm³' },
       { id: 'reservoir1-m2', name: '坝体高度', value: 0, unit: 'm' },
       { id: 'reservoir1-m3', name: '长度', value: 0, unit: 'km2' },
-      { id: 'reservoir1-m4', name: '渠首设计流量', value: 0, unit: '万m³' },
-      { id: 'reservoir1-m5', name: '泄洪流量', value: 0, unit: '万m³' }
+      { id: 'reservoir1-m4', name: '渠首设计流量', value: 0, unit: 'm³' },
+      { id: 'reservoir1-m5', name: '泄洪流量', value: 0, unit: 'm³' }
     ]
   },
   {
     id: 'reservoir2',
-    name: '望城岗水库',
+    name: '邓家桥村水库',
     metrics: [
-      { id: 'reservoir2-m1', name: '水库库容', value: 0, unit: '万m³' },
+      { id: 'reservoir2-m1', name: '水库库容', value: 0, unit: 'm³' },
       { id: 'reservoir2-m2', name: '坝体高度', value: 0, unit: 'm' },
       { id: 'reservoir2-m3', name: '长度', value: 0, unit: 'km2' },
-      { id: 'reservoir2-m4', name: '渠首设计流量', value: 0, unit: '万m³' },
-      { id: 'reservoir2-m5', name: '泄洪流量', value: 0, unit: '万m³' }
-    ]
-  },
-  {
-    id: 'reservoir3',
-    name: '张冲水库',
-    metrics: [
-      { id: 'reservoir3-m1', name: '水库库容', value: 0, unit: '万m³' },
-      { id: 'reservoir3-m2', name: '坝体高度', value: 0, unit: 'm' },
-      { id: 'reservoir3-m3', name: '长度', value: 0, unit: 'km2' },
-      { id: 'reservoir3-m4', name: '渠首设计流量', value: 0, unit: '万m³' },
-      { id: 'reservoir3-m5', name: '泄洪流量', value: 0, unit: '万m³' }
+      { id: 'reservoir2-m4', name: '渠首设计流量', value: 0, unit: 'm³' },
+      { id: 'reservoir2-m5', name: '泄洪流量', value: 0, unit: 'm³' }
     ]
   }
 ])

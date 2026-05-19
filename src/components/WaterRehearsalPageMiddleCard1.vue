@@ -6,32 +6,29 @@
           历史预演
         </button>
       </div>
-      <ElTable :data="dataList" class="files-table" height="470px">
-        <ElTableColumn label="" width="72" align="center">
-          <template #default="scope">
+      <div class="table-wrap">
+        <PageTable
+          class="rehearsal-table"
+          :thead-col="theadCol"
+          :data-list="dataList"
+          :limit-scroll="5"
+          :index="true"
+        >
+          <template #index="scope">
             <div class="table-index">
-              {{ scope.$index + 1 }}
+              {{ scope.index }}
             </div>
           </template>
-        </ElTableColumn>
-        <ElTableColumn prop="planName" label="方案名称" min-width="540" />
-        <ElTableColumn prop="forecastRange" label="预见期" width="120" align="center" />
-        <ElTableColumn prop="totalRainfall" label="累计降雨" width="150" align="center" />
-        <ElTableColumn prop="baseTime" label="依据时间" width="220" align="center" />
-        <ElTableColumn prop="forecastTime" label="预热时间" width="220" align="center" />
-        <ElTableColumn prop="status" label="状态" width="130" align="center">
-          <template #default="scope">
+          <template #status="scope">
             <span class="status-tag">{{ scope.row.status }}</span>
           </template>
-        </ElTableColumn>
-        <ElTableColumn label="操作" width="120" align="center">
-          <template #default>
+          <template #action>
             <button class="action-view" type="button">
               查看
             </button>
           </template>
-        </ElTableColumn>
-      </ElTable>
+        </PageTable>
+      </div>
     </div>
   </PageCard>
 </template>
@@ -46,48 +43,51 @@ type RehearsalPlanItem = {
   status: string
 }
 
-const dataList = ref<RehearsalPlanItem[]>([
-  {
-    planName: '2026-04-21 洪水时冒悬少见预方案',
-    forecastRange: '4天',
-    totalRainfall: '9.97 m',
-    baseTime: '2026-04-21 12:00',
-    forecastTime: '2026-04-21 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-22 洪水时冒悬少见预方案',
-    forecastRange: '3天',
-    totalRainfall: '4.36 m',
-    baseTime: '2026-04-22 12:00',
-    forecastTime: '2026-04-22 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-23 洪水时冒悬少见预方案',
-    forecastRange: '3天',
-    totalRainfall: '3.18 m',
-    baseTime: '2026-04-23 12:00',
-    forecastTime: '2026-04-23 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-24 洪水时冒悬少见预方案',
-    forecastRange: '3天',
-    totalRainfall: '3.46 m',
-    baseTime: '2026-04-24 12:00',
-    forecastTime: '2026-04-24 12:00',
-    status: '进行中'
-  },
-  {
-    planName: '2026-04-25 洪水时冒悬少见预方案',
-    forecastRange: '3天',
-    totalRainfall: '3.46 m',
-    baseTime: '2026-04-25 12:00',
-    forecastTime: '2026-04-25 12:00',
-    status: '进行中'
-  }
+const theadCol = ref([
+  { key: 'planName', name: '方案名称' },
+  { key: 'forecastRange', name: '预见期', width: 200, align: 'center' },
+  { key: 'totalRainfall', name: '累计降雨', width: 220, align: 'center' },
+  { key: 'baseTime', name: '依据时间', width: 300, align: 'center' },
+  { key: 'forecastTime', name: '预热时间', width: 300, align: 'center' },
+  { key: 'status', name: '状态', width: 200, align: 'center' },
+  { key: 'action', name: '操作', width: 200, align: 'center' }
 ])
+
+const dataList = ref<RehearsalPlanItem[]>([
+])
+
+const getOptionConfigResultList = (result: Record<string, any>) => {
+  if (Array.isArray(result)) return result
+  if (Array.isArray(result?.list)) return result.list
+  if (Array.isArray(result?.data)) return result.data
+  if (Array.isArray(result?.detail)) return result.detail
+  if (Array.isArray(result?.detail?.list)) return result.detail.list
+  return []
+}
+
+const statusMap: Record<string, string> = {
+  9: '进行中'
+}
+
+const formatRehearsalPlan = (item: Record<string, any>, index: number): RehearsalPlanItem => {
+  return {
+    planName: item.planName || item.name || item.optionName || item.configName || item.title || `预演方案${index + 1}`,
+    forecastRange: item.forecastRange || item.forecastPeriod || item.period || item.days || '--',
+    totalRainfall: item.totalRainfall || item.rainfall || item.drp || item.pptn || '--',
+    baseTime: item.baseTime || item.tm || item.createTime || item.updateTime || '--',
+    forecastTime: item.forecastTime || item.rehearsalTime || item.updateTime || item.createTime || '--',
+    status: statusMap[String(item.status)] || '--'
+  }
+}
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getOptionConfigList({
+    searchName: ''
+  })
+  console.log('getOptionConfigListResult', result)
+
+  dataList.value = getOptionConfigResultList(result).map(formatRehearsalPlan)
+})
 </script>
 
 <style lang="scss" scoped>
@@ -127,6 +127,35 @@ const dataList = ref<RehearsalPlanItem[]>([
   font-weight: 600;
   background: url('@/components/PageTable/assets/index-bg.png') no-repeat;
   background-size: 100% 100%;
+}
+
+.table-wrap {
+  height: 520px;
+}
+
+.rehearsal-table {
+  height: 100%;
+
+  :deep(.table-header__tr) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+  }
+
+  :deep(.table-body__th) {
+    font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
+    font-size: 19px;
+  }
+
+  :deep(.table-body__tr:nth-child(3)) {
+    color: #fff;
+    background: linear-gradient(180deg, rgb(30 83 132 / 0.52), rgb(0 132 255 / 0.52));
+  }
+
+  :deep(.table-body__tr:nth-child(3) .table-body__th),
+  :deep(.table-body__tr:nth-child(3) .action-view) {
+    color: #fff;
+  }
 }
 
 :deep(.el-table) {

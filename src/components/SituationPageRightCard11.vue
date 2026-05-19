@@ -6,7 +6,7 @@
         <span>熊渡水库水位</span>
       </div>
 
-      <div class="reservoir-summary">
+      <!-- <div class="reservoir-summary">
         <div v-for="item in reservoirInfo" :key="item.name" class="reservoir-summary__item">
           <img :src="item.icon" :alt="item.name" class="reservoir-summary__icon">
           <div class="reservoir-summary__content">
@@ -19,7 +19,7 @@
             </div>
           </div>
         </div>
-      </div>
+      </div> -->
 
       <div class="reservoir-chart">
         <VueEcharts :option="echartOption" />
@@ -84,19 +84,19 @@ const reservoirInfo = ref<Record<string, any>>([
     icon: getSituationPhotoUrl('q1'),
     name: '总库容',
     value: 12.3,
-    unit: '万m3'
+    unit: 'm³/s'
   },
   {
     icon: getWaterPhotoUrl('home-icon'),
     name: '较上年度',
     value: 0.8,
-    unit: '万m3'
+    unit: 'm³/s'
   },
   {
     icon: getSituationPhotoUrl('q2'),
     name: '较多年同期',
     value: -2.3,
-    unit: '万m3'
+    unit: 'm³/s'
   }
 ])
 const theadCol = ref([
@@ -126,6 +126,22 @@ const theadCol = ref([
 ])
 const tableDataList = ref<Record<string, any>[]>([
 ])
+
+const getRsvrStatDayParams = () => {
+  const currentDate = dayjs()
+
+  return {
+    startTime: currentDate.subtract(7, 'day').format('MM-DD'),
+    endTime: currentDate.format('MM-DD'),
+    type: '1',
+    stcd: 'RV_001',
+    years: `${currentDate.year()},${currentDate.subtract(1, 'year').year()}`
+  }
+}
+
+const getRsvrStatDayDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
+}
 
 const echartOption = ref({
   tooltip: {
@@ -236,40 +252,39 @@ const echartOption = ref({
 })
 
 usePolling(async () => {
-  // const zzWarnInfoResult: any = await service.xfqs.getZZWarnInfo({})
-  // console.log('重点水位站数据：', zzWarnInfoResult)
+  const rsvrStatDayParams = getRsvrStatDayParams()
+  const rsvrStatDayResult: any = await service.xfqs.getRsvrStatDay(rsvrStatDayParams)
+  console.log('rsvrStatDayResult', rsvrStatDayResult)
 
   const channelPageResult: any = await service.xfqs.getChannelPage({
     start: 1,
-    limit: 1000
+    limit: 1000,
+    sttp: 'ZZ'
   })
+  tableDataList.value = channelPageResult.list.map(
+    (item: Record<string, any>, index: number) => ({
+      siteName: item.stnm || `站点${index + 1}`,
+      waterLevel: item.z ?? '--',
+      waterDepth: item.zs ?? '--',
+      time: item.tm ? dayjs(item.tm).format('YY/M/DD H:mm') : '--'
+    })
+  )
 
   const warnInfoResult: any = await service.xfqs.getRsvrWarnInfo({})
-  const pageResult: any = await service.xfqs.hsybForecastccFindPage({
-    start: 1,
-    limit: 1,
-    lx: 1
-  })
-
   let xAxisData = ['12.20', '12.21', '12.22', '12.23', '12.24', '12.25']
   let seriesData = [50.1, 56.1, 53.2, 54.8, 50.5, 56.4]
+  const rsvrStatDayDetail = getRsvrStatDayDetail(rsvrStatDayResult)
+  const currentYearRsvrStatList = Array.isArray(rsvrStatDayDetail[String(dayjs().year())])
+    ? rsvrStatDayDetail[String(dayjs().year())]
+    : []
 
-  if (pageResult.list.length > 0) {
-    const echartsResult: any = await service.xfqs.hsybForecastccFindById({
-      id: pageResult.list[0].id
-    })
-    const hsybForecastList =
-      echartsResult?.hsybForecastccDdfafExtList?.[0]?.hsybForecastcExtList?.[0]
-        ?.hsybForecastList || []
-
-    if (hsybForecastList.length > 0) {
-      xAxisData = hsybForecastList.map((item: Record<string, any>) =>
-        dayjs(item.tm).format('MM.DD')
-      )
-      seriesData = hsybForecastList.map(
-        (item: Record<string, any>) => Number(item.z) || 0
-      )
-    }
+  if (currentYearRsvrStatList.length > 0) {
+    xAxisData = currentYearRsvrStatList.map((item: Record<string, any>) =>
+      dayjs(item.tm || item.tmMin).format('MM.DD')
+    )
+    seriesData = currentYearRsvrStatList.map(
+      (item: Record<string, any>) => Number(item.z) || 0
+    )
   }
 
   const currentValue =
@@ -296,15 +311,6 @@ usePolling(async () => {
   const dataMax = Math.max(...seriesData)
   echartOption.value.yAxis.min = Number((dataMin - 3).toFixed(1))
   echartOption.value.yAxis.max = Number((dataMax + 3).toFixed(1))
-
-  tableDataList.value = channelPageResult.list.map(
-    (item: Record<string, any>, index: number) => ({
-      siteName: item.stnm || `站点${index + 1}`,
-      waterLevel: item.z ?? '--',
-      waterDepth: item.zs ?? '--',
-      time: item.tm ? dayjs(item.tm).format('YY/M/DD H:mm') : '--'
-    })
-  )
 })
 </script>
 

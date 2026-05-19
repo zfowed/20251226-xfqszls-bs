@@ -1,9 +1,9 @@
 <template>
-  <PageCard title="方案对比" bg-class="middle">
+  <PageCard title="调度方案" bg-class="middle">
     <div class="page-container">
       <div class="toolbar">
         <button class="history-btn" type="button">
-          方案对比
+          调度方案
         </button>
         <div class="date">
           <ElDatePicker

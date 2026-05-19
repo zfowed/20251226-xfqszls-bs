@@ -70,28 +70,27 @@ const theadCol = ref([
   }
 ])
 
-const formatWarnText = (item: Record<string, any>) => {
-  return item?.chnm || item?.channelName || item?.canalName || item?.channel || item?.stnm || '--'
+const getWarnDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
 }
 
-const formatWarnInfo = (item: Record<string, any>) => {
-  return item?.msg || item?.warnName || item?.warnInfo || item?.warnTypeName || item?.warnType || '--'
+const getWarnStatusText = (warnStatus: unknown) => {
+  return Number(warnStatus) === 1 ? '预警' : '正常'
 }
 
 usePolling(async () => {
-  const result: any = await service.xfqs.getChannelPage({
-    start: 1,
-    limit: 1000
+  const d: any = await service.xfqs.getZZWarnInfo({
   })
+  const detail = getWarnDetail(d)
+  const dataList = Array.isArray(detail.dataList) ? detail.dataList : []
 
-  const list = Array.isArray(result?.list) ? result.list : []
-  totalWarnCount.value = Number(result?.total || result?.count || list.length) || list.length
-  displayList.value = list.map((item: Record<string, any>) => ({
-    stnm: item?.stnm || item?.stationName || '--',
-    warnText: formatWarnText(item),
-    waterValue: item?.z ?? '--',
-    flowValue: item?.q ?? item?.flow ?? '--',
-    publishTime: formatWarnInfo(item)
+  totalWarnCount.value = Number(detail.warnSize) || 0
+  displayList.value = dataList.map((item: Record<string, any>) => ({
+    stnm: item.stnm || '--',
+    warnText: item.channelName || '--',
+    waterValue: item.z ?? '--',
+    flowValue: item.q ?? item.qout ?? '--',
+    publishTime: `${item.tmMin || item.tm || '--'} ${getWarnStatusText(item.warnStatus)}`
   }))
 })
 </script>

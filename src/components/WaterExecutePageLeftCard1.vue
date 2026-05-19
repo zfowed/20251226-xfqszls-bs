@@ -59,7 +59,11 @@
           <span>调度详情</span>
         </div>
         <div class="detail-layout">
-          <div class="plan-preview" aria-hidden="true">
+          <div
+            class="plan-preview"
+            :class="{ 'plan-preview--clickable': Boolean(currentInstruction?.fileUrl) }"
+            @click="downloadCurrentInstructionFile"
+          >
             <div class="plan-preview__page">
               <div class="plan-preview__watermark plan-preview__watermark--top">
                 应急预案
@@ -111,21 +115,23 @@
             内容
           </div>
         </div>
-        <div
-          v-for="(item, idx) in executionTimeline"
-          :key="idx"
-          class="status-card"
-        >
-          <div class="status-card__head">
-            <span class="status-card__arrows" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            {{ item.title }}
-          </div>
-          <div class="status-card__body">
-            {{ item.content }}
+        <div class="status-card__box h-[900px] overflow-auto">
+          <div
+            v-for="(item, idx) in executionTimeline"
+            :key="idx"
+            class="status-card"
+          >
+            <div class="status-card__head">
+              <span class="status-card__arrows" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              {{ item.title }}
+            </div>
+            <div class="status-card__body">
+              {{ item.content }}
+            </div>
           </div>
         </div>
       </div>
@@ -134,6 +140,8 @@
 </template>
 
 <script setup lang="ts">
+import { getAppConfig } from 'zf-dbs'
+
 type InstructionRow = {
   id: number
   code: string
@@ -142,6 +150,7 @@ type InstructionRow = {
   gateOpenTime: string
   gateFlow: string
   fileUrl?: string
+  scheduleList?: Record<string, any>[]
 }
 
 const tableRef = ref<any>()
@@ -196,8 +205,36 @@ interface DetailRow {
   values: string[]
 }
 
+type ExecutionTimelineItem = {
+  title: string
+  content: string
+}
+
 function displayValue (v: string | undefined): string {
   return v === undefined || v === '' ? '—' : v
+}
+
+const getDownloadFileUrl = (filePath?: string) => {
+  if (!filePath) return ''
+  if (/^https?:\/\//.test(filePath)) return filePath
+
+  const appConfig = getAppConfig()
+  const baseUrl = String(appConfig.xfqxRequestUrl || '').replace(/\/$/, '')
+  const normalizedPath = filePath.replace(/^\//, '')
+  return `${baseUrl}/${normalizedPath}`
+}
+
+const downloadCurrentInstructionFile = () => {
+  const row = currentInstruction.value
+  if (!row?.fileUrl) return
+
+  const link = document.createElement('a')
+  link.href = getDownloadFileUrl(row.fileUrl)
+  link.download = row.fileUrl.split('/').pop() || row.code
+  link.target = '_blank'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
 }
 
 const detailRows = computed<DetailRow[]>(() => {
@@ -218,21 +255,41 @@ const detailRows = computed<DetailRow[]>(() => {
   ]
 })
 
-const executionTimeline = ref([
+const executionTimeline = ref<ExecutionTimelineItem[]>([
   { title: '计划开始时间', content: '内容' },
   { title: '计划开始时间', content: '内容' },
   { title: '计划开始时间', content: '内容' }
 ])
 
+const buildExecutionTimeline = (list: Record<string, any>[] = []) => {
+  if (!list.length) {
+    return [
+      { title: '计划开始时间', content: '内容' },
+      { title: '计划开始时间', content: '内容' },
+      { title: '计划开始时间', content: '内容' }
+    ]
+  }
+
+  return list.map((item: Record<string, any>, index: number) => ({
+    title: item.st || `执行节点${index + 1}`,
+    content: `计划开始：${item.time || '--'}；计划结束：${item.endTime || '--'}；实际开始：${item.realStartTime || '--'}；实际结束：${item.realEndTime || '--'}`
+  }))
+}
+
+const updateCurrentInstruction = (row: InstructionRow | null) => {
+  currentInstruction.value = row
+  executionTimeline.value = buildExecutionTimeline(row?.scheduleList || [])
+}
+
 function onInstructionChange (row: InstructionRow | undefined) {
-  currentInstruction.value = row ?? null
+  updateCurrentInstruction(row ?? null)
 }
 
 onMounted(() => {
   nextTick(() => {
     const defaultRow = instructionList.value.find((r) => r.id === 3)
     if (defaultRow) {
-      currentInstruction.value = defaultRow
+      updateCurrentInstruction(defaultRow)
       tableRef.value?.setCurrentRow(defaultRow)
     }
   })
@@ -253,13 +310,14 @@ usePolling(async () => {
     totalSupply: item.processMap?.totalWater ? `${item.processMap.totalWater} m³` : '—',
     gateOpenTime: item.openTime || '—',
     gateFlow: item.openFlow !== null && item.openFlow !== undefined ? `${item.openFlow} m³/s` : '—',
-    fileUrl: item.fileMsg?.path || item.fileUrl || ''
+    fileUrl: item.fileMsg?.path || item.fileUrl || '',
+    scheduleList: Array.isArray(item.processMap?.list) ? item.processMap.list : []
   }))
 
   nextTick(() => {
     const defaultRow = instructionList.value[0]
     if (defaultRow) {
-      currentInstruction.value = defaultRow
+      updateCurrentInstruction(defaultRow)
       tableRef.value?.setCurrentRow(defaultRow)
     }
   })
@@ -449,6 +507,10 @@ usePolling(async () => {
     linear-gradient(180deg, #17b7ff 0 9px, transparent 9px calc(100% - 9px), #17b7ff calc(100% - 9px)) right / 2px 100% no-repeat,
     rgb(0 45 82 / 0.3);
   box-shadow: 0 0 14px rgb(0 185 255 / 0.28);
+
+  &--clickable {
+    cursor: pointer;
+  }
 
   &::before,
   &::after {

@@ -7,12 +7,12 @@
           :class="{ 'card-title__tab--active': currentMonitorType === 'rainfall' }"
           @click="switchMonitorType('rainfall')"
         >降雨监测</span>
-        <span class="card-title__divider">/</span>
+        <!-- <span class="card-title__divider">/</span>
         <span
           class="card-title__tab"
           :class="{ 'card-title__tab--active': currentMonitorType === 'weather' }"
           @click="switchMonitorType('weather')"
-        >气象监测</span>
+        >气象监测</span> -->
       </div>
     </template>
 
@@ -103,9 +103,9 @@ const getPhotoUrl = (icon: string) => {
 const currentMonitorType = ref<'rainfall' | 'weather'>('rainfall')
 
 const rainfallSummaryList = ref<SummaryItem[]>([
-  { key: 'maxRainfall', name: '最大降雨', value: 0, unit: 'm', icon: getPhotoUrl('w1') },
-  { key: 'currentRainfall', name: '当前降雨', value: 0, unit: 'm', icon: getPhotoUrl('w1') },
-  { key: 'totalRainfall', name: '累计降雨', value: 0, unit: 'm', icon: getPhotoUrl('w1') }
+  { key: 'maxRainfall', name: '最大降雨', value: 0, unit: 'mm', icon: getPhotoUrl('w1') },
+  { key: 'currentRainfall', name: '当前降雨', value: 0, unit: 'mm', icon: getPhotoUrl('w1') },
+  { key: 'totalRainfall', name: '累计降雨', value: 0, unit: 'mm', icon: getPhotoUrl('w1') }
 ])
 const weatherSummaryList = ref<SummaryItem[]>([
   { key: 'maxTemp', name: '最高气温', value: 0, unit: '℃', icon: getPhotoUrl('w1') },
@@ -189,6 +189,12 @@ const toNumber = (value: unknown) => {
   return Number.isFinite(numberValue) ? numberValue : 0
 }
 
+const getAverage = (list: number[]) => {
+  if (!list.length) return 0
+
+  return list.reduce((sum, value) => sum + value, 0) / list.length
+}
+
 usePolling(async () => {
   const result: any = await service.xfqs.getPptnPage({
     start: 1,
@@ -204,7 +210,7 @@ usePolling(async () => {
   const totalRainfallList = rainfallList.map((item: Record<string, any>) => toNumber(item.accp))
 
   rainfallSummaryList.value[0].value = Number(Math.max(...periodRainfallList).toFixed(2))
-  rainfallSummaryList.value[1].value = Number(Math.max(...currentRainfallList).toFixed(2))
+  rainfallSummaryList.value[1].value = Number(getAverage(currentRainfallList).toFixed(2))
   rainfallSummaryList.value[2].value = Number(totalRainfallList.reduce((sum, value) => sum + value, 0).toFixed(2))
 
   rainfallRankList.value = rainfallList.map((item: Record<string, any>, index: number) => ({

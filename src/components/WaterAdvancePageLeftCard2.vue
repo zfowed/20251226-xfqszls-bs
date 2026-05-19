@@ -45,28 +45,55 @@ type MetricItem = {
 const metrics = ref<MetricItem[]>([
   {
     label: '水库库容',
-    value: 4545,
-    unit: '万m³',
+    value: 0,
+    unit: 'm³',
     percent: 23
   },
   {
     label: '水位',
-    value: 145,
+    value: 0,
     unit: 'm',
     percent: 46
-  },
-  {
-    label: '河流来水径流',
-    value: 514,
-    unit: 'm',
-    percent: 59
   }
+  // {
+  //   label: '河流来水径流',
+  //   value: 514,
+  //   unit: 'm',
+  //   percent: 59
+  // }
 ])
 
+const toNumber = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : 0
+}
+
+const clampPercent = (value: number, max: number) => {
+  if (!Number.isFinite(value) || value <= 0 || max <= 0) {
+    return 0
+  }
+  return Math.min(100, Math.round((value / max) * 100))
+}
+
+const getRsvrDetailList = (result: Record<string, any>) => {
+  if (Array.isArray(result?.detail)) return result.detail
+  if (Array.isArray(result?.data)) return result.data
+  if (Array.isArray(result?.list)) return result.list
+  return []
+}
+
 usePolling(async () => {
-  // const result: any = await service.xfqs.getRsvrWarnInfo({})
-  // console.log('可供水量预警数据：', result)
-  // const { msg, currntZ, tm } = result
+  const result: any = await service.xfqs.findSinlgeRsvrData({})
+  console.log('可供水量预警数据：', result)
+  const detailList = getRsvrDetailList(result)
+  const currentRsvr = detailList[0] || {}
+  const storageCapacity = toNumber(currentRsvr.v)
+  const waterLevel = toNumber(currentRsvr.z)
+
+  metrics.value[0].value = Number(storageCapacity.toFixed(2))
+  metrics.value[0].percent = clampPercent(storageCapacity, 10000)
+  metrics.value[1].value = Number(waterLevel.toFixed(2))
+  metrics.value[1].percent = clampPercent(waterLevel, 200)
 })
 </script>
 

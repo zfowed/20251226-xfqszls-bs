@@ -2,7 +2,7 @@
   <PageCard title="长期来水预报" bg-class="left">
     <div class="page-container">
       <div class="h-[623px] relative">
-        <span>来水量修正值（万m3)</span>
+        <span>来水量修正值（m³/s)</span>
         <VueEcharts :option="echartOption" class="mt-[40px]" />
       </div>
     </div>

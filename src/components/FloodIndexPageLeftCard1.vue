@@ -257,6 +257,9 @@ const echartOption = ref({
 })
 
 usePolling(async () => {
+  const weatherResult: any = await service.xfqs.queryWeather({})
+  console.log('queryWeatherResult', weatherResult)
+
   const result: any = await service.xfqs.queryStationWeather({})
   const detail = (result?.predict?.detail || []) as Record<string, any>[]
   const tempchart = (result?.tempchart || []) as Record<string, any>[]
@@ -312,15 +315,12 @@ usePolling(async () => {
     humidity: Number(result.real?.weather?.humidity) || 0
   }
 
-  const chartSlice = detail.slice(0, 12)
-  const xData = chartSlice.map((d: Record<string, any>) => dayjs(d.date).format('M.D'))
-  const yData = chartSlice.map((d: Record<string, any>) => {
-    const hi = parseForecastTemp(d.day?.weather?.temperature)
-    const lo = parseForecastTemp(d.night?.weather?.temperature)
-    const row = d.date ? findTempchartRow(tempchart, d.date) : undefined
-    const chartMax = row && typeof row.max_temp === 'number' ? row.max_temp : parseForecastTemp(row?.max_temp)
-    return hi ?? chartMax ?? lo ?? null
-  }) as (number | null)[]
+  const chartList = (weatherResult?.list || []) as Record<string, any>[]
+  const xData = chartList.map((item) => {
+    const tm = String(item.tm || '')
+    return tm.includes(' ') ? tm.split(' ')[1] : tm
+  })
+  const yData = chartList.map((item) => parseForecastTemp(item.temperature) ?? null) as (number | null)[]
 
   echartOption.value.xAxis.data = xData
   ;(echartOption.value.series[0] as Record<string, any>).data = yData

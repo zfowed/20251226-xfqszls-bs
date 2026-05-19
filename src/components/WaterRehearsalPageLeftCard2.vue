@@ -15,14 +15,14 @@
               <span>蓄水量 ：</span>
               <span>
                 <ZfTweenNumber :value="item.value1 === '' ? 0 : Number(item.value1)" />
-                万m3
+                m³/s
               </span>
             </div>
             <div>
               <span>库水位：</span>
               <span>
                 <ZfTweenNumber :value="item.value2 === '' ? 0 : Number(item.value2)" />
-                万m3
+                m³/s
               </span>
             </div>
           </div>
@@ -31,14 +31,14 @@
               <span>入库流量：</span>
               <span>
                 <ZfTweenNumber :value="item.in === '' ? 0 : Number(item.in)" />
-                万m3
+                m³/s
               </span>
             </div>
             <div>
               <span>出库流量：</span>
               <span>
                 <ZfTweenNumber :value="item.out === '' ? 0 : Number(item.out)" />
-                万m3
+                m³/s
               </span>
             </div>
           </div>

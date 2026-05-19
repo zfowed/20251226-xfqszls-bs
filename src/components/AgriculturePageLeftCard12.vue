@@ -55,10 +55,10 @@ const cropIconMap: Record<string, string> = {
 }
 
 const theadCol = ref([
-  { key: 'icon', name: '', width: 92, align: 'center' },
-  { key: 'name', name: '种类', width: 160, align: 'left' },
-  { key: 'sowingDate', name: '播种时间', width: 160, align: 'center' },
-  { key: 'growthStage', name: '生长阶段', width: 150, align: 'center' },
+  { key: 'icon', name: '', align: 'center' },
+  { key: 'name', name: '种类', align: 'left' },
+  // { key: 'sowingDate', name: '播种时间', width: 160, align: 'center' },
+  // { key: 'growthStage', name: '生长阶段', width: 150, align: 'center' },
   { key: 'water', name: '日需水量', width: 180, align: 'left' }
 ])
 
@@ -77,6 +77,7 @@ usePolling(async () => {
 
   cropList.value = data.map((item: Record<string, any>) => {
     const cropName = item.crop || '--'
+    console.log(item.crop, 'item.crop')
     const icon = cropIconMap[cropName] || 'rice'
     return {
       icon: getPhotoUrl(icon),
@@ -84,7 +85,7 @@ usePolling(async () => {
       sowingDate: item.time || firstDay?.time || '--',
       growthStage: '--',
       dailyWater: String(item.water ?? 0),
-      waterUnit: '万m³'
+      waterUnit: 'm³'
     }
   })
 })

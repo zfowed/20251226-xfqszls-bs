@@ -30,7 +30,7 @@
           </div>
           <div class="text-center">
             <ZfTweenNumber :value="completeRate" class="average-water__value" />
-            <span class="average-water__unit">万m3</span>
+            <span class="average-water__unit">m³/s</span>
           </div>
         </div>
         <div class="average-water__content">
@@ -73,34 +73,55 @@ const swiperDataList = ref([
   { id: 5, image: getPhotoUrl('swiper-image1') }
 ])
 
-const completeRate = ref(0)
-const dataList = ref<Record<string, any>[]>([])
+const completeRate = ref(3282.5)
+const dataList = ref<Record<string, any>[]>([
+  {
+    title: '聂家河镇',
+    value: '113.9',
+    unit: 'm³/s'
+  },
+  {
+    title: '姚家店乡',
+    value: '785.2',
+    unit: 'm³/s'
+  },
+  {
+    title: '枝城镇',
+    value: '749.6',
+    unit: 'm³/s'
+  },
+  {
+    title: '陆城街道',
+    value: '633',
+    unit: 'm³/s'
+  }
+])
 
-const getSupplyDetail = (result: Record<string, any>) => {
-  return result?.data || result?.detail || result || {}
-}
+// const getSupplyDetail = (result: Record<string, any>) => {
+//   return result?.data || result?.detail || result || {}
+// }
 
-const toWanM3 = (value: unknown) => {
-  const numberValue = Number(value)
-  return Number.isFinite(numberValue) ? Number((numberValue / 10000).toFixed(2)) : 0
-}
+// const toWanM3 = (value: unknown) => {
+//   const numberValue = Number(value)
+//   return Number.isFinite(numberValue) ? Number((numberValue / 10000).toFixed(2)) : 0
+// }
 
-usePolling(async () => {
-  const result: any = await service.xfqs.getGongshuiInfo({})
-  const detail = getSupplyDetail(result)
-  const tableData = Array.isArray(detail.tableData)
-    ? detail.tableData
-    : Array.isArray(detail.list)
-      ? detail.list
-      : []
+// usePolling(async () => {
+//   // const result: any = await service.xfqs.getGongshuiInfo({})
+//   // const detail = getSupplyDetail(result)
+//   // const tableData = Array.isArray(detail.tableData)
+//   //   ? detail.tableData
+//   //   : Array.isArray(detail.list)
+//   //     ? detail.list
+//   //     : []
 
-  dataList.value = tableData.slice(0, 4).map((item: Record<string, any>) => ({
-    title: item.waterUserName || item.name || '',
-    value: toWanM3(item.yrW ?? item.yrSupplyW),
-    unit: '万m3'
-  }))
-  completeRate.value = Number(detail.yrTotalW) || 0
-})
+//   // dataList.value = tableData.slice(0, 4).map((item: Record<string, any>) => ({
+//   //   title: item.waterUserName || item.name || '',
+//   //   value: toWanM3(item.yrW ?? item.yrSupplyW),
+//   //   unit: 'm³/s'
+//   // }))
+//   completeRate.value = Number(detail.yrTotalW) || 0
+// })
 </script>
 
 <style lang="scss" scoped>

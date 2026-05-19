@@ -33,7 +33,7 @@
         <img src="@/assets/global/images/card-title-icon.png" class="w-[30px] h-[32px] mr-[9px]">
         <span>灌溉需水</span>
       </div>
-      <div class="table-solid">
+      <div class="table-solid h-[1100px] overflow-auto">
         <div
           v-for="item in irrigationNeedList"
           :key="item.id"
@@ -65,25 +65,12 @@ const getSituationPhotoUrl = (icon: string) => {
 }
 
 const reservoirInfo = ref<Record<string, any>>([
-  { icon: getSituationPhotoUrl('q1'), name: '灌溉用水', value: 12.3, unit: '万m3' },
-  { icon: getSituationPhotoUrl('q2'), name: '生态用水', value: 0.8, unit: '万m3' }
+  { icon: getSituationPhotoUrl('q1'), name: '灌溉用水', value: 55, unit: '万m³' },
+  { icon: getSituationPhotoUrl('q2'), name: '生态用水', value: 125, unit: '万m³' }
 ])
 const irrigationNeedList = ref([
-  { id: 'need-1', name: 'XXX行政村', value: 0.67, unit: 't', percent: 48 },
-  { id: 'need-2', name: 'XXX行政村', value: 0.36, unit: 't', percent: 48 },
-  { id: 'need-3', name: 'XXX行政村', value: 0.67, unit: 't', percent: 48 },
-  { id: 'need-4', name: 'XXX行政村', value: 0.36, unit: 't', percent: 48 },
-  { id: 'need-5', name: 'XXX行政村', value: 0.67, unit: 't', percent: 48 },
-  { id: 'need-6', name: 'XXX行政村', value: 0.36, unit: 't', percent: 48 },
-  { id: 'need-7', name: 'XXX行政村', value: 0.67, unit: 't', percent: 48 },
-  { id: 'need-8', name: 'XXX行政村', value: 0.36, unit: 't', percent: 48 }
 ])
 const tableDataList = ref<Record<string, any>[]>([
-  { siteName: 'XXX站点', waterLevel: 2, waterDepth: 2, time: '26/4/23 10:00' },
-  { siteName: 'XXX站点', waterLevel: 1, waterDepth: 1, time: '26/4/22 13:00' },
-  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/21 12:00' },
-  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/20 9:00' },
-  { siteName: 'XXX站点', waterLevel: 0, waterDepth: 0, time: '26/4/20 16:00' }
 ])
 
 const echartOption = ref({
@@ -95,7 +82,7 @@ const echartOption = ref({
     }
   },
   title: {
-    text: '蓄水量（万m3）',
+    text: '蓄水量（m³/s）',
     top: 6,
     left: 0,
     textStyle: {
@@ -215,53 +202,90 @@ const echartOption = ref({
   ]
 })
 
-usePolling(async () => {
-  const warnInfoResult: any = await service.xfqs.getRsvrWarnInfo({})
-  const pageResult: any = await service.xfqs.hsybForecastccFindPage({
-    start: 1,
-    limit: 1,
-    lx: 1
-  })
+const getCurrentHourShortWaterDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
+}
 
-  let xAxisData = ['4.1', '4.2', '4.3', '4.4', '4.5', '4.6', '4.7', '4.8', '4.9', '4.10', '4.11', '4.12']
-  let rapeseedData = [35, 44, 17, 14, 13, 21, 22, 9, 29, 17, 29, 57]
-  let wheatData = [29, 44, 29, 14, 20, 21, 15, 9, 29, 17, 29, 57]
+const toNumber = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : 0
+}
 
-  if (pageResult.list.length > 0) {
-    const echartsResult: any = await service.xfqs.hsybForecastccFindById({
-      id: pageResult.list[0].id
-    })
-    const hsybForecastList =
-      echartsResult?.hsybForecastccDdfafExtList?.[0]?.hsybForecastcExtList?.[0]?.hsybForecastList || []
+const updateCurrentHourShortWaterChart = (result: Record<string, any>) => {
+  const detail = getCurrentHourShortWaterDetail(result)
+  const hourList = Array.isArray(detail.hourList) ? detail.hourList : []
+  if (!hourList.length) return
 
-    if (hsybForecastList.length > 0) {
-      xAxisData = hsybForecastList.map((item: Record<string, any>) => dayjs(item.tm).format('M.D'))
-      const sourceData = hsybForecastList.map((item: Record<string, any>) => Number(item.z) || 0)
-      if (sourceData.length > 0) {
-        rapeseedData = sourceData.map((item: number, index: number) => Number((item + (index % 3 === 0 ? 4 : -2)).toFixed(1)))
-        wheatData = sourceData.map((item: number, index: number) => Number((item + (index % 2 === 0 ? -2 : 3)).toFixed(1)))
+  const chartOption = echartOption.value as Record<string, any>
+  const waterList = hourList.map((item: Record<string, any>) => toNumber(item.water))
+  const maxWater = Math.max(...waterList, toNumber(detail.currentWater), 1)
+
+  chartOption.title.text = '需水量（m³/s）'
+  chartOption.legend.data = [{ name: '需水量', icon: 'rect' }]
+  chartOption.xAxis.data = hourList.map((item: Record<string, any>) => item.time || '--')
+  chartOption.yAxis.max = Math.ceil(maxWater * 1.2)
+  chartOption.yAxis.interval = undefined
+  chartOption.series = [
+    {
+      name: '需水量',
+      data: waterList,
+      type: 'bar',
+      barWidth: 16,
+      itemStyle: {
+        color: {
+          type: 'linear',
+          x: 0,
+          y: 1,
+          x2: 0,
+          y2: 0,
+          colorStops: [
+            { offset: 0, color: 'rgba(106, 196, 129, 0.28)' },
+            { offset: 1, color: 'rgba(121, 241, 138, 0.92)' }
+          ]
+        }
       }
     }
+  ]
+}
+
+const getCurrentDateShortWaterDetail = (result: Record<string, any>) => {
+  return result?.data || result?.detail || result || {}
+}
+
+const updateIrrigationNeedList = (result: Record<string, any>) => {
+  const detail = getCurrentDateShortWaterDetail(result)
+  const list = Array.isArray(detail.list) ? detail.list : []
+  if (!list.length) return
+
+  const maxValue = Math.max(...list.map((item: Record<string, any>) => toNumber(item.sum)), toNumber(detail.allSum), 1)
+
+  irrigationNeedList.value = list.map((item: Record<string, any>, index: number) => {
+    const value = toNumber(item.sum)
+
+    return {
+      id: String(item.id ?? `need-${index + 1}`),
+      name: item.name || '--',
+      value,
+      unit: '万m³',
+      percent: Math.min(100, Number(((value / maxValue) * 100).toFixed(2)))
+    }
+  })
+}
+
+usePolling(async () => {
+  // const warnInfoResult: any = await service.xfqs.getRsvrWarnInfo({})
+  const currentHourShortWaterParams = {
+    time: dayjs().format('YYYY-MM-DD HH:mm:ss')
   }
+  const currentHourShortWaterResult: any = await service.xfqs.getCurrentHourShortWater(currentHourShortWaterParams)
+  updateCurrentHourShortWaterChart(currentHourShortWaterResult)
 
-  const currentValue = Number(warnInfoResult?.currntZ) || rapeseedData[rapeseedData.length - 1] || 12.3
-  const previousYearValue = rapeseedData.length > 1 ? currentValue - Number(rapeseedData[rapeseedData.length - 2] || 0) : 0.8
-  // const multiYearValue = rapeseedData.length > 0
-  //   ? currentValue - rapeseedData.reduce((sum: number, item: number) => sum + item, 0) / rapeseedData.length
-  //   : -2.3
+  const currentDateShortWaterResult: any = await service.xfqs.getCurrentDateShortWater({})
+  updateIrrigationNeedList(currentDateShortWaterResult)
 
-  reservoirInfo.value[0].value = Number((currentValue || 12.3).toFixed(1))
-  reservoirInfo.value[1].value = Number((previousYearValue || 0.8).toFixed(1))
-
-  echartOption.value.xAxis.data = xAxisData
-  echartOption.value.series[0].data = rapeseedData
-  echartOption.value.series[1].data = wheatData
-
-  const allSeriesData = [...rapeseedData, ...wheatData]
-  const dataMax = Math.max(...allSeriesData)
-  const yAxisInterval = 15
-  const yAxisMax = Math.ceil((dataMax + yAxisInterval * 0.4) / yAxisInterval) * yAxisInterval
-  echartOption.value.yAxis.max = yAxisMax
+  const getGongshuiInfo: any = await service.xfqs.getGongshuiInfo()
+  reservoirInfo.value[0].value = toNumber(getGongshuiInfo.dayTotalW)
+  reservoirInfo.value[1].value = toNumber(getGongshuiInfo.mthTotalW)
 
   const gateResult: any = await service.xfqs.getGatePageList({
     start: 1,
