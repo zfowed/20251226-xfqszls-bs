@@ -35,24 +35,76 @@ interface TeamRow {
   values: string[]
 }
 
-const teamRows: TeamRow[] = [
+const teamRows = ref<TeamRow[]>([
   {
     label: '负责单位',
-    values: ['XXX管理局']
+    values: ['-']
   },
   {
     label: '组成人员',
-    values: ['全局在职同志']
+    values: ['-']
   },
   {
     label: '职能',
-    values: [
-      'XXXXXXXXXXXXXXXXXXXXXXX',
-      'XXXXXXXXXXXXXXXXXXXXXXX',
-      'XXXXXXXXXXXXXXXXXXXXXXX'
-    ]
+    values: ['-']
+  },
+  {
+    label: '联系电话',
+    values: ['-']
   }
-]
+])
+
+const getResultList = (result: any) => {
+  if (Array.isArray(result)) return result
+  if (Array.isArray(result?.list)) return result.list
+  if (Array.isArray(result?.detail)) return result.detail
+  if (Array.isArray(result?.detail?.list)) return result.detail.list
+  return []
+}
+
+const getNotEmptyValueList = (list: Record<string, any>[], key: string) => {
+  const valueList = list.map(item => item[key]).filter(Boolean).map(String)
+  return valueList.length ? Array.from(new Set(valueList)) : ['-']
+}
+
+const formatMemberList = (list: Record<string, any>[]) => {
+  const valueList = list.map((item) => {
+    const name = item.userName || '-'
+    const positionName = item.positionName ? `（${item.positionName}）` : ''
+    return `${name}${positionName}`
+  })
+  return valueList.length ? valueList : ['-']
+}
+
+const updateTeamRows = (list: Record<string, any>[]) => {
+  teamRows.value = [
+    {
+      label: '负责单位',
+      values: getNotEmptyValueList(list, 'deptName')
+    },
+    {
+      label: '组成人员',
+      values: formatMemberList(list)
+    },
+    {
+      label: '职能',
+      values: getNotEmptyValueList(list, 'workName')
+    },
+    {
+      label: '联系电话',
+      values: getNotEmptyValueList(list, 'phone')
+    }
+  ]
+}
+
+usePolling(async () => {
+  const result: any = await service.xfqs.queryMaterialManagerList({
+    pageNum: 1,
+    pageSize: 20
+  })
+  console.log('队伍保障责任人列表:', result)
+  updateTeamRows(getResultList(result))
+})
 </script>
 
 <style lang="scss" scoped>

@@ -84,8 +84,6 @@ usePolling(async () => {
   const result: any = await service.xfqs.getOptionConfigList({
     searchName: ''
   })
-  console.log('getOptionConfigListResult', result)
-
   dataList.value = getOptionConfigResultList(result).map(formatRehearsalPlan)
 })
 </script>

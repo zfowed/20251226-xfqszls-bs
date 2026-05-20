@@ -36,60 +36,94 @@ interface LevelGroup {
   details: string[]
 }
 
+type EmergencyPlanItem = {
+  id?: number
+  type?: string
+  level?: string
+  measure?: string
+  startCondition?: string
+}
+
 const levelTabs: LevelTab[] = [
   { label: 'I级', value: '1' },
   { label: 'II级', value: '2' },
   { label: 'III级', value: '3' }
 ]
 
-const levelContentMap: Record<LevelValue, LevelGroup[]> = {
-  1: [
-    {
-      title: '启动条件',
-      details: ['未来24小时降雨量']
-    },
-    {
-      title: '应急响应措施',
-      details: [
-        '未来24小时降雨量',
-        '未来24小时降雨量',
-        '未来24小时降雨量'
-      ]
-    }
-  ],
-  2: [
-    {
-      title: '启动条件',
-      details: ['未来24小时降雨量']
-    },
-    {
-      title: '应急响应措施',
-      details: [
-        '未来24小时降雨量',
-        '未来24小时降雨量',
-        '未来24小时降雨量'
-      ]
-    }
-  ],
-  3: [
-    {
-      title: '启动条件',
-      details: ['未来24小时降雨量']
-    },
-    {
-      title: '应急响应措施',
-      details: [
-        '未来24小时降雨量',
-        '未来24小时降雨量',
-        '未来24小时降雨量'
-      ]
-    }
-  ]
-}
+const levelContentMap = ref<Record<LevelValue, LevelGroup[]>>({
+  1: [],
+  2: [],
+  3: []
+})
 
 const activeLevel = ref<LevelValue>('1')
 
-const currentLevelData = computed(() => levelContentMap[activeLevel.value] ?? [])
+const currentLevelData = computed(() => levelContentMap.value[activeLevel.value] ?? [])
+
+const getResultList = (result: Record<string, any>) => {
+  if (Array.isArray(result)) return result
+  if (Array.isArray(result?.records)) return result.records
+  if (Array.isArray(result?.list)) return result.list
+  if (Array.isArray(result?.detail?.records)) return result.detail.records
+  return []
+}
+
+const splitMeasure = (value: unknown) => {
+  return String(value || '-')
+    .split(/\r?\n/)
+    .map(item => item.trim())
+    .filter(Boolean)
+}
+
+const levelValueMap: Record<string, LevelValue> = {
+  I: '1',
+  II: '2',
+  III: '3'
+}
+
+const getLevelValue = (level: unknown) => {
+  const levelText = String(level || '')
+  const match = levelText.match(/^(I{1,3})级/)
+  return match ? levelValueMap[match[1]] : undefined
+}
+
+const updateLevelContentMap = (list: EmergencyPlanItem[]) => {
+  const map: Record<LevelValue, LevelGroup[]> = {
+    1: [],
+    2: [],
+    3: []
+  }
+
+  list
+    .filter(item => item.type === '防汛')
+    .forEach((item) => {
+      const levelValue = getLevelValue(item.level)
+      if (!levelValue || map[levelValue].length) return
+
+      map[levelValue] = [
+        {
+          title: '启动条件',
+          details: [item.startCondition || '-']
+        },
+        {
+          title: '应急响应措施',
+          details: splitMeasure(item.measure)
+        }
+      ]
+    })
+
+  levelContentMap.value = map
+}
+
+usePolling(async () => {
+  const result: any = await service.xfqs.queryEmergencyPlanList({
+    pageNum: 1,
+    pageSize: 20,
+    _t: Date.now()
+  })
+  console.log('应急预案列表:', result)
+  updateLevelContentMap(getResultList(result))
+})
 </script>
 
 <style lang="scss" scoped>
