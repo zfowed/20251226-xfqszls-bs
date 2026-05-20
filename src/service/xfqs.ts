@@ -122,7 +122,7 @@ export const getChannelPage = defineService<
 // 查询视频点位列表
 export const getVideoStationList = defineService<
   Record<string, any>,
-  Record<string, any>
+  Record<string, any>[]
 >(async function (params, config) {
   return request.get('/api/gq/st/stbprpb/getVideoStationList', { params, ...config })
 })
@@ -190,7 +190,7 @@ export const getOptionConfigList = defineService<
 
 // 供水统计
 export const getGongshuiInfo = defineService<
-  Record<string, any>,
+  undefined,
   Record<string, any>
 >(async function (params, config) {
   return request.get('/api/gq/baseinfo/oneMap/getGongshuiInfo', { params, ...config })

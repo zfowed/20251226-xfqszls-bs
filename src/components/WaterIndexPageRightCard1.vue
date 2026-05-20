@@ -68,7 +68,7 @@ const reservoirInfo = ref<Record<string, any>>([
   { icon: getSituationPhotoUrl('q1'), name: '灌溉用水', value: 55, unit: '万m³' },
   { icon: getSituationPhotoUrl('q2'), name: '生态用水', value: 125, unit: '万m³' }
 ])
-const irrigationNeedList = ref([
+const irrigationNeedList = ref<Record<string, any>[]>([
 ])
 const tableDataList = ref<Record<string, any>[]>([
 ])

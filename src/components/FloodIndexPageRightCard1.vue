@@ -31,7 +31,7 @@ const COLOR_INFLOW = '#32d74b'
 const COLOR_OUTFLOW = '#f39800'
 const COLOR_DAM = '#3c80c0'
 
-const getForecastDetailById = async (id: string) => {
+const getForecastDetailById = async (_id: string) => {
   // if (!id) return
   // const result: any = await service.xfqs.hsybForecastccFindById({ id: 'd38361b0a80c45b492b0386cf3ad2d54' })
   // console.log('水库洪水预报详情:', { id, result })

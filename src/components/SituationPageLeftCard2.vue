@@ -211,7 +211,7 @@ usePolling(async () => {
 
   rainfallSummaryList.value[0].value = Number(Math.max(...periodRainfallList).toFixed(2))
   rainfallSummaryList.value[1].value = Number(getAverage(currentRainfallList).toFixed(2))
-  rainfallSummaryList.value[2].value = Number(totalRainfallList.reduce((sum, value) => sum + value, 0).toFixed(2))
+  rainfallSummaryList.value[2].value = Number(totalRainfallList.reduce((sum: number, value: number) => sum + value, 0).toFixed(2))
 
   rainfallRankList.value = rainfallList.map((item: Record<string, any>, index: number) => ({
     id: String(item.id || item.stcd || `rain-${index + 1}`),

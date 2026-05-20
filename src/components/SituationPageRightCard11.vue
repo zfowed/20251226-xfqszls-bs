@@ -201,6 +201,8 @@ const echartOption = ref({
   yAxis: {
     type: 'value',
     splitNumber: 3,
+    min: undefined as number | undefined,
+    max: undefined as number | undefined,
     axisLine: {
       show: false
     },
