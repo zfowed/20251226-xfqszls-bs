@@ -62,6 +62,7 @@ const theadCol = ref([
 ])
 
 const dataList = ref<ForecastPlanRow[]>([])
+const selectedForecastId = ref('')
 
 const formatDateTime = (value: unknown) => {
   return value ? String(value).slice(0, 16) : '-'
@@ -78,9 +79,15 @@ const formatRainNum = (value: unknown) => {
 }
 
 const openForecastDetail = (row: ForecastPlanRow) => {
-  console.log(row, 'row')
   if (!row.id) return
+  selectedForecastId.value = row.id
   emit('forecast-plan-select', row.id)
+}
+
+const openDefaultForecastDetail = () => {
+  const firstRow = dataList.value[0]
+  if (!firstRow?.id || selectedForecastId.value === firstRow.id) return
+  openForecastDetail(firstRow)
 }
 
 usePolling(async () => {
@@ -88,7 +95,6 @@ usePolling(async () => {
     start: 1,
     limit: 1000
   })
-  console.log('预报方案列表:', result)
 
   const list = Array.isArray(result?.list) ? result.list : []
   dataList.value = list.map((item: Record<string, any>) => ({
@@ -99,6 +105,8 @@ usePolling(async () => {
     baseTime: formatDateTime(item.pymdh),
     forecastTime: formatDateTime(item.fymdh)
   }))
+
+  openDefaultForecastDetail()
 })
 </script>
 

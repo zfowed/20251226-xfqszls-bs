@@ -83,6 +83,7 @@ usePolling(async () => {
   const maxTemperature = Number(airTemperature?.maxTemperature)
   const maxTime = airTemperature?.maxTime
   const PPTNSum1 = Number(pptnData?.PPTNSum1)
+  const PPTNSum12 = Number(pptnData?.PPTNSum12)
   const accp = Number(pptnData?.beforePptn?.accp)
 
   warningStatusText.value = '正常'
@@ -100,6 +101,11 @@ usePolling(async () => {
   if (Number.isFinite(accp)) {
     metrics.value[1].value = accp
     metrics.value[1].percent = clampPercent(accp, 100)
+  }
+
+  if (Number.isFinite(PPTNSum12)) {
+    metrics.value[2].value = PPTNSum12
+    metrics.value[2].percent = clampPercent(PPTNSum12, 30)
   }
 })
 </script>

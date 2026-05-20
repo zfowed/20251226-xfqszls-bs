@@ -67,14 +67,55 @@ const theadCol = ref([
   { key: 'action', name: '操作', width: 200, align: 'center' }
 ])
 
-const dataList = ref<RehearsalPlanRow[]>(Array.from({ length: 20 }, (_, index) => ({
-  planName: `2026-04-21 供水时间最少调度方案 ${index + 1}`,
-  forecastRange: '4天',
-  rainNum: '9.97',
-  baseTime: '2026-04-21 12:00',
-  forecastTime: '2026-04-21 12:00',
-  status: '进行中'
-})))
+const dataList = ref<RehearsalPlanRow[]>([])
+
+const getResultList = (result: Record<string, any>) => {
+  if (Array.isArray(result)) return result
+  if (Array.isArray(result?.list)) return result.list
+  if (Array.isArray(result?.detail?.list)) return result.detail.list
+  return []
+}
+
+const formatDateTime = (value: unknown) => {
+  return value ? String(value).slice(0, 16) : '-'
+}
+
+const formatForecastRange = (startTime: unknown, endTime: unknown) => {
+  const start = startTime ? new Date(String(startTime).replace(/-/g, '/')).getTime() : 0
+  const end = endTime ? new Date(String(endTime).replace(/-/g, '/')).getTime() : 0
+  if (!start || !end || end < start) return '-'
+
+  const hours = Math.ceil((end - start) / 1000 / 60 / 60) + 1
+  return hours >= 24 ? `${Math.ceil(hours / 24)}天` : `${hours}小时`
+}
+
+const formatNumber = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? String(Number(numberValue.toFixed(2))) : '0'
+}
+
+const statusMap: Record<string, string> = {
+  9: '进行中'
+}
+
+const formatRehearsalPlan = (item: Record<string, any>, index: number): RehearsalPlanRow => {
+  return {
+    planName: item.optionName || `预演方案${index + 1}`,
+    forecastRange: formatForecastRange(item.startTime, item.endTime),
+    rainNum: formatNumber(item.sumWater),
+    baseTime: formatDateTime(item.startTime),
+    forecastTime: formatDateTime(item.createTime),
+    status: statusMap[String(item.status)] || '-'
+  }
+}
+
+usePolling(async () => {
+  const result: any = await service.xfqs.getOptionConfigList({
+    searchName: ''
+  })
+  console.log(result, 'result')
+  dataList.value = getResultList(result).map(formatRehearsalPlan)
+})
 </script>
 
 <style lang="scss" scoped>

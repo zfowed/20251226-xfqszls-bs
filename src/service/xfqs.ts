@@ -233,7 +233,7 @@ export const hsybForecastccFindById = defineService<
   Record<string, any>,
   Record<string, any>
 >(async function (params, config) {
-  return request.post('/api/hsyb/business/hsybForecastcc/findById', { ...params, ...config })
+  return request.post(`/api/hsyb/business/hsybForecastcc/findById?id=${params.id}`, { ...params, ...config })
 })
 
 // 安全管理责任人列表查询
@@ -290,6 +290,14 @@ export const queryMaterialList = defineService<
   Record<string, any>
 >(async function (params, config) {
   return request.get('/api/gq/flood/control/queryMaterialList', { params, ...config })
+})
+
+// 应急预案列表查询
+export const queryEmergencyPlanList = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/flood/control/queryEmergencyPlanList', { params, ...config })
 })
 
 // 预案调令列表查询

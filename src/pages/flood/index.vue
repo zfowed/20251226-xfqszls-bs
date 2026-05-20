@@ -17,13 +17,14 @@
 
     <template #right>
       <FloodIndexPageRightCard1 ref="floodIndexPageRightCard1Ref" class="mb-[50px]" />
-      <FloodIndexPageRightCard2 />
+      <FloodIndexPageRightCard2 ref="floodIndexPageRightCard2Ref" />
     </template>
   </PageScreen>
 </template>
 
 <script setup lang="ts">
 const floodIndexPageRightCard1Ref = ref<any>(null)
+const floodIndexPageRightCard2Ref = ref<any>(null)
 
 const navList = ref<Record<string, any>[]>([
   { name: '预报', path: '/flood' },
@@ -34,6 +35,7 @@ const navList = ref<Record<string, any>[]>([
 
 const handleForecastPlanSelect = (id: string) => {
   floodIndexPageRightCard1Ref.value?.getForecastDetailById(id)
+  floodIndexPageRightCard2Ref.value?.getForecastDetailById(id)
 }
 </script>
 
