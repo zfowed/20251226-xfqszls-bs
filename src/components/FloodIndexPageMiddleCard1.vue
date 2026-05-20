@@ -8,6 +8,7 @@
           :data-list="dataList"
           :limit-scroll="5"
           :index="true"
+          @row-click="openForecastDetail"
         >
           <template #index="scope">
             <div class="table-index">
@@ -41,12 +42,15 @@
 
 <script setup lang="ts">
 type ForecastPlanRow = {
+  id: string
   planName: string
   forecastRange: string
   rainNum: string
   baseTime: string
   forecastTime: string
 }
+
+const emit = defineEmits(['forecast-plan-select'])
 
 const theadCol = ref([
   { key: 'planName', name: '方案名称' },
@@ -57,13 +61,45 @@ const theadCol = ref([
   { key: 'action', name: '操作', width: 200, align: 'center' }
 ])
 
-const dataList = ref<ForecastPlanRow[]>(Array.from({ length: 20 }, (_, index) => ({
-  planName: `2026-04-21 供水时间最少调度方案 ${index + 1}`,
-  forecastRange: '4天',
-  rainNum: '9.87',
-  baseTime: '2026-04-21 12:00',
-  forecastTime: '自动预报'
-})))
+const dataList = ref<ForecastPlanRow[]>([])
+
+const formatDateTime = (value: unknown) => {
+  return value ? String(value).slice(0, 16) : '-'
+}
+
+const formatForecastRange = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? `${numberValue}小时` : '-'
+}
+
+const formatRainNum = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? String(numberValue) : '0'
+}
+
+const openForecastDetail = (row: ForecastPlanRow) => {
+  console.log(row, 'row')
+  if (!row.id) return
+  emit('forecast-plan-select', row.id)
+}
+
+usePolling(async () => {
+  const result: any = await service.xfqs.hsybForecastccFindPage({
+    start: 1,
+    limit: 1000
+  })
+  console.log('预报方案列表:', result)
+
+  const list = Array.isArray(result?.list) ? result.list : []
+  dataList.value = list.map((item: Record<string, any>) => ({
+    id: item.id || '',
+    planName: item.name || '-',
+    forecastRange: formatForecastRange(item.fdays),
+    rainNum: formatRainNum(item.zdrp),
+    baseTime: formatDateTime(item.pymdh),
+    forecastTime: formatDateTime(item.fymdh)
+  }))
+})
 </script>
 
 <style lang="scss" scoped>

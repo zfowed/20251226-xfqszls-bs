@@ -204,6 +204,14 @@ export const getRsvrWarnInfo = defineService<
   return request.get('/api/gq/baseinfo/oneMap/getRsvrWarnInfo', { params, ...config })
 })
 
+// 降雨信息
+export const getPptnInfo = defineService<
+  Record<string, any>,
+  Record<string, any>
+>(async function (params, config) {
+  return request.get('/api/gq/baseinfo/oneMap/getPptnInfo', { params, ...config })
+})
+
 // 来水预报
 export const getIwfShortAchievementList = defineService<
   Record<string, any>,
@@ -225,7 +233,7 @@ export const hsybForecastccFindById = defineService<
   Record<string, any>,
   Record<string, any>
 >(async function (params, config) {
-  return request.get('/api/hsyb/business/hsybForecastcc/findById', { params, ...config })
+  return request.post('/api/hsyb/business/hsybForecastcc/findById', { ...params, ...config })
 })
 
 // 安全管理责任人列表查询

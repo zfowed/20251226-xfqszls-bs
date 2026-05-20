@@ -1,24 +1,6 @@
 <template>
   <PageCard title="降雨预报" bg-class="left">
     <div class="page-container">
-      <div class="forecast-plan-select">
-        <!-- <span class="forecast-plan-select__label">成果方案</span> -->
-        <ElSelect
-          v-model="selectedPlanId"
-          class="forecast-plan-select__control"
-          popper-class="forecast-plan-select__popper"
-          placeholder="请选择成果方案"
-          @change="handlePlanChange"
-        >
-          <ElOption
-            v-for="item in forecastPlanList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          />
-        </ElSelect>
-      </div>
-
       <div class="rain-chart">
         <VueEcharts :option="echartOption" />
       </div>
@@ -29,16 +11,11 @@
 <script setup lang="ts">
 import dayjs from 'dayjs'
 
-type ForecastPlanOption = {
-  id: string
-  name: string
-  raw: Record<string, any>
-}
-
 /** 设计稿参考值（mm），接口无有效降雨数据时使用 */
-const DEFAULT_RAIN_MM = [62, 44, 58, 78, 72, 58, 33, 52, 61, 52, 72, 33]
-const SPLIT = 6
-const CHART_LEN = 12
+const DEFAULT_PAST_RAIN_MM = [0, 0, 38.39, 41.6, 78.5, 2.09, 0]
+const DEFAULT_FUTURE_RAIN_MM = [0.4, 4.09, 13.59, 11.19, 46.6, 19.5, 0]
+const SPLIT = 7
+const CHART_LEN = 14
 
 /** 图表样式与 FloodIndexPageRightCard2 对齐 */
 const CHART_FONT = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft YaHei", sans-serif'
@@ -46,43 +23,31 @@ const CHART_FONT_AXIS_VALUE = '"Alibaba PuHuiTi 2.0", "PingFang SC", "Microsoft 
 const CHART_FONT_X = '"PingFang SC", "Microsoft YaHei", sans-serif'
 const FONT_SIZE = 20
 const LINE_WIDTH = 1
-const selectedPlanId = ref('')
-const forecastPlanList = ref<ForecastPlanOption[]>([])
 
-const getForecastPlanName = (item: Record<string, any>, index: number) => {
-  const planTime = item?.tm || item?.createTime || item?.forecastTime || item?.startTime
-  return item?.name || item?.planName || item?.schemeName || item?.title || (planTime ? dayjs(planTime).format('YYYY-MM-DD HH:mm') : `成果方案${index + 1}`)
+type PptnChartItem = {
+  date: string
+  value: number
 }
 
-const handlePlanChange = async (value: string) => {
-  const currentPlan = forecastPlanList.value.find(item => item.id === value)
-  if (!currentPlan?.id) return
+const toNumber = (value: unknown) => {
+  const numberValue = Number(value)
+  return Number.isFinite(numberValue) ? numberValue : 0
+}
 
-  const result: any = await service.xfqs.hsybForecastccFindById({
-    id: currentPlan.id
+const parsePptnList = (list: unknown): PptnChartItem[] => {
+  if (!Array.isArray(list)) return []
+
+  return list.flatMap((item) => {
+    if (!item || typeof item !== 'object') return []
+
+    return Object.entries(item as Record<string, unknown>).map(([date, value]) => ({
+      date,
+      value: toNumber(value)
+    }))
   })
-  console.log('成果方案详情:', result)
 }
 
-const getNumberByKeys = (source: Record<string, any>, keys: string[]) => {
-  for (const key of keys) {
-    const value = Number(source?.[key])
-    if (!Number.isNaN(value) && Number.isFinite(value)) {
-      return value
-    }
-  }
-  return 0
-}
-
-const rainFromForecastDay = (d: Record<string, any>) => {
-  const top = getNumberByKeys(d, ['rain', 'rainfall', 'precipitation', 'pcpn', 'dayRain', 'accRain'])
-  if (top) return top
-  const day = getNumberByKeys(d?.day || {}, ['rainfall', 'precipitation', 'rain'])
-  if (day) return day
-  return getNumberByKeys(d?.day?.weather || {}, ['rainfall', 'precipitation', 'rain'])
-}
-
-const capDelta = (v: number) => Math.min(5, Math.max(2, Math.round(v * 0.055)))
+const capDelta = (v: number) => Math.min(v, Math.min(5, Math.max(2, Math.round(v * 0.055))))
 
 const gradientBlue = {
   type: 'linear' as const,
@@ -198,8 +163,8 @@ const echartOption = ref({
       padding: [0, 0, 0, 10]
     },
     data: [
-      { name: '前期', icon: 'rect', itemStyle: { color: '#4aaef2' } },
-      { name: '后期', icon: 'rect', itemStyle: { color: '#6c5ef2' } }
+      { name: '前7天', icon: 'rect', itemStyle: { color: '#4aaef2' } },
+      { name: '后7天', icon: 'rect', itemStyle: { color: '#6c5ef2' } }
     ]
   },
   grid: {
@@ -266,7 +231,7 @@ const echartOption = ref({
   },
   series: [
     {
-      name: '前期',
+      name: '前7天',
       type: 'bar' as const,
       stack: 'early',
       barMaxWidth: 14,
@@ -290,7 +255,7 @@ const echartOption = ref({
       z: 3
     },
     {
-      name: '后期',
+      name: '后7天',
       type: 'bar' as const,
       stack: 'late',
       barMaxWidth: 14,
@@ -319,7 +284,7 @@ const echartOption = ref({
 function applyRainChart (xLabels: string[], rainMm: number[]) {
   const values = rainMm.slice(0, CHART_LEN)
   while (values.length < CHART_LEN) {
-    values.push(DEFAULT_RAIN_MM[values.length] ?? 0)
+    values.push(0)
   }
   const { bodyEarly, capEarly, bodyLate, capLate } = buildSeriesData(values)
 
@@ -342,34 +307,24 @@ function applyRainChart (xLabels: string[], rainMm: number[]) {
 }
 
 usePolling(async () => {
-  const planResult: any = await service.xfqs.hsybForecastccFindPage({
-    start: 1,
-    limit: 1000
-  })
-  const planList = Array.isArray(planResult?.list) ? planResult.list : []
-  forecastPlanList.value = planList.map((item: Record<string, any>, index: number) => ({
-    id: String(item?.id ?? item?.fid ?? item?.uuid ?? index + 1),
-    name: getForecastPlanName(item, index),
-    raw: item
-  }))
-  if (!selectedPlanId.value && forecastPlanList.value.length) {
-    selectedPlanId.value = forecastPlanList.value[0].id
+  const pptnInfoResult: any = await service.xfqs.getPptnInfo({})
+
+  const pastList = parsePptnList(pptnInfoResult?.pastList)
+  const futureList = parsePptnList(pptnInfoResult?.fList)
+  const chartList = [...pastList, ...futureList]
+
+  if (!chartList.length) {
+    applyRainChart(
+      Array.from({ length: CHART_LEN }, (_, i) => dayjs().add(i - SPLIT, 'day').format('M.D')),
+      [...DEFAULT_PAST_RAIN_MM, ...DEFAULT_FUTURE_RAIN_MM]
+    )
+    return
   }
 
-  const result: any = await service.xfqs.queryStationWeather({})
-  const detail = (result?.predict?.detail || []) as Record<string, any>[]
-  const slice = detail.slice(0, CHART_LEN)
-
-  const xLabels = slice.length
-    ? slice.map((d) => dayjs(d.date).format('M.D'))
-    : Array.from({ length: CHART_LEN }, (_, i) => `4.${i + 1}`)
-
-  let rainMm = slice.map((d) => rainFromForecastDay(d))
-  if (!rainMm.length || rainMm.every((v) => !v)) {
-    rainMm = [...DEFAULT_RAIN_MM]
-  }
-
-  applyRainChart(xLabels.length ? xLabels : Array.from({ length: CHART_LEN }, (_, i) => `4.${i + 1}`), rainMm)
+  applyRainChart(
+    chartList.map((item) => dayjs(item.date).format('M.D')),
+    chartList.map((item) => item.value)
+  )
 })
 </script>
 
@@ -379,39 +334,7 @@ usePolling(async () => {
   box-sizing: border-box;
 }
 
-.forecast-plan-select {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 14px;
-  height: 52px;
-  margin-bottom: 8px;
-}
-
-.forecast-plan-select__label {
-  color: #d9f4ff;
-  font-size: 22px;
-  font-family: 'Alibaba PuHuiTi 2.0', PingFangSC, sans-serif;
-}
-
-.forecast-plan-select__control {
-  width: 280px;
-}
-
-:deep(.forecast-plan-select__control .el-select__wrapper) {
-  min-height: 44px;
-  background: rgb(14 63 108 / 0.68);
-  border: 1px solid rgb(112 194 255 / 0.42);
-  box-shadow: inset 0 0 18px rgb(73 169 255 / 0.12);
-}
-
-:deep(.forecast-plan-select__control .el-select__placeholder),
-:deep(.forecast-plan-select__control .el-select__selected-item) {
-  color: #e8f8ff;
-  font-size: 18px;
-}
-
 .rain-chart {
-  height: 320px;
+  height: 380px;
 }
 </style>

@@ -20,7 +20,7 @@
       </div>
     </div>
     <div ref="tableBodyScroll" class="table-body" @mouseout="mouseout" @mouseover="mouseover">
-      <div v-for="(rowItem, rowIndex) in props.dataList" :key="rowIndex" class="table-body__tr">
+      <div v-for="(rowItem, rowIndex) in props.dataList" :key="rowIndex" class="table-body__tr" @click="emit('row-click', rowItem, rowIndex)">
         <div v-if="props.index" class="table-body__th flex items-center justify-center w-[110px]">
           <slot name="index" :row="rowItem" :index="rowIndex + 1">
             {{ rowIndex + 1 }}
@@ -57,6 +57,8 @@ const props = withDefaults(defineProps<Props>(), {
   limitScroll: undefined,
   index: false
 })
+
+const emit = defineEmits(['row-click'])
 
 let intervalValue = reactive({} as any)
 // 鼠标经过
