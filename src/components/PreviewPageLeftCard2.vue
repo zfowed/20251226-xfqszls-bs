@@ -53,7 +53,7 @@ const clickOperationHandle = (item: Record<string, any>) => {
   })
   item.active = true
   currentType.value = item.value
-  tablePolling.trigger()
+  tablePolling.execute()
 }
 
 const theadCol = ref([

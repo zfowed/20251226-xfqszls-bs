@@ -8,7 +8,7 @@
           placeholder="请选择"
           :teleported="false"
           class="app-select mb-[40px]"
-          @change="dataListTiggle.trigger()"
+          @change="dataListTiggle.execute()"
         >
           <ElOption
             v-for="item in optionsList"
