@@ -7,12 +7,8 @@
     "preinstall": "npx only-allow pnpm",
     "dev": "vite",
     "build": "vue-tsc && vite build",
-    "build:test": "vue-tsc && vite build --mode test",
-    "build:online": "vue-tsc && vite build --mode online",
-    "deploy-empty:test": "zf-hbuilderx-cli hosting delete -c ./deploy.test.config.json",
-    "deploy-empty:online": "zf-hbuilderx-cli hosting delete -c ./deploy.online.config.json",
-    "deploy:test": "pnpm build:test && pnpm deploy-empty:test && zf-hbuilderx-cli hosting deploy -c ./deploy.test.config.json",
-    "deploy:online": "pnpm build:online && pnpm deploy-empty:online && zf-hbuilderx-cli hosting deploy -c ./deploy.online.config.json"
+    "deploy": "zf-dbs-vite deploy",
+    "delivery": "zf-dbs-vite delivery"
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
@@ -33,7 +29,7 @@
     "vue-router": "^4.3.2",
     "xgplayer": "^3.0.23",
     "xgplayer-flv": "^3.0.23",
-    "zf-dbs": "^1.1.0",
+    "zf-dbs": "^3.0.2",
     "zf-utilz": "^0.1.19",
     "zf-vue-use": "^0.1.4"
   },
@@ -59,7 +55,7 @@
     "typescript": "^5.4.5",
     "vite": "^5.2.10",
     "vue-tsc": "^3.2.1",
-    "zf-dbs-vite": "^1.0.4",
+    "zf-dbs-vite": "^2.0.6",
     "zf-hbuilderx-cli": "^0.1.7"
   }
 }

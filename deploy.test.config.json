@@ -1,7 +1,0 @@
-{
-  "cli": "/Applications/HBuilderX.app/Contents/MacOS/cli",
-  "provider": "aliyun",
-  "space": "jnkszhdp-test",
-  "source": "./dist",
-  "prefix": "/"
-}
