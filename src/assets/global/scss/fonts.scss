@@ -1,18 +1,19 @@
 
 // YouSheBiaoTiHei
-@import url('@zf-web-font/youshebiaotihei/style-cdn.scss');
+@import '@zf-web-font/youshebiaotihei/style-cdn.scss';
 
 // Digital
-@import url('@zf-web-font/digital/style-cdn.scss');
+@import '@zf-web-font/digital/style-cdn.scss';
 
 // Montserrat Ace
-@import url('@zf-web-font/montserrat-ace/style-cdn.scss');
+@import '@zf-web-font/montserrat-ace/style-cdn.scss';
 
 // 思源黑体 SourceHanSansCN
-@import url('@zf-web-font/sourcehansanscn/style-cdn.scss');
+@import '@zf-web-font/sourcehansanscn/style-cdn.scss';
 
 // DIN Alternate Bold
 @font-face {
+	/* stylelint-disable-next-line font-family-name-quotes */
 	font-family: 'DINAlternateBold';
 	src: url('../font/DINAlternateBold.ttf') format('truetype');
 	font-weight: 700;
@@ -40,6 +41,7 @@
 
 // 胖棉正道标题体 PangMenZhengDao
 @font-face {
+	/* stylelint-disable-next-line font-family-name-quotes */
 	font-family: 'PangMenZhengDao';
 	src: url('../font/PangMenZhengDaoBiaoTiTi-1.ttf') format('truetype');
 	font-weight: normal;
