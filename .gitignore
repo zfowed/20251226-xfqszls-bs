@@ -25,3 +25,5 @@ dist-ssr
 *.sw?
 
 private_key.pem
+
+dist-zip
